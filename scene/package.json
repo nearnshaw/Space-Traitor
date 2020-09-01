@@ -12,5 +12,9 @@
   },
   "devDependencies": {
     "decentraland-ecs": "latest"
+  },
+  "dependencies": {
+    "@dcl/ui-utils": "^1.0.2",
+    "decentraland-ecs-utils": "^1.1.4"
   }
 }
