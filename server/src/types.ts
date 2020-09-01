@@ -15,6 +15,16 @@ export interface roomDictionary {
   [index: string]: roomData
 }
 
+export class Player extends Object {
+  id: number
+  isTraitor: boolean = false
+  constructor(id: number, traitor: boolean) {
+    super()
+    this.id = id
+    this.isTraitor = traitor
+  }
+}
+
 export enum MessageType {
   JOIN = 'join',
   NEWGAME = 'new',
@@ -38,17 +48,9 @@ type TileChange = {
 
 export type FullState = {
   active: boolean
+  playerIsTraitor: boolean
   tiles: tileColor[][]
   timeLeft?: number
   blue?: number
   red?: number
-}
-
-export class Player extends Object {
-  id: number
-  team: tileColor
-  constructor(id: number, team: tileColor) {
-    super()
-    ;(this.id = id), (this.team = team)
-  }
 }

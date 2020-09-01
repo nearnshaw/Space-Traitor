@@ -124,6 +124,38 @@ export async function sendAll(message: WebSocket.Data, room: string) {
   })
 }
 
+export async function sendAllButTraitor(message: WebSocket.Data, room: string) {
+  wss.clients.forEach(function each(client) {
+    const cWs = client as customWs
+    let traitorID = rooms[room].traitors[0]
+    if (CLIENTS[traitorID] !== cWs) {
+      try {
+        if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
+          cWs.send(message)
+        }
+      } catch {
+        console.log("couldn't send to a user")
+      }
+    }
+  })
+}
+
+export async function sendTraitor(message: WebSocket.Data, room: string) {
+  wss.clients.forEach(function each(client) {
+    const cWs = client as customWs
+    let traitorID = rooms[room].traitors[0]
+    if (CLIENTS[traitorID] == cWs) {
+      try {
+        if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
+          cWs.send(message)
+        }
+      } catch {
+        console.log("couldn't send to a user")
+      }
+    }
+  })
+}
+
 export async function sendAllOthers(
   message: WebSocket.Data,
   room: string,
@@ -144,7 +176,15 @@ export async function sendAllOthers(
 }
 
 export function pickTraitor(room: string) {
-  // TODO Pick random traitor
+  let rnd = Math.floor(Math.random() * rooms[room].players.length)
+  rooms[room].players[rnd].isTraitor = true
+  rooms[room].traitors = [rnd]
+  console.log(
+    'Player ',
+    rnd,
+    ' is the traitor, id: ',
+    rooms[room].players[rnd].id
+  )
 }
 
 export async function newGame(room: string) {
@@ -184,10 +224,33 @@ export async function newGame(room: string) {
 
   setTimeout(function () {
     rooms[room].gameActive = true
-    sendAll(
+
+    sendAllButTraitor(
       JSON.stringify({
         type: MessageType.NEWGAME,
-        data: { duration: gameDuration },
+        data: { duration: gameDuration, playerIsTraitor: false },
+      }),
+      room
+    )
+    sendAllButTraitor(
+      JSON.stringify({
+        type: MessageType.MESSAGE,
+        data: { text: 'One of your mates is a treacherous android.' },
+      }),
+      room
+    )
+
+    sendTraitor(
+      JSON.stringify({
+        type: MessageType.NEWGAME,
+        data: { duration: gameDuration, playerIsTraitor: true },
+      }),
+      room
+    )
+    sendAllButTraitor(
+      JSON.stringify({
+        type: MessageType.MESSAGE,
+        data: { text: 'You are the treasoning android!' },
       }),
       room
     )
