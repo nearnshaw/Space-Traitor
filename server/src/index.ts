@@ -1,25 +1,19 @@
 import * as WebSocket from 'ws'
-import {
-  roomDictionary,
-  MessageType,
-  roomData,
-  tileColor,
-  Player,
-} from './types'
+import { roomDictionary, MessageType, roomData, Player } from './types'
 
-const wss = new WebSocket.Server({ port: 8080 })
+export const wss = new WebSocket.Server({ port: 8080 })
 
-let MINIMUM_PLAYERS = 4
+export let MINIMUM_PLAYERS = 4
 
-let gameDuration: number = 60 * 5
+export let gameDuration: number = 60 * 5
 
-var rooms = {} as roomDictionary
+export var rooms = {} as roomDictionary
 
-interface customWs extends WebSocket {
+export interface customWs extends WebSocket {
   room: string
 }
 
-var CLIENTS: customWs[] = []
+export var CLIENTS: customWs[] = []
 
 wss.once('listening', () => {
   console.log('Listening on port 8080')
@@ -81,7 +75,8 @@ wss.on('connection', (clientWs, request) => {
       // TILE CHANGE
       case 'Board-singleChange':
         if (room.gameActive) {
-          room.tiles[msg.data.position.i][msg.data.position.j] = msg.data.color
+          // TODO DO CHANGE
+          //room.tiles[msg.data.position.i][msg.data.position.j] = msg.data.color
           sendAll(message, ws.room)
           //console.log('Board changed ', room.tiles)
         } else {
@@ -95,7 +90,7 @@ wss.on('connection', (clientWs, request) => {
             type: 'Board-fullStateRes',
             data: {
               active: room.gameActive,
-              tiles: room.tiles,
+              //tiles: room.tiles,
               timeleft: 60,
             },
           })
@@ -110,70 +105,6 @@ wss.on('connection', (clientWs, request) => {
     })
   })
 })
-
-export async function sendAll(message: WebSocket.Data, room: string) {
-  wss.clients.forEach(function each(client) {
-    const cWs = client as customWs
-    try {
-      if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
-        cWs.send(message)
-      }
-    } catch {
-      console.log("couldn't send to a user")
-    }
-  })
-}
-
-export async function sendAllButTraitor(message: WebSocket.Data, room: string) {
-  wss.clients.forEach(function each(client) {
-    const cWs = client as customWs
-    let traitorID = rooms[room].traitors[0]
-    if (CLIENTS[traitorID] !== cWs) {
-      try {
-        if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
-          cWs.send(message)
-        }
-      } catch {
-        console.log("couldn't send to a user")
-      }
-    }
-  })
-}
-
-export async function sendTraitor(message: WebSocket.Data, room: string) {
-  wss.clients.forEach(function each(client) {
-    const cWs = client as customWs
-    let traitorID = rooms[room].traitors[0]
-    if (CLIENTS[traitorID] == cWs) {
-      try {
-        if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
-          cWs.send(message)
-        }
-      } catch {
-        console.log("couldn't send to a user")
-      }
-    }
-  })
-}
-
-export async function sendAllOthers(
-  message: WebSocket.Data,
-  room: string,
-  socketId: number
-) {
-  wss.clients.forEach(function each(client) {
-    const cWs = client as customWs
-    if (CLIENTS[socketId] !== cWs) {
-      try {
-        if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
-          cWs.send(message)
-        }
-      } catch {
-        console.log("couldn't send to a user")
-      }
-    }
-  })
-}
 
 export function pickTraitor(room: string) {
   let rnd = Math.floor(Math.random() * rooms[room].players.length)
@@ -247,7 +178,7 @@ export async function newGame(room: string) {
       }),
       room
     )
-    sendAllButTraitor(
+    sendTraitor(
       JSON.stringify({
         type: MessageType.MESSAGE,
         data: { text: 'You are the treasoning android!' },
@@ -272,19 +203,19 @@ export async function endGame(room: string) {
     blueScore,
     ' Red ',
     redScore,
-    'FINAL RESULT ',
-    rooms[room].tiles
+    'FINAL RESULT '
+    //rooms[room].tiles
   )
 
-  for (let i = 0; i < rooms[room].tiles.length; i++) {
-    for (let j = 0; j < rooms[room].tiles[i].length; j++) {
-      if (rooms[room].tiles[i][j] == tileColor.BLUE) {
-        blueScore += 1
-      } else if (rooms[room].tiles[i][j] == tileColor.RED) {
-        redScore += 1
-      }
-    }
-  }
+  //   for (let i = 0; i < rooms[room].tiles.length; i++) {
+  //     for (let j = 0; j < rooms[room].tiles[i].length; j++) {
+  //       if (rooms[room].tiles[i][j] == tileColor.BLUE) {
+  //         blueScore += 1
+  //       } else if (rooms[room].tiles[i][j] == tileColor.RED) {
+  //         redScore += 1
+  //       }
+  //     }
+  //   }
   sendAll(
     JSON.stringify({
       type: MessageType.END,
@@ -300,9 +231,9 @@ export async function resetGame(room: string) {
   rooms[room].gameActive = false
   rooms[room].players = []
   rooms[room].traitors = []
-  rooms[room].tiles = new Array(14)
-    .fill(null)
-    .map(() => new Array(14).fill(null))
+  //   rooms[room].tiles = new Array(14)
+  //     .fill(null)
+  //     .map(() => new Array(14).fill(null))
 }
 
 export async function playerJoin(
@@ -320,15 +251,21 @@ export async function playerJoin(
     newGame(roomName)
     console.log('New game starting! with ', room.players)
   } else {
-    JSON.stringify({
-      type: MessageType.MESSAGE,
-      data: {
-        text:
-          'You need at least ' +
-          MINIMUM_PLAYERS +
-          ' to start a game. Invite your friends!',
-      },
-    })
+    sendPlayer(
+      JSON.stringify({
+        type: MessageType.MESSAGE,
+        data: {
+          text:
+            room.players.length +
+            ' Players are ready \n' +
+            'You need at least ' +
+            MINIMUM_PLAYERS +
+            ' to start a game.\n Invite your friends/nemesis!',
+        },
+      }),
+      roomName,
+      newPlayer.id
+    )
   }
 }
 
@@ -347,4 +284,90 @@ export function removeFromTeams(player: number, room: roomData) {
       room.players = room.players.splice(i, 1)
     }
   }
+}
+
+/// SENDING
+
+export async function sendAll(message: WebSocket.Data, room: string) {
+  wss.clients.forEach(function each(client) {
+    const cWs = client as customWs
+    try {
+      if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
+        cWs.send(message)
+      }
+    } catch {
+      console.log("couldn't send to a user")
+    }
+  })
+}
+
+export async function sendAllButTraitor(message: WebSocket.Data, room: string) {
+  wss.clients.forEach(function each(client) {
+    const cWs = client as customWs
+    let traitorID = rooms[room].traitors[0]
+    if (CLIENTS[traitorID] != cWs) {
+      try {
+        if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
+          cWs.send(message)
+        }
+      } catch {
+        console.log("couldn't send to a user")
+      }
+    }
+  })
+}
+
+export async function sendTraitor(message: WebSocket.Data, room: string) {
+  //wss.clients.forEach(function each(client) {
+  const cWs = CLIENTS[rooms[room].traitors[0]] as customWs
+  //let traitorID = rooms[room].traitors[0]
+  //if (CLIENTS[traitorID] == cWs) {
+  try {
+    if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
+      cWs.send(message)
+    }
+  } catch {
+    console.log("couldn't send to a user")
+  }
+  // }
+  //})
+}
+
+export async function sendAllOthers(
+  message: WebSocket.Data,
+  room: string,
+  socketId: number
+) {
+  wss.clients.forEach(function each(client) {
+    const cWs = client as customWs
+    if (CLIENTS[socketId] != cWs) {
+      try {
+        if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
+          cWs.send(message)
+        }
+      } catch {
+        console.log("couldn't send to a user")
+      }
+    }
+  })
+}
+
+export async function sendPlayer(
+  message: WebSocket.Data,
+  room: string,
+  socketId: number
+) {
+  //   wss.clients.forEach(function each(client) {
+  //     const cWs = client as customWs
+  //     if (CLIENTS[socketId] == cWs) {
+  const cWs = CLIENTS[socketId] as customWs
+  try {
+    if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
+      cWs.send(message)
+    }
+  } catch {
+    console.log("couldn't send to a user")
+  }
+  //     }
+  //   })
 }
