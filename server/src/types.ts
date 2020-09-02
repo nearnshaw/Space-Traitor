@@ -1,14 +1,14 @@
+import { ITEMS_IN_SHIP } from '.'
+
 // data per each room
 export class roomData {
   gameActive: boolean = false
   players: Player[] = []
   traitors: number[] = []
-  // blueTeam: Player[] = []
-  // redTeam: Player[] = []
-  //   tiles: tileColor[][] = new Array(14)
+  timeLeft: number = 0
+  toFix: EquiptmentChange[] = new Array(ITEMS_IN_SHIP)
   //     .fill(null)
-  //     .map(() => new Array(14).fill(null))
-  // TODO add time remaining
+  //.map({id: 1, state: true})
 }
 
 export interface roomDictionary {
@@ -36,25 +36,14 @@ export enum MessageType {
   BREAK = 'break',
 }
 
-// export enum tileColor {
-//   NEUTRAL,
-//   BLUE,
-//   RED,
-// }
-
-// export type TilePosition = { i: number; j: number }
-
-type TileChange = {
-  //   position: TilePosition
-  //   color: tileColor
-  //   sender?: string
-}
-
 export type FullState = {
   active: boolean
   playerIsTraitor: boolean
-  //tiles: tileColor[][]
   timeLeft?: number
-  blue?: number
-  red?: number
+  toFix: EquiptmentChange[]
+}
+
+type EquiptmentChange = {
+  id: number
+  broken: boolean
 }

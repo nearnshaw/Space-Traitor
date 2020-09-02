@@ -5,6 +5,8 @@ export const wss = new WebSocket.Server({ port: 8080 })
 
 export let MINIMUM_PLAYERS = 4
 
+export let ITEMS_IN_SHIP = 11
+
 export let gameDuration: number = 60 * 5
 
 export var rooms = {} as roomDictionary
@@ -73,24 +75,25 @@ wss.on('connection', (clientWs, request) => {
         }
         break
       // TILE CHANGE
-      case 'Board-singleChange':
+      case 'Ship-singleChange':
         if (room.gameActive) {
           // TODO DO CHANGE
-          //room.tiles[msg.data.position.i][msg.data.position.j] = msg.data.color
+          room.toFix[msg.data.id].broken = msg.data.broken
           sendAll(message, ws.room)
-          //console.log('Board changed ', room.tiles)
+          console.log('Ship changed ', room.toFix)
         } else {
           console.log('no change bc room inactive')
         }
         break
       // REQUEST SYNC
-      case 'Board-fullStateReq':
+      case 'Ship-fullStateReq':
         ws.send(
           JSON.stringify({
-            type: 'Board-fullStateRes',
+            type: 'Ship-fullStateRes',
             data: {
               active: room.gameActive,
-              //tiles: room.tiles,
+              toFix: room.toFix,
+              playerIsTraitor: room.players[id].isTraitor,
               timeleft: 60,
             },
           })

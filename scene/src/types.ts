@@ -1,3 +1,5 @@
+import { EquiptmentType } from './entities/equipment'
+
 export enum MessageType {
   JOIN = 'join',
   NEWGAME = 'new',
@@ -7,4 +9,10 @@ export enum MessageType {
   VOTE = 'vote',
   FIX = 'fix',
   BREAK = 'break',
+}
+
+export class EquiptmentData {
+  transform: TranformConstructorArgs
+  type: EquiptmentType
+  startBroken?: boolean
 }

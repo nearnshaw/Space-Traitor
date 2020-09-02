@@ -1,34 +1,52 @@
 import { MultiplayerEntity } from './MultiplayerEntity'
-import { Fixable } from './Tile'
+import { Equipment, EquiptmentType } from './equipment'
+import { EquiptmentData } from '../types'
 //import { game } from '../game'
 
-export class Board extends MultiplayerEntity<FixableChange, FullState> {
-  public toFix: Fixable[]
-  public toSabbotage: Fixable[]
+let equiptMentList: EquiptmentData[] = [
+  {
+    transform: { position: new Vector3(8, 1, 8) },
+    type: EquiptmentType.CONSOLE,
+  },
+  {
+    transform: { position: new Vector3(10, 1, 8) },
+    type: EquiptmentType.CONSOLE,
+  },
+  {
+    transform: { position: new Vector3(12, 1, 8) },
+    type: EquiptmentType.REACTOR,
+  },
+]
+
+export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
+  public toFix: Equipment[]
+  // public toSabbotage: Equipment[]
   public active: boolean = false
   public timeLeft: number
 
   constructor() {
-    super('Board')
+    super('Ship')
     engine.addEntity(this)
 
-    // this.tiles = []
-    // for (let i = 0; i < GRIDX; i++) {
-    //   this.tiles[i] = []
-    //   for (let j = 0; j < GRIDZ; j++) {
-    //     const position = { i, j }
-    //     const tile = new Tile(position, (position, color) =>
-    //       this.propagateChange({ position, color })
-    //     )
-    //     tile.setParent(this)
-    //     this.tiles[i][j] = tile
-    //   }
-    // }
+    this.toFix = new Array(equiptMentList.length)
+
+    for (let i = 0; i < equiptMentList.length; i++) {
+      let eq = new Equipment(
+        i,
+        equiptMentList[i].transform,
+        equiptMentList[i].type,
+        (state) => {
+          this.propagateChange({ id: i, broken: state })
+        },
+        equiptMentList[i].startBroken
+      )
+      this.toFix.push(eq)
+    }
   }
 
-  protected reactToSingleChanges(change: FixableChange): void {
-    // const { position, color } = change
-    // this.tiles[position.i][position.j].activate(color)
+  protected reactToSingleChanges(change: EquiptmentChange): void {
+    this.toFix[change.id].change(change.broken)
+    // UI changes
   }
 
   protected loadFullState(fullState: FullState): void {
@@ -69,19 +87,14 @@ export class Board extends MultiplayerEntity<FixableChange, FullState> {
   }
 }
 
-type FixableChange = {
-  //   position: TilePosition
-  //   color: tileColor
-  //   sender?: string
+type EquiptmentChange = {
+  id: number
+  broken: boolean
 }
 
-type BreakableChange = {}
-
 type FullState = {
-  type: string
   active: boolean
-  tiles: Fixable[]
+  toFix: EquiptmentChange[]
   timeLeft?: number
-  blue?: number
-  red?: number
+  playerIsTraitor?: boolean
 }

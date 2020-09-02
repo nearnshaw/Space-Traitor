@@ -21,17 +21,55 @@ export enum EquiptmentType {
 }
 
 export class Equipment extends Entity {
-  broken: boolean
+  broken: boolean = false
+  type: EquiptmentType
   fixable: boolean
   breakable: boolean
+  id: number
 
-  constructor(position: TranformConstructorArgs, type: EquiptmentType) {
+  constructor(
+    id: number,
+    transform: TranformConstructorArgs,
+    type: EquiptmentType,
+    changeListener: (state: boolean) => void,
+    startBroken?: boolean
+  ) {
     super('Equipment')
-    this.addComponent(new Transform(position))
+
+    this.id = id
+
+    this.addComponent(new Transform(transform))
     this.addComponent(new ConeShape())
     engine.addEntity(this)
 
-    switch (type) {
+    this.type = type
+    this.reset()
+
+    if (this.broken) {
+      this.addComponentOrReplace(redMaterial)
+    } else {
+      this.addComponentOrReplace(greenMaterial)
+    }
+
+    this.addComponent(
+      new OnPointerDown(() => {
+        if (isTraitor && this.breakable && !this.broken) {
+          this.addComponentOrReplace(redMaterial)
+          this.broken = true
+        } else if (!isTraitor && this.fixable && this.broken) {
+          this.addComponentOrReplace(greenMaterial)
+          this.broken = false
+        }
+        changeListener(this.broken)
+      })
+    )
+  }
+
+  change(isBroken: boolean) {
+    this.broken = isBroken
+  }
+  reset() {
+    switch (this.type) {
       case EquiptmentType.CONSOLE:
         this.fixable = true
         this.broken = true
@@ -41,15 +79,5 @@ export class Equipment extends Entity {
         this.broken = false
         break
     }
-
-    this.addComponent(
-      new OnPointerDown(() => {
-        if (isTraitor && this.breakable && !this.broken) {
-          this.addComponentOrReplace(redMaterial)
-        } else if (!isTraitor && this.fixable && this.broken) {
-          this.addComponentOrReplace(greenMaterial)
-        }
-      })
-    )
   }
 }
