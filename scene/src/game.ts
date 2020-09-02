@@ -32,7 +32,9 @@ doorBell.addComponent(
 )
 engine.addEntity(doorBell)
 
-let ship: SpaceShip
+export let ship: SpaceShip
+
+export let isTraitor: boolean
 
 joinGame()
 
@@ -43,6 +45,7 @@ export async function joinGame() {
     tag: MessageType.NEWGAME,
     action: (data) => {
       //game.startGame(data.duration)
+      isTraitor = data.playerIsTraitor
     },
   }
   let endGame: MessageAction = {

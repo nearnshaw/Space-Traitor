@@ -100,10 +100,6 @@ export abstract class MultiplayerEntity<
           data: null,
         })
       )
-
-      //   setTimeout(1000, () => {
-      //     this.requestFullState()
-      //   })
     }
   }
 
