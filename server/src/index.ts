@@ -15,6 +15,8 @@ export interface customWs extends WebSocket {
   room: string
 }
 
+export let startBrokenArray = [true, true, true, true, false, false]
+
 export var CLIENTS: customWs[] = []
 
 wss.once('listening', () => {
@@ -37,7 +39,7 @@ wss.on('connection', (clientWs, request) => {
     if (!rooms[ws.room]) {
       rooms[ws.room] = new roomData()
       for (let i = 0; i < rooms[ws.room].toFix.length; i++) {
-        rooms[ws.room].toFix[i] = { id: i, broken: true }
+        rooms[ws.room].toFix[i] = { id: i, broken: startBrokenArray[i] }
       }
     }
 

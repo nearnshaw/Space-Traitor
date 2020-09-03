@@ -14,10 +14,6 @@ let equiptMentList: EquiptmentData[] = [
     type: EquiptmentType.CONSOLE,
   },
   {
-    transform: { position: new Vector3(12, 1, 8) },
-    type: EquiptmentType.REACTOR,
-  },
-  {
     transform: { position: new Vector3(8, 1, 14) },
     type: EquiptmentType.CONSOLE,
   },
@@ -27,6 +23,10 @@ let equiptMentList: EquiptmentData[] = [
   },
   {
     transform: { position: new Vector3(12, 1, 14) },
+    type: EquiptmentType.REACTOR,
+  },
+  {
+    transform: { position: new Vector3(12, 1, 8) },
     type: EquiptmentType.REACTOR,
   },
 ]
@@ -41,7 +41,7 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     super('Ship')
     engine.addEntity(this)
 
-    this.toFix = new Array(equiptMentList.length)
+    this.toFix = [] //new Array(equiptMentList.length)
 
     for (let i = 0; i < equiptMentList.length; i++) {
       let eq = new Equipment(
@@ -80,7 +80,7 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     // }
 
     for (let i = 0; i < this.toFix.length; i++) {
-      this.toFix[i].broken = fullState.toFix[i].broken
+      this.toFix[i].alterState(fullState.toFix[i].broken)
     }
   }
 

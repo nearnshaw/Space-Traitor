@@ -1,4 +1,4 @@
-import { ITEMS_IN_SHIP } from '.'
+import { ITEMS_IN_SHIP, startBrokenArray } from '.'
 
 // data per each room
 export class roomData {
@@ -6,7 +6,7 @@ export class roomData {
   players: Player[] = []
   traitors: number[] = []
   timeLeft: number = 0
-  toFix: EquiptmentChange[] = new Array(ITEMS_IN_SHIP)
+  toFix: EquiptmentChange[] = new Array(startBrokenArray.length)
   //     .fill(null)
 }
 
