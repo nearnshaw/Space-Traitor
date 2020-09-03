@@ -8,7 +8,6 @@ export class roomData {
   timeLeft: number = 0
   toFix: EquiptmentChange[] = new Array(ITEMS_IN_SHIP)
   //     .fill(null)
-  //.map({id: 1, state: true})
 }
 
 export interface roomDictionary {
@@ -26,6 +25,7 @@ export class Player extends Object {
 }
 
 export enum MessageType {
+  FULLSTATE = 'FullState',
   JOIN = 'join',
   NEWGAME = 'new',
   END = 'end',
@@ -46,4 +46,5 @@ export type FullState = {
 type EquiptmentChange = {
   id: number
   broken: boolean
+  //type?: EquiptmentType
 }

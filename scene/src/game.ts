@@ -5,7 +5,7 @@ import {
   startSocketListeners,
   socket,
 } from './entities/MultiplayerEntity'
-import { MessageType } from './messaging'
+import { MessageType } from './types'
 import * as ui from '../node_modules/@dcl/ui-utils/index'
 import { SpaceShip } from './entities/SpaceShip'
 
@@ -34,20 +34,18 @@ engine.addEntity(doorBell)
 
 export let ship: SpaceShip
 
-export let isTraitor: boolean
-
 joinGame()
 
 export async function joinGame() {
   await joinSocketsServer()
 
-  let newGame: MessageAction = {
-    tag: MessageType.NEWGAME,
-    action: (data) => {
-      //game.startGame(data.duration)
-      isTraitor = data.playerIsTraitor
-    },
-  }
+  //   let newGame: MessageAction = {
+  //     tag: MessageType.NEWGAME,
+  //     action: (data) => {
+  //       //game.startGame(data.duration)
+  //       isTraitor = data.playerIsTraitor
+  //     },
+  //   }
   let endGame: MessageAction = {
     tag: MessageType.END,
     action: (data) => {
@@ -61,14 +59,14 @@ export async function joinGame() {
     },
   }
 
-  messageActions.push(newGame)
+  //messageActions.push(newGame)
   messageActions.push(endGame)
   messageActions.push(message)
 
-  //ship = new SpaceShip()
+  ship = new SpaceShip()
   // initate any other multiplayer things
   await startSocketListeners()
-  socket.onopen = function (event) {
-    //ship.start()
-  }
+  //   socket.onopen = function (event) {
+  //     ship.start()
+  //   }
 }
