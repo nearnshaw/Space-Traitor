@@ -1,8 +1,11 @@
 import { MultiplayerEntity } from './MultiplayerEntity'
-import { Equipment, EquiptmentType } from './equipment'
-import { EquiptmentData } from '../types'
+import { Equipment } from './equipment'
+import { EquiptmentData, EquiptmentType, MessageType } from '../types'
+import { Button } from './Button'
 
 export let playerIsTraitor: boolean = false
+export let playerIsAlive: boolean = true
+export let playerVoted: boolean = false
 
 let equiptMentList: EquiptmentData[] = [
   {
@@ -22,11 +25,17 @@ let equiptMentList: EquiptmentData[] = [
     type: EquiptmentType.CONSOLE,
   },
   {
-    transform: { position: new Vector3(12, 1, 14) },
+    transform: {
+      position: new Vector3(12, 1, 24),
+      rotation: Quaternion.Euler(180, 0, 0),
+    },
     type: EquiptmentType.REACTOR,
   },
   {
-    transform: { position: new Vector3(12, 1, 8) },
+    transform: {
+      position: new Vector3(10, 1, 24),
+      rotation: Quaternion.Euler(180, 0, 0),
+    },
     type: EquiptmentType.REACTOR,
   },
 ]
@@ -55,6 +64,20 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
       )
       this.toFix.push(eq)
     }
+
+    let panicButton = new Button(
+      {
+        position: new Vector3(20, 1, 20),
+      },
+      () => {
+        this.socket.send(
+          JSON.stringify({
+            type: MessageType.STARTVOTE,
+            data: null,
+          })
+        )
+      }
+    )
   }
 
   protected reactToSingleChanges(change: EquiptmentChange): void {

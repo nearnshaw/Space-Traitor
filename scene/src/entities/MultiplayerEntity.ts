@@ -22,10 +22,9 @@ export async function startSocketListeners() {
   socket.onmessage = function (event) {
     try {
       const msg = JSON.parse(event.data)
-      log(msg)
+      //log(msg)
 
       for (let action of messageActions) {
-        //log('checking match with ', action.tag, ' msg.type is: ', msg.type)
         if (msg.type == action.tag) {
           log('WSMESSAGE ', msg.type, ' : ', msg.data)
           action.action(msg.data)
@@ -43,9 +42,12 @@ export abstract class MultiplayerEntity<
   FullState
 > extends Entity {
   private initialized: boolean = false
+  public socket: WebSocket
 
   constructor(private readonly entityType: string) {
     super()
+
+    this.socket = socket
 
     let change: MessageAction = {
       tag: this.generateMessageId(SINGLE_CHANGE_EVENT),

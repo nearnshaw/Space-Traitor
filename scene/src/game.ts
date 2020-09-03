@@ -7,7 +7,9 @@ import {
 } from './entities/MultiplayerEntity'
 import { MessageType } from './types'
 import * as ui from '../node_modules/@dcl/ui-utils/index'
-import { SpaceShip } from './entities/SpaceShip'
+import { SpaceShip, playerIsAlive, playerVoted } from './entities/SpaceShip'
+import { openVotingUI, updateVotingUI, closeVotingUI } from './voting'
+import { getUserData } from '@decentraland/Identity'
 
 let doorBell = new Entity()
 doorBell.addComponent(
@@ -19,12 +21,13 @@ doorBell.addComponent(new BoxShape())
 
 doorBell.addComponent(
   new OnPointerDown(async () => {
-    //await joinGame()
+    userName = await (await getUserData()).displayName
+
     socket.send(
       JSON.stringify({
         type: MessageType.JOIN,
         data: {
-          sender: '123',
+          sender: userName,
         },
       })
     )
@@ -33,19 +36,13 @@ doorBell.addComponent(
 engine.addEntity(doorBell)
 
 export let ship: SpaceShip
+export let userName: string
 
 joinGame()
 
 export async function joinGame() {
   await joinSocketsServer()
 
-  //   let newGame: MessageAction = {
-  //     tag: MessageType.NEWGAME,
-  //     action: (data) => {
-  //       //game.startGame(data.duration)
-  //       isTraitor = data.playerIsTraitor
-  //     },
-  //   }
   let endGame: MessageAction = {
     tag: MessageType.END,
     action: (data) => {
@@ -58,10 +55,42 @@ export async function joinGame() {
       ui.displayAnnouncement(data.text, 10, false, Color4.Yellow())
     },
   }
+  let startVote: MessageAction = {
+    tag: MessageType.STARTVOTE,
+    action: (data) => {
+      if (!playerIsAlive) return
+      openVotingUI(data.players)
+      ship.active = false
+    },
+  }
+  let vote: MessageAction = {
+    tag: MessageType.VOTE,
+    action: (data) => {
+      if (!playerIsAlive) return
+      updateVotingUI(data.voted, data.voter, data.thumb)
+    },
+  }
+  let endVote: MessageAction = {
+    tag: MessageType.ENDVOTE,
+    action: (data) => {
+      if (!playerIsAlive) return
+      closeVotingUI(
+        data.playerToKick ? data.playerToKick : null,
+        data.isTraitor
+      )
+      if (data.kickedPlayer == userName) {
+        movePlayerTo({ x: 1, y: 1, z: 1 })
+      }
+      playerVoted = false
+      ship.active = true
+    },
+  }
 
-  //messageActions.push(newGame)
   messageActions.push(endGame)
   messageActions.push(message)
+  messageActions.push(startVote)
+  messageActions.push(vote)
+  messageActions.push(endVote)
 
   ship = new SpaceShip()
   // initate any other multiplayer things

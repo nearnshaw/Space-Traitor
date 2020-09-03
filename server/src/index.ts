@@ -1,13 +1,15 @@
 import * as WebSocket from 'ws'
 import { roomDictionary, MessageType, roomData, Player } from './types'
+import { startCountdown } from './timer'
+import {
+  removeFromTeams,
+  playerJoin,
+  checkAlredyInTeams,
+  pickTraitor,
+} from './handlePlayers'
+import { PORT, startBrokenArray, GAME_DURATION } from './config'
 
-export const wss = new WebSocket.Server({ port: 8080 })
-
-export let MINIMUM_PLAYERS = 4
-
-export let ITEMS_IN_SHIP = 11
-
-export let gameDuration: number = 60 * 2
+export const wss = new WebSocket.Server({ port: PORT })
 
 export var rooms = {} as roomDictionary
 
@@ -15,19 +17,17 @@ export interface customWs extends WebSocket {
   room: string
 }
 
-export let startBrokenArray = [true, true, true, true, false, false]
-
 export var CLIENTS: customWs[] = []
 
 wss.once('listening', () => {
-  console.log('Listening on port 8080')
+  console.log('Listening on port ', PORT)
 })
 
 wss.on('connection', (clientWs, request) => {
   const ws = clientWs as customWs
   ws.room = request.url || ''
 
-  let id = Math.random()
+  let id = new Date().getTime()
   console.log('connection is established : ' + id)
   CLIENTS[id] = ws
   CLIENTS.push(ws)
@@ -76,7 +76,7 @@ wss.on('connection', (clientWs, request) => {
           )
           return
         } else {
-          playerJoin(id, msg, room, ws.room)
+          playerJoin(id, msg.data, room, ws.room)
         }
         break
       // TILE CHANGE
@@ -101,11 +101,67 @@ wss.on('connection', (clientWs, request) => {
               playerIsTraitor: room.players[id]
                 ? room.players[id].isTraitor
                 : false,
-              timeleft: 60,
+              timeleft: room.timeLeft,
             },
           })
-          // TODO add timeLeft  & maybe blue & red score
         )
+        break
+
+      case MessageType.STARTVOTE:
+        for (let player of room.players) {
+          player.votes = []
+        }
+
+        if (room.gameActive) {
+          room.gamePaused = true
+          sendAllAlive(
+            JSON.stringify({
+              type: MessageType.STARTVOTE,
+              data: {
+                players: room.players,
+              },
+            }),
+            ws.room
+          )
+        } else {
+          console.log('no change bc room inactive')
+        }
+        break
+
+      case MessageType.VOTE:
+        if (room.gamePaused) {
+          room.players[msg.data.voted].votes.push(msg.data.voter)
+
+          sendAllAlive(
+            JSON.stringify({
+              type: MessageType.VOTE,
+              data: {
+                voter: msg.data.voter,
+                voted: msg.data.voted,
+                thumb: room.players[msg.data.voted].thumb,
+              },
+            }),
+            ws.room
+          )
+
+          let voteCount = 0
+          for (let player of room.players) {
+            voteCount += player.votes.length
+          }
+
+          if (voteCount >= room.players.length) {
+            endVotes(ws.room)
+          } else {
+            console.log(
+              'We have ',
+              voteCount,
+              ' votes, we need ',
+              room.players.length
+            )
+          }
+        } else {
+          console.log('no change bc voting not on')
+        }
         break
     }
     ws.on('close', function () {
@@ -115,18 +171,6 @@ wss.on('connection', (clientWs, request) => {
     })
   })
 })
-
-export function pickTraitor(room: string) {
-  let rnd = Math.floor(Math.random() * 4) // rooms[room].players.length - 1)
-  rooms[room].players[rnd].isTraitor = true
-  rooms[room].traitors = [rnd]
-  console.log(
-    'Player ',
-    rnd,
-    ' is the traitor, id: ',
-    rooms[room].players[rnd].id
-  )
-}
 
 export async function newGame(room: string) {
   sendAll(
@@ -171,7 +215,7 @@ export async function newGame(room: string) {
         data: {
           active: true,
           toFix: rooms[room].toFix,
-          timeLeft: gameDuration,
+          timeLeft: GAME_DURATION,
           playerIsTraitor: false,
         },
       }),
@@ -191,7 +235,7 @@ export async function newGame(room: string) {
         data: {
           active: true,
           toFix: rooms[room].toFix,
-          timeLeft: gameDuration,
+          timeLeft: GAME_DURATION,
           playerIsTraitor: true,
         },
       }),
@@ -205,9 +249,11 @@ export async function newGame(room: string) {
       room
     )
 
-    setTimeout(function () {
-      endGame(room)
-    }, gameDuration * 1000)
+    startCountdown(room, GAME_DURATION)
+
+    // setTimeout(function () {
+    //   endGame(room)
+    // }, gameDuration * 1000)
   }, 8000)
 }
 
@@ -250,57 +296,78 @@ export async function resetGame(room: string) {
   rooms[room].gameActive = false
   rooms[room].players = []
   rooms[room].traitors = []
-  //   rooms[room].toFix = new Array(14)
-}
-
-export async function playerJoin(
-  id: number,
-  msg: any,
-  room: roomData,
-  roomName: string
-) {
-  let newPlayer = new Player(id, msg.data.team)
-
-  room.players.push(newPlayer)
-  console.log(msg.data.sender, ' joined the game')
-  if (room.players.length >= MINIMUM_PLAYERS) {
-    // with enough players, start game
-    newGame(roomName)
-    console.log('New game starting! with ', room.players)
-  } else {
-    sendPlayer(
-      JSON.stringify({
-        type: MessageType.MESSAGE,
-        data: {
-          text:
-            room.players.length +
-            ' Players are ready \n' +
-            'You need at least ' +
-            MINIMUM_PLAYERS +
-            ' to start a game.\n Invite your friends/nemesis!',
-        },
-      }),
-      roomName,
-      newPlayer.id
-    )
+  rooms[room].toFix = new Array(14)
+  for (let i = 0; i < rooms[room].toFix.length; i++) {
+    rooms[room].toFix[i] = { id: i, broken: startBrokenArray[i] }
   }
 }
 
-export function checkAlredyInTeams(player: number, room: string) {
-  for (let i = 0; i < rooms[room].players.length; i++) {
-    if (rooms[room].players[i].id == player) {
-      return true
+export function randomBreakEquipt(room: string) {
+  let attempts = 0
+  let brokeSomething = false
+  while (!brokeSomething) {
+    let randomI = Math.floor(Math.random() * rooms[room].toFix.length)
+
+    if (!rooms[room].toFix[randomI].broken && startBrokenArray[randomI]) {
+      rooms[room].toFix[randomI].broken = true
+      sendAll(
+        JSON.stringify({
+          type: 'Ship-singleChange',
+          data: {
+            id: randomI,
+            broken: true,
+          },
+        }),
+        room
+      )
+      brokeSomething = true
+      console.log('Randomly breaking equiptment ', randomI)
+    } else {
+      attempts++
+      if (attempts > 10) {
+        brokeSomething = true
+      }
     }
   }
-  return false
 }
 
-export function removeFromTeams(player: number, room: roomData) {
+export function endVotes(roomName: string) {
+  let room = rooms[roomName]
+  room.gameActive = true
+  let mostVotesAgainst = 0
+  let playerWithMostVotes = null
   for (let i = 0; i < room.players.length; i++) {
-    if (room.players[i].id == player) {
-      room.players = room.players.splice(i, 1)
+    if (room.players[i].votes.length > mostVotesAgainst) {
+      mostVotesAgainst = room.players[i].votes.length
+      playerWithMostVotes = i
+      console.log(mostVotesAgainst, ' votes for ', i)
+    } else if (room.players[i].votes.length == mostVotesAgainst) {
+      playerWithMostVotes = null
+      console.log("it's a tie! ", mostVotesAgainst, ' votes also for ', i)
     }
   }
+
+  let playerToKick = null
+  let isTraitor = false
+  if (mostVotesAgainst > 1 && playerWithMostVotes) {
+    room.players[playerWithMostVotes].alive = false
+    playerToKick = room.players[playerWithMostVotes].name
+    isTraitor = room.players[playerWithMostVotes].isTraitor
+    console.log('We have a victim! ', playerToKick)
+  }
+
+  sendAllPlayers(
+    JSON.stringify({
+      type: MessageType.ENDVOTE,
+      data: {
+        kickedPlayer: playerToKick,
+        wasTraitor: isTraitor,
+      },
+    }),
+    roomName
+  )
+
+  console.log(playerToKick + ' was kicked out, ')
 }
 
 /// SENDING
@@ -328,6 +395,22 @@ export async function sendAllPlayers(message: WebSocket.Data, room: string) {
       }
     } catch {
       console.log("couldn't send to a user")
+    }
+  })
+}
+
+export async function sendAllAlive(message: WebSocket.Data, room: string) {
+  rooms[room].players.forEach(function each(player) {
+    if (player.alive) {
+      const cWs = CLIENTS[player.id] as customWs
+
+      try {
+        if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
+          cWs.send(message)
+        }
+      } catch {
+        console.log("couldn't send to a user")
+      }
     }
   })
 }

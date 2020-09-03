@@ -1,5 +1,6 @@
 import { ship } from '../game'
 import { playerIsTraitor } from './SpaceShip'
+import { EquiptmentType } from '../types'
 
 //Reusable materials
 export let neutralMaterial = new Material()
@@ -13,13 +14,6 @@ greenMaterial.albedoColor = Color3.Green()
 let redMaterial = new Material()
 redMaterial.roughness = 1
 redMaterial.albedoColor = Color3.FromInts(500, 150, 180) // Pink glow
-
-export enum EquiptmentType {
-  CONSOLE,
-  CABLES,
-  OXYGEN,
-  REACTOR,
-}
 
 export class Equipment extends Entity {
   broken: boolean = false
