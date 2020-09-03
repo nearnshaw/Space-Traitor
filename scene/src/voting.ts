@@ -12,11 +12,12 @@ import { playerVoted } from './entities/SpaceShip'
 let votingUI: ui.CustomPrompt
 
 export function openVotingUI(players: Player[]) {
+  playerVoted = false
   votingUI = new ui.CustomPrompt(PromptStyles.DARKSLANTED)
   votingUI.addText('Voting Time', 0, 130, Color4.Red(), 30)
   votingUI.addText("Who's the traitor?", 0, 100)
 
-  let offset = -20
+  let offset = 30
   for (let i = 0; i < players.length; i++) {
     votingUI.addButton(
       players[i].name,
@@ -29,6 +30,17 @@ export function openVotingUI(players: Player[]) {
       ButtonStyles.SQUARESILVER
     )
 
+    votingUI.addIcon(
+      'https://peer.decentraland.org/content/contents/' + players[i].thumb,
+      -100,
+      offset,
+      64 * 0.7,
+      64 * 0.7,
+      {
+        sourceHeight: 128,
+        sourceWidth: 128,
+      }
+    )
     // Player icon
     offset -= 50
   }
@@ -37,9 +49,22 @@ export function openVotingUI(players: Player[]) {
 export function updateVotingUI(
   voted: number,
   voter: number,
+  votes: number,
   thumb: string | null
 ) {
   // add player icon
+
+  votingUI.addIcon(
+    'https://peer.decentraland.org/content/contents/' + thumb,
+    70 + votes * 40,
+    30 + voted * -50,
+    64 * 0.5,
+    64 * 0.5,
+    {
+      sourceHeight: 128,
+      sourceWidth: 128,
+    }
+  )
 }
 
 export function closeVotingUI(playerToKick: string, isTraitor: boolean) {

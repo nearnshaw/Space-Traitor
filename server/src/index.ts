@@ -138,6 +138,7 @@ wss.on('connection', (clientWs, request) => {
               data: {
                 voter: msg.data.voter,
                 voted: msg.data.voted,
+                votes: room.players[msg.data.voted].votes.length,
                 thumb: room.players[msg.data.voted].thumb,
               },
             }),

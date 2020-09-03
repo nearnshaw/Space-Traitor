@@ -25,14 +25,15 @@ export enum EquiptmentType {
 
 export class Player extends Object {
   id: number
-  name: string = 'test'
-  thumb: string = 'path'
+  name: string
+  thumb: string | null
   isTraitor: boolean = false
   alive: boolean = true
   votes: number[] = []
-  constructor(id: number, traitor: boolean) {
+  constructor(id: number, name: string, thumb?: string) {
     super()
     this.id = id
-    this.isTraitor = traitor
+    this.name = name
+    this.thumb = thumb ? thumb : null
   }
 }

@@ -9,7 +9,7 @@ import { MessageType } from './types'
 import * as ui from '../node_modules/@dcl/ui-utils/index'
 import { SpaceShip, playerIsAlive, playerVoted } from './entities/SpaceShip'
 import { openVotingUI, updateVotingUI, closeVotingUI } from './voting'
-import { getUserData } from '@decentraland/Identity'
+import { getUserInfo, userName } from './getUser'
 
 let doorBell = new Entity()
 doorBell.addComponent(
@@ -21,22 +21,26 @@ doorBell.addComponent(new BoxShape())
 
 doorBell.addComponent(
   new OnPointerDown(async () => {
-    userName = await (await getUserData()).displayName
+    let userInfo = await getUserInfo()
+    log(userInfo)
 
     socket.send(
       JSON.stringify({
         type: MessageType.JOIN,
         data: {
           sender: userName,
+          thumb: userInfo.id
+            ? userInfo.metadata.avatars[0].avatar.snapshots.face128
+            : 'Qmbqv4pZvhypGj3KiCisvxn9UazodQ8aQStiBEy6HvxuJz',
         },
       })
     )
   })
 )
+
 engine.addEntity(doorBell)
 
 export let ship: SpaceShip
-export let userName: string
 
 joinGame()
 
@@ -63,11 +67,12 @@ export async function joinGame() {
       ship.active = false
     },
   }
+
   let vote: MessageAction = {
     tag: MessageType.VOTE,
     action: (data) => {
       if (!playerIsAlive) return
-      updateVotingUI(data.voted, data.voter, data.thumb)
+      updateVotingUI(data.voted, data.voter, data.votes, data.thumb)
     },
   }
   let endVote: MessageAction = {
@@ -81,7 +86,6 @@ export async function joinGame() {
       if (data.kickedPlayer == userName) {
         movePlayerTo({ x: 1, y: 1, z: 1 })
       }
-      playerVoted = false
       ship.active = true
     },
   }
@@ -94,8 +98,6 @@ export async function joinGame() {
 
   ship = new SpaceShip()
   // initate any other multiplayer things
+
   await startSocketListeners()
-  //   socket.onopen = function (event) {
-  //     ship.start()
-  //   }
 }
