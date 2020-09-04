@@ -5,9 +5,11 @@ import {
   startSocketListeners,
   socket,
 } from './entities/MultiplayerEntity'
-import { MessageType } from './messaging'
+import { MessageType } from './types'
 import * as ui from '../node_modules/@dcl/ui-utils/index'
-import { SpaceShip } from './entities/SpaceShip'
+import { SpaceShip, playerIsAlive } from './entities/SpaceShip'
+import { openVotingUI, updateVotingUI, closeVotingUI } from './voting'
+import { getUserInfo, userName } from './getUser'
 
 let doorBell = new Entity()
 doorBell.addComponent(
@@ -19,35 +21,32 @@ doorBell.addComponent(new BoxShape())
 
 doorBell.addComponent(
   new OnPointerDown(async () => {
-    //await joinGame()
+    let userInfo = await getUserInfo()
+    log(userInfo)
+
     socket.send(
       JSON.stringify({
         type: MessageType.JOIN,
         data: {
-          sender: '123',
+          sender: userName,
+          thumb: userInfo.id
+            ? userInfo.metadata.avatars[0].avatar.snapshots.face128
+            : 'Qmbqv4pZvhypGj3KiCisvxn9UazodQ8aQStiBEy6HvxuJz',
         },
       })
     )
   })
 )
+
 engine.addEntity(doorBell)
 
 export let ship: SpaceShip
-
-export let isTraitor: boolean
 
 joinGame()
 
 export async function joinGame() {
   await joinSocketsServer()
 
-  let newGame: MessageAction = {
-    tag: MessageType.NEWGAME,
-    action: (data) => {
-      //game.startGame(data.duration)
-      isTraitor = data.playerIsTraitor
-    },
-  }
   let endGame: MessageAction = {
     tag: MessageType.END,
     action: (data) => {
@@ -60,15 +59,45 @@ export async function joinGame() {
       ui.displayAnnouncement(data.text, 10, false, Color4.Yellow())
     },
   }
+  let startVote: MessageAction = {
+    tag: MessageType.STARTVOTE,
+    action: (data) => {
+      if (!playerIsAlive) return
+      openVotingUI(data.players)
+      ship.active = false
+    },
+  }
 
-  messageActions.push(newGame)
+  let vote: MessageAction = {
+    tag: MessageType.VOTE,
+    action: (data) => {
+      if (!playerIsAlive) return
+      updateVotingUI(data.voted, data.voter, data.votes, data.thumb)
+    },
+  }
+  let endVote: MessageAction = {
+    tag: MessageType.ENDVOTE,
+    action: (data) => {
+      if (!playerIsAlive) return
+      closeVotingUI(
+        data.kickedPlayer ? data.kickedPlayer : null,
+        data.isTraitor
+      )
+      if (data.kickedPlayer == userName) {
+        movePlayerTo({ x: 1, y: 1, z: 1 })
+      }
+      ship.active = true
+    },
+  }
+
   messageActions.push(endGame)
   messageActions.push(message)
+  messageActions.push(startVote)
+  messageActions.push(vote)
+  messageActions.push(endVote)
 
-  //ship = new SpaceShip()
+  ship = new SpaceShip()
   // initate any other multiplayer things
+
   await startSocketListeners()
-  socket.onopen = function (event) {
-    //ship.start()
-  }
 }

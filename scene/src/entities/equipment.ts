@@ -1,4 +1,7 @@
-import { isTraitor } from '../game'
+import { ship } from '../game'
+import { playerIsTraitor } from './SpaceShip'
+import { EquiptmentType } from '../types'
+import { fixCounter, minutesCounter } from '../HUD'
 
 //Reusable materials
 export let neutralMaterial = new Material()
@@ -13,19 +16,13 @@ let redMaterial = new Material()
 redMaterial.roughness = 1
 redMaterial.albedoColor = Color3.FromInts(500, 150, 180) // Pink glow
 
-export enum EquiptmentType {
-  CONSOLE,
-  CABLES,
-  OXYGEN,
-  REACTOR,
-}
-
 export class Equipment extends Entity {
   broken: boolean = false
   type: EquiptmentType
   fixable: boolean
   breakable: boolean
   id: number
+  changeListener: (state: boolean) => void
 
   constructor(
     id: number,
@@ -37,6 +34,7 @@ export class Equipment extends Entity {
     super('Equipment')
 
     this.id = id
+    this.changeListener = changeListener
 
     this.addComponent(new Transform(transform))
     this.addComponent(new ConeShape())
@@ -51,23 +49,71 @@ export class Equipment extends Entity {
       this.addComponentOrReplace(greenMaterial)
     }
 
-    this.addComponent(
-      new OnPointerDown(() => {
-        if (isTraitor && this.breakable && !this.broken) {
-          this.addComponentOrReplace(redMaterial)
-          this.broken = true
-        } else if (!isTraitor && this.fixable && this.broken) {
-          this.addComponentOrReplace(greenMaterial)
-          this.broken = false
+    this.addComponentOrReplace(
+      new OnPointerDown(
+        () => {
+          log('clicked by ', playerIsTraitor ? 'traitor' : 'crew memeber')
+          if (playerIsTraitor && this.breakable && !this.broken) {
+            // BREAK
+            this.changeListener(true)
+          } else if (!playerIsTraitor && this.fixable && this.broken) {
+            // FIX
+            this.changeListener(false)
+          }
+        },
+        {
+          hoverText: playerIsTraitor ? 'Break' : 'Fix',
         }
-        changeListener(this.broken)
-      })
+      )
     )
   }
 
-  change(isBroken: boolean) {
+  //   adapt(isTraitor: boolean) {
+  //     if (isTraitor && this.breakable) {
+  //       this.addComponentOrReplace(
+  //         new OnPointerDown(
+  //           () => {
+  //             log('clicked by ', isTraitor ? 'traitor' : 'crew memeber')
+  //             if (!this.broken) {
+  //               this.changeListener(true)
+  //             }
+  //           },
+  //           {
+  //             hoverText: 'Break',
+  //           }
+  //         )
+  //       )
+  //     } else if (!isTraitor && this.fixable) {
+  //       this.addComponentOrReplace(
+  //         new OnPointerDown(
+  //           () => {
+  //             log('clicked by ', isTraitor ? 'traitor' : 'crew memeber')
+  //             if (this.broken) {
+  //               this.changeListener(true)
+  //             }
+  //           },
+  //           {
+  //             hoverText: 'Fix',
+  //           }
+  //         )
+  //       )
+  //     }
+  //   }
+
+  alterState(isBroken: boolean) {
+    log('Equip was broken :', this.broken, ' and now is broken: ', isBroken)
+    if (this.broken != isBroken) {
+      if (isBroken) {
+        this.addComponentOrReplace(redMaterial)
+        minutesCounter.decrease()
+      } else {
+        this.addComponentOrReplace(greenMaterial)
+        fixCounter.increase()
+      }
+    }
     this.broken = isBroken
   }
+
   reset() {
     switch (this.type) {
       case EquiptmentType.CONSOLE:

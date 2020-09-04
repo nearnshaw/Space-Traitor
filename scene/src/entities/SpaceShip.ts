@@ -1,7 +1,11 @@
 import { MultiplayerEntity } from './MultiplayerEntity'
-import { Equipment, EquiptmentType } from './equipment'
-import { EquiptmentData } from '../types'
-//import { game } from '../game'
+import { Equipment } from './equipment'
+import { EquiptmentData, EquiptmentType, MessageType } from '../types'
+import { Button } from './Button'
+import { startUI } from '../HUD'
+
+export let playerIsTraitor: boolean = false
+export let playerIsAlive: boolean = true
 
 let equiptMentList: EquiptmentData[] = [
   {
@@ -13,7 +17,25 @@ let equiptMentList: EquiptmentData[] = [
     type: EquiptmentType.CONSOLE,
   },
   {
-    transform: { position: new Vector3(12, 1, 8) },
+    transform: { position: new Vector3(8, 1, 14) },
+    type: EquiptmentType.CONSOLE,
+  },
+  {
+    transform: { position: new Vector3(10, 1, 14) },
+    type: EquiptmentType.CONSOLE,
+  },
+  {
+    transform: {
+      position: new Vector3(12, 1, 24),
+      rotation: Quaternion.Euler(180, 0, 0),
+    },
+    type: EquiptmentType.REACTOR,
+  },
+  {
+    transform: {
+      position: new Vector3(10, 1, 24),
+      rotation: Quaternion.Euler(180, 0, 0),
+    },
     type: EquiptmentType.REACTOR,
   },
 ]
@@ -28,7 +50,7 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     super('Ship')
     engine.addEntity(this)
 
-    this.toFix = new Array(equiptMentList.length)
+    this.toFix = [] //new Array(equiptMentList.length)
 
     for (let i = 0; i < equiptMentList.length; i++) {
       let eq = new Equipment(
@@ -42,47 +64,66 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
       )
       this.toFix.push(eq)
     }
+
+    let panicButton = new Button(
+      {
+        position: new Vector3(20, 1, 20),
+      },
+      () => {
+        this.socket.send(
+          JSON.stringify({
+            type: MessageType.STARTVOTE,
+            data: null,
+          })
+        )
+      }
+    )
   }
 
   protected reactToSingleChanges(change: EquiptmentChange): void {
-    this.toFix[change.id].change(change.broken)
+    log('reacting to single change ', change)
+    this.toFix[change.id].alterState(change.broken)
     // UI changes
   }
 
   protected loadFullState(fullState: FullState): void {
-    this.active = fullState.active
-    if (fullState.active == true) {
-      //game.startGame(fullState.timeLeft)
-    } else {
-      //game.defaultBoard()
+    log('loading full state ', fullState)
+    if (fullState.active && !this.active) {
+      // Start new game
+      startUI(fullState.timeLeft)
+    } else if (!fullState.active && this.active) {
+      // finish game
     }
-    // for (let i = 0; i < GRIDX; i++) {
-    //   for (let j = 0; j < GRIDX; j++) {
-    //     this.tiles[i][j].activate(fullState.tiles[i][j])
-    //   }
+    this.active = fullState.active
+    this.timeLeft = fullState.timeLeft
+
+    playerIsTraitor = fullState.playerIsTraitor
+
+    // for (let i = 0; i < this.toFix.length; i++) {
+    //   this.toFix[i].adapt(playerIsTraitor)
     // }
+
+    for (let i = 0; i < this.toFix.length; i++) {
+      this.toFix[i].alterState(fullState.toFix[i].broken)
+    }
   }
 
   resetAllGame(): void {
-    // for (let i = 0; i < GRIDX; i++) {
-    //   for (let j = 0; j < GRIDX; j++) {
-    //     this.tiles[i][j].activate(tileColor.NEUTRAL)
-    //   }
-    // }
+    movePlayerTo({ x: 1, y: 0, z: 1 }, { x: 8, y: 1, z: 8 })
+    for (let i = 0; i < this.toFix.length; i++) {
+      this.toFix[i].reset()
+    }
   }
 
   countFixes(): number[] {
     let fixCount = [0, 0]
-    // for (let i = 0; i < GRIDX; i++) {
-    //   for (let j = 0; j < GRIDX; j++) {
-    //     if (this.tiles[i][j].getColor() == tileColor.BLUE) {
-    //       tileCount[0] += 1
-    //     } else if (this.tiles[i][j].getColor() == tileColor.RED) {
-    //       tileCount[1] += 1
-    //     }
-    //   }
-    // }
-
+    for (let i = 0; i < this.toFix.length; i++) {
+      if (this.toFix[i].broken == true) {
+        fixCount[0]++
+      } else {
+        fixCount[1]++
+      }
+    }
     return fixCount
   }
 }

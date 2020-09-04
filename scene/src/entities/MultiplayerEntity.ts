@@ -18,13 +18,13 @@ export async function joinSocketsServer() {
 
 export async function startSocketListeners() {
   // Listen for incoming ws messages
+  log('full list of messages lisened for: ', messageActions)
   socket.onmessage = function (event) {
     try {
       const msg = JSON.parse(event.data)
-      log(msg)
+      //log(msg)
 
       for (let action of messageActions) {
-        //log('checking match with ', action.tag, ' msg.type is: ', msg.type)
         if (msg.type == action.tag) {
           log('WSMESSAGE ', msg.type, ' : ', msg.data)
           action.action(msg.data)
@@ -42,9 +42,12 @@ export abstract class MultiplayerEntity<
   FullState
 > extends Entity {
   private initialized: boolean = false
+  public socket: WebSocket
 
   constructor(private readonly entityType: string) {
     super()
+
+    this.socket = socket
 
     let change: MessageAction = {
       tag: this.generateMessageId(SINGLE_CHANGE_EVENT),
@@ -54,28 +57,28 @@ export abstract class MultiplayerEntity<
     }
 
     messageActions.push(change)
+
+    let getStateResponse: MessageAction = {
+      tag: this.generateMessageId(FULL_STATE_RESPONSE),
+      action: (data) => {
+        //if (!this.initialized) {
+        this.initialized = true
+        this.loadFullState(data)
+        //}
+      },
+    }
+
+    messageActions.push(getStateResponse)
   }
 
   /** Request the full state from server, and load it */
   public start() {
     // Load the full state
 
-    let getStateResponse: MessageAction = {
-      tag: this.generateMessageId(FULL_STATE_RESPONSE),
-      action: (data) => {
-        if (!this.initialized) {
-          this.initialized = true
-          this.loadFullState(data)
-        }
-      },
-    }
-
-    messageActions.push(getStateResponse)
-
     // Request full state
     this.requestFullState()
 
-    this.initialized = true
+    //this.initialized = true
   }
 
   public propagateChange(change: SingleChange) {
