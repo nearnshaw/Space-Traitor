@@ -10,6 +10,7 @@ import * as ui from '../node_modules/@dcl/ui-utils/index'
 import { SpaceShip, playerIsAlive } from './entities/SpaceShip'
 import { openVotingUI, updateVotingUI, closeVotingUI } from './voting'
 import { getUserInfo, userName } from './getUser'
+import { MiniGameMachine } from './minigames/MiniGameMachine'
 
 let doorBell = new Entity()
 doorBell.addComponent(
@@ -101,3 +102,16 @@ export async function joinGame() {
 
   await startSocketListeners()
 }
+
+// Spawn a minigame machine:
+let minigameMachineEntity = new Entity()
+minigameMachineEntity.addComponent(
+  new Transform({
+    position: new Vector3(24, 1, 8),
+  })
+)
+minigameMachineEntity.addComponent(
+  new MiniGameMachine(minigameMachineEntity)
+)
+minigameMachineEntity.addComponent(new BoxShape())
+engine.addEntity(minigameMachineEntity)
