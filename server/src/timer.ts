@@ -7,10 +7,9 @@ export function startCountdown(roomName: string, seconds: number) {
   room.timeLeft = seconds
 
   const interval = setInterval(() => {
-    //console.log(room.timeLeft)
-
     if (!room.gamePaused) {
       room.timeLeft--
+      console.log(room.timeLeft)
 
       let randomBreak = Math.random()
       if (randomBreak < 1 / randomBreakProbability) {
@@ -19,6 +18,8 @@ export function startCountdown(roomName: string, seconds: number) {
 
       if (room.timeLeft < 0) {
         endGame(roomName)
+        room.gameActive = false
+        clearInterval(interval)
       }
     }
   }, 1000)

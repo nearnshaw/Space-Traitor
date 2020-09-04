@@ -7,7 +7,7 @@ import {
 } from './entities/MultiplayerEntity'
 import { MessageType } from './types'
 import * as ui from '../node_modules/@dcl/ui-utils/index'
-import { SpaceShip, playerIsAlive, playerVoted } from './entities/SpaceShip'
+import { SpaceShip, playerIsAlive } from './entities/SpaceShip'
 import { openVotingUI, updateVotingUI, closeVotingUI } from './voting'
 import { getUserInfo, userName } from './getUser'
 
@@ -80,7 +80,7 @@ export async function joinGame() {
     action: (data) => {
       if (!playerIsAlive) return
       closeVotingUI(
-        data.playerToKick ? data.playerToKick : null,
+        data.kickedPlayer ? data.kickedPlayer : null,
         data.isTraitor
       )
       if (data.kickedPlayer == userName) {

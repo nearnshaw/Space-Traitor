@@ -2,10 +2,10 @@ import { MultiplayerEntity } from './MultiplayerEntity'
 import { Equipment } from './equipment'
 import { EquiptmentData, EquiptmentType, MessageType } from '../types'
 import { Button } from './Button'
+import { startUI } from '../HUD'
 
 export let playerIsTraitor: boolean = false
 export let playerIsAlive: boolean = true
-export let playerVoted: boolean = false
 
 let equiptMentList: EquiptmentData[] = [
   {
@@ -90,6 +90,7 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     log('loading full state ', fullState)
     if (fullState.active && !this.active) {
       // Start new game
+      startUI(fullState.timeLeft)
     } else if (!fullState.active && this.active) {
       // finish game
     }

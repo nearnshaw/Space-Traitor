@@ -1,6 +1,7 @@
 import { ship } from '../game'
 import { playerIsTraitor } from './SpaceShip'
 import { EquiptmentType } from '../types'
+import { fixCounter, minutesCounter } from '../HUD'
 
 //Reusable materials
 export let neutralMaterial = new Material()
@@ -61,7 +62,7 @@ export class Equipment extends Entity {
           }
         },
         {
-          hoverText: 'Break',
+          hoverText: playerIsTraitor ? 'Break' : 'Fix',
         }
       )
     )
@@ -104,12 +105,15 @@ export class Equipment extends Entity {
     if (this.broken != isBroken) {
       if (isBroken) {
         this.addComponentOrReplace(redMaterial)
+        minutesCounter.decrease()
       } else {
         this.addComponentOrReplace(greenMaterial)
+        fixCounter.increase()
       }
     }
     this.broken = isBroken
   }
+
   reset() {
     switch (this.type) {
       case EquiptmentType.CONSOLE:

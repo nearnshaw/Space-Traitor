@@ -108,11 +108,15 @@ wss.on('connection', (clientWs, request) => {
         break
 
       case MessageType.STARTVOTE:
+        let playersAlive = 0
         for (let player of room.players) {
-          player.votes = []
+          if (player.alive) playersAlive++
         }
 
-        if (room.gameActive) {
+        if (room.gameActive && playersAlive > 2) {
+          for (let player of room.players) {
+            player.votes = []
+          }
           room.gamePaused = true
           sendAllAlive(
             JSON.stringify({
@@ -199,12 +203,6 @@ export async function newGame(room: string) {
       room
     )
   }, 6000)
-  setTimeout(function () {
-    sendAll(
-      JSON.stringify({ type: MessageType.MESSAGE, data: { text: 'GO' } }),
-      room
-    )
-  }, 8000)
 
   setTimeout(function () {
     pickTraitor(room)
@@ -334,7 +332,7 @@ export function randomBreakEquipt(room: string) {
 
 export function endVotes(roomName: string) {
   let room = rooms[roomName]
-  room.gameActive = true
+
   let mostVotesAgainst = 0
   let playerWithMostVotes = null
   for (let i = 0; i < room.players.length; i++) {
@@ -350,7 +348,7 @@ export function endVotes(roomName: string) {
 
   let playerToKick = null
   let isTraitor = false
-  if (mostVotesAgainst > 1 && playerWithMostVotes) {
+  if (mostVotesAgainst > 1 && playerWithMostVotes != null) {
     room.players[playerWithMostVotes].alive = false
     playerToKick = room.players[playerWithMostVotes].name
     isTraitor = room.players[playerWithMostVotes].isTraitor
@@ -369,6 +367,10 @@ export function endVotes(roomName: string) {
   )
 
   console.log(playerToKick + ' was kicked out, ')
+
+  setTimeout(() => {
+    room.gamePaused = false
+  }, 3000)
 }
 
 /// SENDING
@@ -433,10 +435,8 @@ export async function sendAllButTraitor(message: WebSocket.Data, room: string) {
 }
 
 export async function sendTraitor(message: WebSocket.Data, room: string) {
-  //wss.clients.forEach(function each(client) {
   const cWs = CLIENTS[rooms[room].traitors[0]] as customWs
-  //let traitorID = rooms[room].traitors[0]
-  //if (CLIENTS[traitorID] == cWs) {
+
   try {
     if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
       cWs.send(message)
@@ -444,8 +444,6 @@ export async function sendTraitor(message: WebSocket.Data, room: string) {
   } catch {
     console.log("couldn't send to a user")
   }
-  // }
-  //})
 }
 
 export async function sendPlayer(

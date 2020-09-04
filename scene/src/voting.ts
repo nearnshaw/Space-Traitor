@@ -5,14 +5,16 @@ import {
 } from '../node_modules/@dcl/ui-utils/utils/types'
 import { Player, MessageType } from './types'
 import { socket } from './entities/MultiplayerEntity'
-import { userName } from './game'
 import { setTimeout } from './Utils'
-import { playerVoted } from './entities/SpaceShip'
+import { userName } from './getUser'
+import { timer } from './HUD'
 
 let votingUI: ui.CustomPrompt
+export let playerVoted: boolean = false
 
 export function openVotingUI(players: Player[]) {
   playerVoted = false
+  timer.running = false
   votingUI = new ui.CustomPrompt(PromptStyles.DARKSLANTED)
   votingUI.addText('Voting Time', 0, 130, Color4.Red(), 30)
   votingUI.addText("Who's the traitor?", 0, 100)
@@ -76,6 +78,7 @@ export function closeVotingUI(playerToKick: string, isTraitor: boolean) {
     ui.displayAnnouncement(playerToKick + 'was ejected out into space')
 
     setTimeout(3000, () => {
+      timer.running = true
       if (isTraitor) {
         ui.displayAnnouncement(playerToKick + ' was the traitor, you win!')
       } else {
