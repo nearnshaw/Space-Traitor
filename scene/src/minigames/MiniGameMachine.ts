@@ -20,15 +20,3 @@ export class MiniGameMachine {
       }))
   }
 }
-
-// let minigameMachineEntity = new Entity()
-// minigameMachineEntity.addComponent(
-//   new Transform({
-//     position: new Vector3(8, 1, 8),
-//   })
-// )
-// minigameMachineEntity.addComponent(
-//   new MiniGameMachine(minigameMachineEntity)
-// )
-// minigameMachineEntity.addComponent(new BoxShape())
-// engine.addEntity(minigameMachineEntity)
