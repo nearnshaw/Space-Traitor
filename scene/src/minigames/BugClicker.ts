@@ -8,7 +8,7 @@ export class BugClicker extends MiniGame {
     headerText = this.prompt.addText('CLICK THE BUGS! ', 0, 250, Color4.Green(), 40)
     bugButton = this.prompt.addButton('',0,0, 
       () => {
-        this.ScoreSuccess(1)
+        this.AddSuccess(1)
 
         this.RepositionBug()
       },
@@ -23,11 +23,6 @@ export class BugClicker extends MiniGame {
       this.RepositionBug()
       
       this.prompt.close()
-    }
-  
-    Start() {
-      this.started = true
-      this.prompt.reopen()
     }
 
     Update(dt: number) {

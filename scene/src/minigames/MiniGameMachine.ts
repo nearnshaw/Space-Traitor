@@ -2,6 +2,7 @@ import { WordTyper } from "./WordTyper"
 import { BugClicker } from "./BugClicker"
 import * as ui from '../../node_modules/@dcl/ui-utils/index'
 import { PromptStyles } from "../../node_modules/@dcl/ui-utils/utils/types"
+import { SwitchToggler } from "./SwitchToggler"
 
 export class MiniGame {
   started: boolean
@@ -21,10 +22,12 @@ export class MiniGame {
 
   Start() {
     this.started = true
+    this.prompt.reopen()
   }
 
   Stop()
   {
+    this.prompt.close()
     this.Reset()
   }
 
@@ -36,7 +39,9 @@ export class MiniGame {
     this.successesText.text.value = 'SUCCESS: ' + this.currentSuccesses + "/" + this.successesNeeded
   }
 
-  ScoreSuccess(newSuccesses: number) {
+  AddSuccess(newSuccesses: number) {
+    if(newSuccesses <= 0) return
+
     this.currentSuccesses += newSuccesses
 
     this.UpdateSuccessText()
@@ -48,8 +53,7 @@ export class MiniGame {
   }
 
   Win() {
-    this.prompt.close()
-    this.Reset()
+    this.Stop()
   }
 }
 
@@ -59,7 +63,19 @@ export class MiniGameMachine {
   
   constructor(entity: Entity) {
     // Randomize instantiated MiniGame type
-    this.minigame = Scalar.RandomRange(0, 1) > 0.5 ? new WordTyper() : new BugClicker()
+    const randomNumber = Math.floor(Scalar.RandomRange(0,3))
+
+    switch (randomNumber) {
+      case 1:
+        this.minigame = new BugClicker()
+        break;
+      case 2:
+          this.minigame = new SwitchToggler()
+        break;
+      default: // 0
+          this.minigame = new WordTyper()
+        break;
+    }
 
     entity.addComponent(
       new OnPointerDown(async () => {
