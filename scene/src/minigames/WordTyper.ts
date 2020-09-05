@@ -1,15 +1,8 @@
 import { MiniGame } from "./MiniGameMachine"
-import * as ui from '../../node_modules/@dcl/ui-utils/index'
-import { PromptStyles } from "../../node_modules/@dcl/ui-utils/utils/types"
 
 export class WordTyper extends MiniGame {
-    randomWords = ['HOLLY', 'MOLLY', 'SALMONOMICON', 'DECENTRALAND', 'SCIFI', 'DROID', 'ROBOT', 'AIR', 'MARS']
-    successesNeeded = 3
-    currentSuccesses = 0
-    prompt = new ui.CustomPrompt(PromptStyles.DARK, 800, 600)
+    randomWords = ['HOLY', 'MOLLY', 'SALMONOMICON', 'DECENTRALAND', 'SCIFI', 'DROID', 'ROBOT', 'AIR', 'MARS', 'KITCHEN', 'CHIPA', 'PHILIP']
     currentChallengeWord = ""
-    headerText = this.prompt.addText('TYPE THE NEXT WORD: ', 0, 260, Color4.Green(), 30)
-    successesText = this.prompt.addText('SUCCESS: 0/' + this.successesNeeded, 0, 0, Color4.Yellow(), 20)
     inputBox = this.prompt.addTextBox(0, -150, "type word here", (e) => {})
   
     constructor() {
@@ -22,14 +15,7 @@ export class WordTyper extends MiniGame {
         const submittedText = x.text
       
         if(submittedText.localeCompare(this.currentChallengeWord) === 0) {
-          this.currentSuccesses++
-      
-          this.UpdateSuccessText()
-      
-          if(this.currentSuccesses == this.successesNeeded) {
-            this.prompt.close()
-            return
-          }
+          this.ScoreSuccess(1)
         }
       
         this.UpdateHeaderText()
@@ -41,17 +27,9 @@ export class WordTyper extends MiniGame {
      this.prompt.reopen()
     }
   
-    Reset() {
-      this.currentSuccesses = 0
-    }
-  
     UpdateHeaderText() {
       this.currentChallengeWord = this.GetRandomWord()
       this.headerText.text.value = 'TYPE THE NEXT WORD: ' + this.currentChallengeWord
-    }
-    
-    UpdateSuccessText() {
-      this.successesText.text.value = 'SUCCESS: ' + this.currentSuccesses + "/" + this.successesNeeded
     }
   
     GetRandomWord(): string {
