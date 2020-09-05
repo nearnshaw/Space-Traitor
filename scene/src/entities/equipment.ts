@@ -68,38 +68,6 @@ export class Equipment extends Entity {
     )
   }
 
-  //   adapt(isTraitor: boolean) {
-  //     if (isTraitor && this.breakable) {
-  //       this.addComponentOrReplace(
-  //         new OnPointerDown(
-  //           () => {
-  //             log('clicked by ', isTraitor ? 'traitor' : 'crew memeber')
-  //             if (!this.broken) {
-  //               this.changeListener(true)
-  //             }
-  //           },
-  //           {
-  //             hoverText: 'Break',
-  //           }
-  //         )
-  //       )
-  //     } else if (!isTraitor && this.fixable) {
-  //       this.addComponentOrReplace(
-  //         new OnPointerDown(
-  //           () => {
-  //             log('clicked by ', isTraitor ? 'traitor' : 'crew memeber')
-  //             if (this.broken) {
-  //               this.changeListener(true)
-  //             }
-  //           },
-  //           {
-  //             hoverText: 'Fix',
-  //           }
-  //         )
-  //       )
-  //     }
-  //   }
-
   alterState(isBroken: boolean) {
     log('Equip was broken :', this.broken, ' and now is broken: ', isBroken)
     if (this.broken != isBroken) {

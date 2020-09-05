@@ -1,4 +1,4 @@
-import { startBrokenArray } from './config'
+import { startBrokenArray, FUSE_BOXES } from './config'
 
 // data per each room
 export class roomData {
@@ -9,7 +9,29 @@ export class roomData {
   traitors: number[] = []
   timeLeft: number = 0
   toFix: EquiptmentChange[] = new Array(startBrokenArray.length)
-  //     .fill(null)
+  fuseBoxes: FullFuseState[] = [
+    {
+      id: 0,
+      doorOpen: false,
+      redCut: false,
+      greenCut: false,
+      blueCut: false,
+    },
+    {
+      id: 1,
+      doorOpen: false,
+      redCut: false,
+      greenCut: false,
+      blueCut: false,
+    },
+    {
+      id: 2,
+      doorOpen: false,
+      redCut: false,
+      greenCut: false,
+      blueCut: false,
+    },
+  ]
 }
 
 export interface roomDictionary {
@@ -55,12 +77,29 @@ export type FullState = {
 type EquiptmentChange = {
   id: number
   broken: boolean
-  type?: EquiptmentType
+  //type?: EquiptmentType
 }
 
-export enum EquiptmentType {
-  CONSOLE,
-  CABLES,
-  OXYGEN,
-  REACTOR,
+// export enum EquiptmentType {
+//   CONSOLE,
+//   CABLES,
+//   OXYGEN,
+//   REACTOR,
+// }
+
+type FuseChange = {
+  id: number
+  doorOpen?: boolean
+  redCut?: boolean
+  greenCut?: boolean
+  blueCut?: boolean
+}
+
+type FullFuseState = {
+  id: number
+  doorOpen: boolean
+  redCut: boolean
+  greenCut: boolean
+  blueCut: boolean
+  timeLeft?: number
 }

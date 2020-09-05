@@ -1,11 +1,5 @@
 import * as WebSocket from 'ws'
-import {
-  roomDictionary,
-  MessageType,
-  roomData,
-  Player,
-  EquiptmentType,
-} from './types'
+import { roomDictionary, MessageType, roomData, Player } from './types'
 import { startCountdown } from './timer'
 import {
   removeFromTeams,
@@ -55,9 +49,9 @@ wss.on('connection', (clientWs, request) => {
         rooms[ws.room].toFix[i] = {
           id: i,
           broken: startBrokenArray[i],
-          type: isReactorArray[i]
-            ? EquiptmentType.REACTOR
-            : EquiptmentType.CONSOLE,
+          //   type: isReactorArray[i]
+          //     ? EquiptmentType.REACTOR
+          //     : EquiptmentType.CONSOLE,
         }
       }
     }
@@ -103,12 +97,7 @@ wss.on('connection', (clientWs, request) => {
         if (room.gameActive) {
           room.toFix[msg.data.id].broken = msg.data.broken
 
-          if (
-            msg.data.broken &&
-            room.toFix[msg.data.id].type == EquiptmentType.REACTOR
-          ) {
-            room.timeLeft -= sabotagePenalty
-          } else if (!msg.data.broken) {
+          if (!msg.data.broken) {
             room.fixCount += 1
             if (room.fixCount >= FIXES_TO_WIN) {
               endGame(ws.room)
@@ -156,6 +145,83 @@ wss.on('connection', (clientWs, request) => {
         )
         break
 
+      case 'FuseBox-singleChange':
+        if (room.gameActive) {
+          if (`doorOpen` in msg.data) {
+            console.log(
+              'door ',
+              msg.data.id,
+              ' to ',
+              msg.data.doorOpen ? 'open' : 'close'
+            )
+            sendAll(
+              JSON.stringify({
+                type: 'FuseBox-singleChange',
+                data: msg.data,
+              }),
+              ws.room
+            )
+          } else {
+            let playerIndex = 0
+            for (let i = 0; i > room.players.length; i++) {
+              if (id == room.players[i].id) {
+                playerIndex = i
+              }
+            }
+            if (room.players[playerIndex].isTraitor) {
+              if (!room.fuseBoxes[msg.data.id].redCut && msg.data.redCut) {
+                room.fuseBoxes[msg.data.id].redCut = true
+              }
+              if (!room.fuseBoxes[msg.data.id].blueCut && msg.data.blueCut) {
+                room.fuseBoxes[msg.data.id].blueCut = true
+              }
+              if (!room.fuseBoxes[msg.data.id].greenCut && msg.data.greenCut) {
+                room.fuseBoxes[msg.data.id].greenCut = true
+              }
+              sendAll(
+                JSON.stringify({
+                  type: 'FuseBox-singleChange',
+                  data: msg.data,
+                }),
+                ws.room
+              )
+
+              // fully destroyed?
+              if (
+                room.fuseBoxes[msg.data.id].redCut &&
+                room.fuseBoxes[msg.data.id].blueCut &&
+                room.fuseBoxes[msg.data.id].greenCut
+              ) {
+                room.timeLeft -= sabotagePenalty
+                sendAll(
+                  JSON.stringify({
+                    type: 'FuseBox-fullStateRes',
+                    data: {
+                      id: msg.data.id,
+                      doorOpen: room.fuseBoxes[msg.data.id].doorOpen,
+                      redCut: true,
+                      greenCut: true,
+                      blueCut: true,
+                      timeLeft: room.timeLeft,
+                    },
+                  }),
+                  ws.room
+                )
+              }
+            } else {
+              ws.send(
+                JSON.stringify({
+                  type: MessageType.MESSAGE,
+                  data: {
+                    text:
+                      'Only a traitor would sabotage their own ship like that.',
+                  },
+                })
+              )
+            }
+          }
+        }
+        break
       case MessageType.STARTVOTE:
         let playersAlive = 0
         for (let player of room.players) {
@@ -355,6 +421,15 @@ export async function resetGame(room: string) {
   rooms[room].toFix = new Array(14)
   for (let i = 0; i < rooms[room].toFix.length; i++) {
     rooms[room].toFix[i] = { id: i, broken: startBrokenArray[i] }
+  }
+  for (let i = 0; i < rooms[room].fuseBoxes.length; i++) {
+    rooms[room].fuseBoxes[i] = {
+      id: i,
+      doorOpen: false,
+      redCut: false,
+      greenCut: false,
+      blueCut: false,
+    }
   }
 }
 

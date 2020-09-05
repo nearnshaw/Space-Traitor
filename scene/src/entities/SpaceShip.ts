@@ -74,6 +74,7 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
       {
         position: new Vector3(20, 1, 20),
       },
+      new GLTFShape('models/Danger_SciFi_Button.glb'),
       () => {
         this.socket.send(
           JSON.stringify({
@@ -81,7 +82,8 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
             data: null,
           })
         )
-      }
+      },
+      'Emergency Meeting'
     )
   }
 

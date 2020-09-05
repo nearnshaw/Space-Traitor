@@ -12,17 +12,15 @@ import { openVotingUI, updateVotingUI, closeVotingUI } from './voting'
 import { getUserInfo, userName } from './getUser'
 import { MiniGameMachine } from './minigames/MiniGameMachine'
 import { timer } from './HUD'
+import { Button } from './entities/Button'
+import { FuseBox } from './entities/fuseBox'
 
-let doorBell = new Entity()
-doorBell.addComponent(
-  new Transform({
+let doorBell = new Button(
+  {
     position: new Vector3(4, 1, 4),
-  })
-)
-doorBell.addComponent(new BoxShape())
-
-doorBell.addComponent(
-  new OnPointerDown(async () => {
+  },
+  new GLTFShape('models/Green_SciFi_Button.glb'),
+  async () => {
     let userInfo = await getUserInfo()
     log(userInfo)
 
@@ -37,7 +35,8 @@ doorBell.addComponent(
         },
       })
     )
-  })
+  },
+  'Join Game'
 )
 
 engine.addEntity(doorBell)
@@ -104,6 +103,10 @@ export async function joinGame() {
   messageActions.push(endVote)
 
   ship = new SpaceShip()
+  let fuse1 = new FuseBox(0, { position: new Vector3(15, 1, 15) })
+  let fuse2 = new FuseBox(1, { position: new Vector3(17, 1, 15) })
+  let fuse3 = new FuseBox(2, { position: new Vector3(19, 1, 15) })
+
   // initate any other multiplayer things
 
   await startSocketListeners()
@@ -139,3 +142,7 @@ export function finishGame(traitorWon: boolean) {
     )
   }
 }
+
+// fuse1.start()
+// fuse2.start()
+// fuse3.start()

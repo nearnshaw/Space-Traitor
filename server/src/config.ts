@@ -2,6 +2,8 @@ export const MINIMUM_PLAYERS = 3
 
 export const FIXES_TO_WIN = 11
 
+export const FUSE_BOXES = 3
+
 export const GAME_DURATION: number = 60 * 2
 
 export const randomBreakProbability: number = 30

@@ -1,6 +1,8 @@
 import { setTimeout } from '../Utils'
 import { getCurrentRealm } from '@decentraland/EnvironmentAPI'
 
+//export let sceneMessageBus = new MessageBus()
+
 export let socket: WebSocket
 
 export type MessageAction = { tag: string; action: (data) => void }
