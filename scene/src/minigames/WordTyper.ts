@@ -1,7 +1,7 @@
 import { MiniGame } from "./MiniGameMachine"
 
 export class WordTyper extends MiniGame {
-    randomWords = ['HOLY', 'MOLLY', 'SALMONOMICON', 'DECENTRALAND', 'SCIFI', 'DROID', 'ROBOT', 'AIR', 'MARS', 'KITCHEN', 'CHIPA', 'PHILIP']
+    randomWords = ['HOLY', 'MOLLY', 'SALMONOMICON', 'DECENTRALAND', 'SCIFI', 'DROID', 'ROBOT', 'AIR', 'MARS', 'KITCHEN', 'CHIPA', 'PHILIP', 'HACKATHON', 'MANA', 'LAND', 'SYNTHWAVE', 'JOJO']
     currentChallengeWord = ""
     inputBox = this.prompt.addTextBox(0, -150, "type word here", (e) => {})
   
@@ -15,16 +15,11 @@ export class WordTyper extends MiniGame {
         const submittedText = x.text
       
         if(submittedText.localeCompare(this.currentChallengeWord) === 0) {
-          this.ScoreSuccess(1)
+          this.AddSuccess(1)
         }
       
         this.UpdateHeaderText()
       })
-    }
-  
-    Start() {
-     this.Reset()
-     this.prompt.reopen()
     }
   
     UpdateHeaderText() {
