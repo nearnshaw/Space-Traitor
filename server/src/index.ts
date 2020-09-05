@@ -134,14 +134,20 @@ wss.on('connection', (clientWs, request) => {
         break
       // REQUEST SYNC
       case 'Ship-fullStateReq':
+        let playerIndex = 0
+        for (let i = 0; i > room.players.length; i++) {
+          if (id == room.players[i].id) {
+            playerIndex = i
+          }
+        }
         ws.send(
           JSON.stringify({
             type: 'Ship-fullStateRes',
             data: {
               active: room.gameActive,
               toFix: room.toFix,
-              playerIsTraitor: room.players[id]
-                ? room.players[id].isTraitor
+              playerIsTraitor: room.players[playerIndex]
+                ? room.players[playerIndex].isTraitor
                 : false,
               timeleft: room.timeLeft,
               fixCount: room.fixCount,
@@ -171,7 +177,7 @@ wss.on('connection', (clientWs, request) => {
             ws.room
           )
         } else {
-          console.log('no change bc room inactive')
+          console.log('no change bc room inactive or less than 3 players')
         }
         break
 
@@ -247,8 +253,8 @@ export async function newGame(room: string) {
     )
   }, 6000)
 
-  setTimeout(function () {
-    pickTraitor(room)
+  setTimeout(async function () {
+    await pickTraitor(room)
     rooms[room].gameActive = true
 
     sendAllButTraitor(
@@ -416,7 +422,7 @@ export function endVotes(roomName: string) {
       type: MessageType.ENDVOTE,
       data: {
         kickedPlayer: playerToKick,
-        wasTraitor: isTraitor,
+        isTraitor: isTraitor,
         playersLeft: playersLeft,
       },
     }),
@@ -480,9 +486,8 @@ export async function sendAllAlive(message: WebSocket.Data, room: string) {
 }
 
 export async function sendAllButTraitor(message: WebSocket.Data, room: string) {
-  let traitorID = rooms[room].traitors[0]
   rooms[room].players.forEach(function each(player) {
-    if (traitorID != player.id) {
+    if (!player.isTraitor) {
       const cWs = CLIENTS[player.id] as customWs
       try {
         if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {
@@ -496,7 +501,9 @@ export async function sendAllButTraitor(message: WebSocket.Data, room: string) {
 }
 
 export async function sendTraitor(message: WebSocket.Data, room: string) {
-  const cWs = CLIENTS[rooms[room].traitors[0]] as customWs
+  let traitorInex = rooms[room].traitors[0]
+  let traitorId = rooms[room].players[traitorInex].id
+  const cWs = CLIENTS[traitorId] as customWs
 
   try {
     if (cWs.readyState === WebSocket.OPEN && cWs.room === room) {

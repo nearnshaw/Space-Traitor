@@ -61,7 +61,7 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
           this.propagateChange({
             id: i,
             broken: state,
-            fixCount: fixCounter.read(),
+            fixCount: 0,
             timeLeft: this.timeLeft,
           })
         },
@@ -101,11 +101,16 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     } else if (!fullState.active && this.active) {
       // finish game
     }
+    playerIsTraitor = fullState.playerIsTraitor
     this.active = fullState.active
     this.timeLeft = fullState.timeLeft
-    fixCounter.set(fullState.fixCount)
+    if (fixCounter) {
+      fixCounter.set(fullState.fixCount)
+    }
 
-    playerIsTraitor = fullState.playerIsTraitor
+    if (playerIsTraitor) {
+      log('PLAYER IS TRAITOR')
+    }
 
     // for (let i = 0; i < this.toFix.length; i++) {
     //   this.toFix[i].adapt(playerIsTraitor)

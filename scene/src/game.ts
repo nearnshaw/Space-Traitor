@@ -11,6 +11,7 @@ import { SpaceShip, playerIsAlive, playerIsTraitor } from './entities/SpaceShip'
 import { openVotingUI, updateVotingUI, closeVotingUI } from './voting'
 import { getUserInfo, userName } from './getUser'
 import { MiniGameMachine } from './minigames/MiniGameMachine'
+import { timer } from './HUD'
 
 let doorBell = new Entity()
 doorBell.addComponent(
@@ -51,6 +52,8 @@ export async function joinGame() {
   let endGame: MessageAction = {
     tag: MessageType.END,
     action: (data) => {
+      timer.running = false
+      finishGame(data.traitorWon)
       //game.endGame(data.blue, data.red)
     },
   }
