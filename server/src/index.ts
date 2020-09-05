@@ -1,5 +1,11 @@
 import * as WebSocket from 'ws'
-import { roomDictionary, MessageType, roomData, Player } from './types'
+import {
+  roomDictionary,
+  MessageType,
+  roomData,
+  Player,
+  EquiptmentType,
+} from './types'
 import { startCountdown } from './timer'
 import {
   removeFromTeams,
@@ -7,7 +13,14 @@ import {
   checkAlredyInTeams,
   pickTraitor,
 } from './handlePlayers'
-import { PORT, startBrokenArray, GAME_DURATION } from './config'
+import {
+  PORT,
+  startBrokenArray,
+  GAME_DURATION,
+  sabotagePenalty,
+  isReactorArray,
+  FIXES_TO_WIN,
+} from './config'
 
 export const wss = new WebSocket.Server({ port: PORT })
 
@@ -39,7 +52,13 @@ wss.on('connection', (clientWs, request) => {
     if (!rooms[ws.room]) {
       rooms[ws.room] = new roomData()
       for (let i = 0; i < rooms[ws.room].toFix.length; i++) {
-        rooms[ws.room].toFix[i] = { id: i, broken: startBrokenArray[i] }
+        rooms[ws.room].toFix[i] = {
+          id: i,
+          broken: startBrokenArray[i],
+          type: isReactorArray[i]
+            ? EquiptmentType.REACTOR
+            : EquiptmentType.CONSOLE,
+        }
       }
     }
 
@@ -79,12 +98,35 @@ wss.on('connection', (clientWs, request) => {
           playerJoin(id, msg.data, room, ws.room)
         }
         break
-      // TILE CHANGE
+      // EQUIPTMENT CHANGE
       case 'Ship-singleChange':
         if (room.gameActive) {
-          // TODO DO CHANGE
           room.toFix[msg.data.id].broken = msg.data.broken
-          sendAll(message, ws.room)
+
+          if (
+            msg.data.broken &&
+            room.toFix[msg.data.id].type == EquiptmentType.REACTOR
+          ) {
+            room.timeLeft -= sabotagePenalty
+          } else if (!msg.data.broken) {
+            room.fixCount += 1
+            if (room.fixCount >= FIXES_TO_WIN) {
+              endGame(ws.room)
+            }
+          }
+
+          sendAll(
+            JSON.stringify({
+              type: 'Ship-singleChange',
+              data: {
+                id: msg.data.id,
+                broken: msg.data.broken,
+                timeLeft: room.timeLeft,
+                fixCount: room.fixCount,
+              },
+            }),
+            ws.room
+          )
           console.log('Ship changed ', room.toFix)
         } else {
           console.log('no change bc room inactive')
@@ -102,6 +144,7 @@ wss.on('connection', (clientWs, request) => {
                 ? room.players[id].isTraitor
                 : false,
               timeleft: room.timeLeft,
+              fixCount: room.fixCount,
             },
           })
         )
@@ -260,30 +303,37 @@ export async function endGame(room: string) {
   //   let blueScore = 0
   //   let redScore = 0
 
+  let traitorAlive = true
+  for (let player of rooms[room].players) {
+    if (player.isTraitor) {
+      traitorAlive = player.alive
+    }
+  }
+
+  let traitorWon =
+    rooms[room].fixCount < FIXES_TO_WIN && traitorAlive
+      ? 'Traitor won'
+      : 'Humans won'
+
   console.log(
     'FINISHED GAME in room ',
     room,
-    ' Blue: ',
-    // blueScore,
-    ' Red ',
-    // redScore,
-    'FINAL RESULT '
-    //rooms[room].tiles
+    ' time remaining: ',
+    rooms[room].timeLeft,
+    ' fix count: ',
+    rooms[room].fixCount,
+    'FINAL RESULT ',
+    traitorWon
   )
 
-  //   for (let i = 0; i < rooms[room].tiles.length; i++) {
-  //     for (let j = 0; j < rooms[room].tiles[i].length; j++) {
-  //       if (rooms[room].tiles[i][j] == tileColor.BLUE) {
-  //         blueScore += 1
-  //       } else if (rooms[room].tiles[i][j] == tileColor.RED) {
-  //         redScore += 1
-  //       }
-  //     }
-  //   }
   sendAll(
     JSON.stringify({
       type: MessageType.END,
-      data: {},
+      data: {
+        traitorWon: traitorWon,
+        fixCount: rooms[room].fixCount,
+        timeLeft: rooms[room].timeLeft,
+      },
     }),
     room
   )
@@ -295,6 +345,7 @@ export async function resetGame(room: string) {
   rooms[room].gameActive = false
   rooms[room].players = []
   rooms[room].traitors = []
+  rooms[room].fixCount = 0
   rooms[room].toFix = new Array(14)
   for (let i = 0; i < rooms[room].toFix.length; i++) {
     rooms[room].toFix[i] = { id: i, broken: startBrokenArray[i] }
@@ -315,6 +366,8 @@ export function randomBreakEquipt(room: string) {
           data: {
             id: randomI,
             broken: true,
+            timeLeft: rooms[room].timeLeft,
+            fixCount: rooms[room].fixCount,
           },
         }),
         room
@@ -335,7 +388,9 @@ export function endVotes(roomName: string) {
 
   let mostVotesAgainst = 0
   let playerWithMostVotes = null
+  let playersLeft = 0
   for (let i = 0; i < room.players.length; i++) {
+    if (room.players[i].alive) playersLeft++
     if (room.players[i].votes.length > mostVotesAgainst) {
       mostVotesAgainst = room.players[i].votes.length
       playerWithMostVotes = i
@@ -352,6 +407,7 @@ export function endVotes(roomName: string) {
     room.players[playerWithMostVotes].alive = false
     playerToKick = room.players[playerWithMostVotes].name
     isTraitor = room.players[playerWithMostVotes].isTraitor
+    playersLeft--
     console.log('We have a victim! ', playerToKick)
   }
 
@@ -361,6 +417,7 @@ export function endVotes(roomName: string) {
       data: {
         kickedPlayer: playerToKick,
         wasTraitor: isTraitor,
+        playersLeft: playersLeft,
       },
     }),
     roomName
@@ -369,7 +426,11 @@ export function endVotes(roomName: string) {
   console.log(playerToKick + ' was kicked out, ')
 
   setTimeout(() => {
-    room.gamePaused = false
+    if (isTraitor || playersLeft < 2) {
+      endGame(roomName)
+    } else {
+      room.gamePaused = false
+    }
   }, 3000)
 }
 

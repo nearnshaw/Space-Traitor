@@ -1,5 +1,6 @@
 import * as ui from '../node_modules/@dcl/ui-utils/index'
 import { SFHeavyFont } from '../node_modules/@dcl/ui-utils/utils/default-ui-comopnents'
+import { ship } from './game'
 
 export let fixUIBck: ui.LargeIcon
 export let fixCounter: ui.UICounter
@@ -43,16 +44,22 @@ class CountdownSystem implements ISystem {
     this.timer -= dt
     if (this.timer <= 0) {
       this.timer = 1
-      secondsCounter.decrease()
-      if (secondsCounter.read() < 0) {
-        if (minutesCounter.read() <= 0) {
-          // TIME UP
-          // RESET
-        } else {
-          secondsCounter.set(59)
-          minutesCounter.decrease()
-        }
+      ship.timeLeft -= 1
+      secondsCounter.set(ship.timeLeft % 60)
+      minutesCounter.set(Math.floor(ship.timeLeft / 60))
+
+      if (ship.timeLeft < 0) {
+        ship.active = false
       }
+      //   if (secondsCounter.read() < 0) {
+      //     if (minutesCounter.read() <= 0) {
+      //       // TIME UP
+      //       // RESET
+      //     } else {
+      //       secondsCounter.set(59)
+      //       minutesCounter.decrease()
+      //     }
+      //   }
     }
   }
 }

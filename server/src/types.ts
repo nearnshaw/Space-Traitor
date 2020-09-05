@@ -4,6 +4,7 @@ import { startBrokenArray } from './config'
 export class roomData {
   gameActive: boolean = false
   gamePaused: boolean = false
+  fixCount: number = 0
   players: Player[] = []
   traitors: number[] = []
   timeLeft: number = 0

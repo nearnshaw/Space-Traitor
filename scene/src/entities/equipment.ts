@@ -105,10 +105,10 @@ export class Equipment extends Entity {
     if (this.broken != isBroken) {
       if (isBroken) {
         this.addComponentOrReplace(redMaterial)
-        minutesCounter.decrease()
+        //minutesCounter.decrease()
       } else {
         this.addComponentOrReplace(greenMaterial)
-        fixCounter.increase()
+        //fixCounter.increase()
       }
     }
     this.broken = isBroken

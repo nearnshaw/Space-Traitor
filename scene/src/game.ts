@@ -7,7 +7,7 @@ import {
 } from './entities/MultiplayerEntity'
 import { MessageType } from './types'
 import * as ui from '../node_modules/@dcl/ui-utils/index'
-import { SpaceShip, playerIsAlive } from './entities/SpaceShip'
+import { SpaceShip, playerIsAlive, playerIsTraitor } from './entities/SpaceShip'
 import { openVotingUI, updateVotingUI, closeVotingUI } from './voting'
 import { getUserInfo, userName } from './getUser'
 import { MiniGameMachine } from './minigames/MiniGameMachine'
@@ -88,6 +88,9 @@ export async function joinGame() {
         movePlayerTo({ x: 1, y: 1, z: 1 })
       }
       ship.active = true
+      if (data.isTraitor) {
+        finishGame(true)
+      }
     },
   }
 
@@ -110,8 +113,26 @@ minigameMachineEntity.addComponent(
     position: new Vector3(24, 1, 8),
   })
 )
-minigameMachineEntity.addComponent(
-  new MiniGameMachine(minigameMachineEntity)
-)
+minigameMachineEntity.addComponent(new MiniGameMachine(minigameMachineEntity))
 minigameMachineEntity.addComponent(new BoxShape())
 engine.addEntity(minigameMachineEntity)
+
+export function finishGame(traitorWon: boolean) {
+  ship.active = false
+  movePlayerTo({ x: 1, y: 1, z: 1 })
+  if (traitorWon && playerIsTraitor) {
+    ui.displayAnnouncement(
+      'Congratulations! You obliterated those horrible humans!'
+    )
+  } else if (traitorWon && !playerIsTraitor) {
+    ui.displayAnnouncement('Oh no, the android has defeated you.')
+  } else if (!traitorWon && playerIsTraitor) {
+    ui.displayAnnouncement(
+      "Oh no, those ridiculously fragile humans beat you. What's wrong with you?"
+    )
+  } else {
+    ui.displayAnnouncement(
+      'Congratulations! You have saved the humanity from the evil android!'
+    )
+  }
+}

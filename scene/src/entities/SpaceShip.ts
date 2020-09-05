@@ -2,7 +2,7 @@ import { MultiplayerEntity } from './MultiplayerEntity'
 import { Equipment } from './equipment'
 import { EquiptmentData, EquiptmentType, MessageType } from '../types'
 import { Button } from './Button'
-import { startUI } from '../HUD'
+import { startUI, fixCounter } from '../HUD'
 
 export let playerIsTraitor: boolean = false
 export let playerIsAlive: boolean = true
@@ -58,7 +58,12 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
         equiptMentList[i].transform,
         equiptMentList[i].type,
         (state) => {
-          this.propagateChange({ id: i, broken: state })
+          this.propagateChange({
+            id: i,
+            broken: state,
+            fixCount: fixCounter.read(),
+            timeLeft: this.timeLeft,
+          })
         },
         equiptMentList[i].startBroken
       )
@@ -83,6 +88,8 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
   protected reactToSingleChanges(change: EquiptmentChange): void {
     log('reacting to single change ', change)
     this.toFix[change.id].alterState(change.broken)
+    this.timeLeft = change.timeLeft
+    fixCounter.set(change.fixCount)
     // UI changes
   }
 
@@ -96,6 +103,7 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     }
     this.active = fullState.active
     this.timeLeft = fullState.timeLeft
+    fixCounter.set(fullState.fixCount)
 
     playerIsTraitor = fullState.playerIsTraitor
 
@@ -131,11 +139,14 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
 type EquiptmentChange = {
   id: number
   broken: boolean
+  timeLeft: number
+  fixCount: number
 }
 
 type FullState = {
   active: boolean
   toFix: EquiptmentChange[]
   timeLeft?: number
+  fixCount: number
   playerIsTraitor?: boolean
 }
