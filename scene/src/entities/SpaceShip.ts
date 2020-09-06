@@ -1,6 +1,6 @@
 import { MultiplayerEntity } from './MultiplayerEntity'
 import { Equipment } from './equipment'
-import { EquiptmentData, EquiptmentType, MessageType } from '../types'
+import { EquiptmentData, MessageType } from '../types'
 import { Button } from './Button'
 import { startUI, fixCounter } from '../HUD'
 
@@ -10,33 +10,27 @@ export let playerIsAlive: boolean = true
 let equiptMentList: EquiptmentData[] = [
   {
     transform: { position: new Vector3(8, 1, 8) },
-    type: EquiptmentType.CONSOLE,
   },
   {
     transform: { position: new Vector3(10, 1, 8) },
-    type: EquiptmentType.CONSOLE,
   },
   {
     transform: { position: new Vector3(8, 1, 14) },
-    type: EquiptmentType.CONSOLE,
   },
   {
     transform: { position: new Vector3(10, 1, 14) },
-    type: EquiptmentType.CONSOLE,
   },
   {
-    transform: {
-      position: new Vector3(12, 1, 24),
-      rotation: Quaternion.Euler(180, 0, 0),
-    },
-    type: EquiptmentType.REACTOR,
+    transform: { position: new Vector3(12, 1, 24) },
   },
   {
-    transform: {
-      position: new Vector3(10, 1, 24),
-      rotation: Quaternion.Euler(180, 0, 0),
-    },
-    type: EquiptmentType.REACTOR,
+    transform: { position: new Vector3(10, 1, 24) },
+  },
+  {
+    transform: { position: new Vector3(12, 1, 28) },
+  },
+  {
+    transform: { position: new Vector3(10, 1, 28) },
   },
 ]
 
@@ -56,7 +50,7 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
       let eq = new Equipment(
         i,
         equiptMentList[i].transform,
-        equiptMentList[i].type,
+        //equiptMentList[i].type,
         (state) => {
           this.propagateChange({
             id: i,

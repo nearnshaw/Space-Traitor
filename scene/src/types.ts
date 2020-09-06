@@ -12,16 +12,16 @@ export enum MessageType {
 
 export class EquiptmentData {
   transform: TranformConstructorArgs
-  type: EquiptmentType
+  //type: EquiptmentType
   startBroken?: boolean
 }
 
-export enum EquiptmentType {
-  CONSOLE,
-  CABLES,
-  OXYGEN,
-  REACTOR,
-}
+// export enum EquiptmentType {
+//   CONSOLE,
+//   CABLES,
+//   OXYGEN,
+//   REACTOR,
+// }
 
 export class Player extends Object {
   id: number
