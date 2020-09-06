@@ -154,3 +154,11 @@ Input.instance.subscribe('BUTTON_DOWN', ActionButton.PRIMARY, false, (e) => {
   log(`pos: `, Camera.instance.position)
   log(`rot: `, Camera.instance.rotation)
 })
+
+// Setup Environemnt
+const environmentEntity = new Entity()
+environmentEntity.addComponent(new Transform({
+  position: Vector3.Zero(),
+}))
+environmentEntity.addComponent(new GLTFShape('models/Environment.glb'))
+engine.addEntity(environmentEntity)
