@@ -11,9 +11,14 @@ import { SpaceShip, playerIsAlive, playerIsTraitor } from './entities/SpaceShip'
 import { openVotingUI, updateVotingUI, closeVotingUI } from './voting'
 import { getUserInfo, userName } from './getUser'
 import { MiniGameMachine } from './minigames/MiniGameMachine'
-import { timer } from './HUD'
+import { timer, startUI, satelliteUI, robotUI } from './HUD'
 import { Button } from './entities/Button'
 import { FuseBox } from './entities/fuseBox'
+import {
+  MissionControlBrief,
+  EvilRobotTips,
+  MissionControlTips,
+} from './dialogs'
 
 let doorBell = new Button(
   {
@@ -21,23 +26,27 @@ let doorBell = new Button(
   },
   new GLTFShape('models/Green_SciFi_Button.glb'),
   async () => {
-    let userInfo = await getUserInfo()
-    log(userInfo)
-
-    socket.send(
-      JSON.stringify({
-        type: MessageType.JOIN,
-        data: {
-          sender: userName,
-          thumb: userInfo.id
-            ? userInfo.metadata.avatars[0].avatar.snapshots.face128
-            : 'Qmbqv4pZvhypGj3KiCisvxn9UazodQ8aQStiBEy6HvxuJz',
-        },
-      })
-    )
+    satelliteUI.openDialogWindow(MissionControlBrief, 0)
   },
   'Join Game'
 )
+
+export async function sendJoinRequest() {
+  let userInfo = await getUserInfo()
+  log(userInfo)
+
+  socket.send(
+    JSON.stringify({
+      type: MessageType.JOIN,
+      data: {
+        sender: userName,
+        thumb: userInfo.id
+          ? userInfo.metadata.avatars[0].avatar.snapshots.face128
+          : 'Qmbqv4pZvhypGj3KiCisvxn9UazodQ8aQStiBEy6HvxuJz',
+      },
+    })
+  )
+}
 
 engine.addEntity(doorBell)
 
@@ -121,18 +130,32 @@ export function finishGame(traitorWon: boolean) {
   ship.active = false
   movePlayerTo({ x: 1, y: 1, z: 1 })
   if (traitorWon && playerIsTraitor) {
-    ui.displayAnnouncement(
-      'Congratulations! You obliterated those horrible humans!'
-    )
+    robotUI.openDialogWindow(EvilRobotTips, 3)
+    // ui.displayAnnouncement(
+    //   'Congratulations! You obliterated those horrible humans!'
+    // )
   } else if (traitorWon && !playerIsTraitor) {
-    ui.displayAnnouncement('Oh no, the android has defeated you.')
+    satelliteUI.openDialogWindow(MissionControlTips, 4)
+    //ui.displayAnnouncement('Oh no, the android has defeated you.')
   } else if (!traitorWon && playerIsTraitor) {
-    ui.displayAnnouncement(
-      "Oh no, those ridiculously fragile humans beat you. What's wrong with you?"
-    )
+    robotUI.openDialogWindow(EvilRobotTips, 4)
+    // ui.displayAnnouncement(
+    //   "Oh no, those ridiculously fragile humans beat you. What's wrong with you?"
+    // )
   } else {
-    ui.displayAnnouncement(
-      'Congratulations! You have saved the humanity from the evil android!'
-    )
+    // ui.displayAnnouncement(
+    //   'Congratulations! You have saved the humanity from the evil android!'
+    // )
+    satelliteUI.openDialogWindow(MissionControlTips, 3)
   }
 }
+
+// let infoCube = new Entity()
+// infoCube.addComponent(new BoxShape())
+// infoCube.addComponent(new Transform({ position: new Vector3(2, 1, 1) }))
+// engine.addEntity(infoCube)
+// infoCube.addComponent(
+//   new OnPointerDown(() => {
+//     satelliteUI.openDialogWindow(MissionControl, 0)
+//   })
+// )

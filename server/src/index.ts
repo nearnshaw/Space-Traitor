@@ -12,7 +12,6 @@ import {
   startBrokenArray,
   GAME_DURATION,
   sabotagePenalty,
-  isReactorArray,
   FIXES_TO_WIN,
 } from './config'
 
@@ -49,7 +48,7 @@ wss.on('connection', (clientWs, request) => {
         rooms[ws.room].toFix[i] = {
           id: i,
           broken: startBrokenArray[i],
-          //   type: isReactorArray[i]
+
           //     ? EquiptmentType.REACTOR
           //     : EquiptmentType.CONSOLE,
         }
@@ -431,7 +430,7 @@ export function randomBreakEquipt(room: string) {
   while (!brokeSomething) {
     let randomI = Math.floor(Math.random() * rooms[room].toFix.length)
 
-    if (!rooms[room].toFix[randomI].broken && startBrokenArray[randomI]) {
+    if (!rooms[room].toFix[randomI].broken) {
       rooms[room].toFix[randomI].broken = true
       sendAll(
         JSON.stringify({

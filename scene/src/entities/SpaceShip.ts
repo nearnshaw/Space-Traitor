@@ -2,23 +2,36 @@ import { MultiplayerEntity } from './MultiplayerEntity'
 import { Equipment } from './equipment'
 import { EquiptmentData, MessageType } from '../types'
 import { Button } from './Button'
-import { startUI, fixCounter } from '../HUD'
+import { startUI, fixCounter, satelliteUI, robotUI } from '../HUD'
+import { EvilRobotBrief } from '../dialogs'
 
 export let playerIsTraitor: boolean = false
 export let playerIsAlive: boolean = true
 
 let equiptMentList: EquiptmentData[] = [
   {
-    transform: { position: new Vector3(8, 1, 8) }, startBroken: true
+    transform: { position: new Vector3(8, 1, 8) },
   },
   {
-    transform: { position: new Vector3(10, 1, 8) }, startBroken: true
+    transform: { position: new Vector3(10, 1, 8) },
   },
   {
-    transform: { position: new Vector3(8, 1, 14) }, startBroken: true
+    transform: { position: new Vector3(8, 1, 14) },
   },
   {
-    transform: { position: new Vector3(10, 1, 14) }, startBroken: true
+    transform: { position: new Vector3(10, 1, 14) },
+  },
+  {
+    transform: { position: new Vector3(12, 1, 24) },
+  },
+  {
+    transform: { position: new Vector3(10, 1, 24) },
+  },
+  {
+    transform: { position: new Vector3(12, 1, 28) },
+  },
+  {
+    transform: { position: new Vector3(10, 1, 28) },
   },
 ]
 
@@ -82,6 +95,10 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     if (fullState.active && !this.active) {
       // Start new game
       startUI(fullState.timeLeft)
+      if (fullState.playerIsTraitor) {
+        satelliteUI.closeDialogWindow()
+        robotUI.openDialogWindow(EvilRobotBrief, 0)
+      }
     } else if (!fullState.active && this.active) {
       // finish game
     }

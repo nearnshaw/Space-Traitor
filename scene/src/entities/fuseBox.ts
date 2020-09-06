@@ -1,6 +1,8 @@
 import { MultiplayerEntity } from './MultiplayerEntity'
 import { ship } from '../game'
 import { playerIsTraitor } from './SpaceShip'
+import { robotUI } from '../HUD'
+import { EvilRobotTips } from '../dialogs'
 
 @Component('org.decentraland.CableBox')
 export class CableBox {
@@ -311,6 +313,10 @@ export function toggleCable(
 
   if (boxState.blueCableCut && boxState.redCableCut && boxState.greenCableCut) {
     // BREAK  WS MSG  ... or do on server better?
+    if (playerIsTraitor) {
+      robotUI.openDialogWindow(EvilRobotTips, 0)
+    }
+
     log('ALL THREE CABLES CUT')
   }
 }

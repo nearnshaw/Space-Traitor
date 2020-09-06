@@ -1,8 +1,9 @@
 import { ship } from '../game'
 import { playerIsTraitor } from './SpaceShip'
-import { fixCounter, minutesCounter } from '../HUD'
+import { fixCounter, minutesCounter, robotUI } from '../HUD'
 import * as ui from '../../node_modules/@dcl/ui-utils/index'
 import { MiniGameMachine } from '../minigames/MiniGameMachine'
+import { EvilRobotTips } from '../dialogs'
 
 //Reusable materials
 export let neutralMaterial = new Material()
@@ -42,10 +43,16 @@ export class Equipment extends Entity {
     this.addComponent(new ConeShape())
     engine.addEntity(this)
 
-    this.miniGameMachine = this.addComponent(new MiniGameMachine(this, () => {
-      this.alterState(false)
-      this.changeListener(this.broken)
-    }, false))
+    this.miniGameMachine = this.addComponent(
+      new MiniGameMachine(
+        this,
+        () => {
+          this.alterState(false)
+          this.changeListener(this.broken)
+        },
+        false
+      )
+    )
 
     this.alterState(startBroken)
 
@@ -58,7 +65,11 @@ export class Equipment extends Entity {
     this.addComponentOrReplace(
       new OnPointerDown(
         () => {
-          if(this.broken) {
+          if (this.broken) {
+            if (playerIsTraitor) {
+              robotUI.openDialogWindow(EvilRobotTips, 0)
+              return
+            }
             this.miniGameMachine.minigame.Start()
           }
         },
