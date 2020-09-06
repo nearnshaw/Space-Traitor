@@ -11,6 +11,6 @@ export const randomBreakProbability: number = 15
 
 export const startBrokenArray = [true, true, true, true, true, true, true, true]
 
-export const PORT = 8080
+export const PORT = 8081
 
 export const sabotagePenalty = 40
