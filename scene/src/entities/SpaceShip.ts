@@ -9,28 +9,16 @@ export let playerIsAlive: boolean = true
 
 let equiptMentList: EquiptmentData[] = [
   {
-    transform: { position: new Vector3(8, 1, 8) },
+    transform: { position: new Vector3(8, 1, 8) }, startBroken: true
   },
   {
-    transform: { position: new Vector3(10, 1, 8) },
+    transform: { position: new Vector3(10, 1, 8) }, startBroken: true
   },
   {
-    transform: { position: new Vector3(8, 1, 14) },
+    transform: { position: new Vector3(8, 1, 14) }, startBroken: true
   },
   {
-    transform: { position: new Vector3(10, 1, 14) },
-  },
-  {
-    transform: { position: new Vector3(12, 1, 24) },
-  },
-  {
-    transform: { position: new Vector3(10, 1, 24) },
-  },
-  {
-    transform: { position: new Vector3(12, 1, 28) },
-  },
-  {
-    transform: { position: new Vector3(10, 1, 28) },
+    transform: { position: new Vector3(10, 1, 14) }, startBroken: true
   },
 ]
 

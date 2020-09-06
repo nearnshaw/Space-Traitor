@@ -5,8 +5,8 @@ export class WordTyper extends MiniGame {
     currentChallengeWord = ""
     inputBox = this.prompt.addTextBox(0, -150, "type word here", (e) => {})
   
-    constructor() {
-      super()
+    constructor(onWinCallback: () => any) {
+      super(onWinCallback)
   
       this.prompt.close()
       this.UpdateHeaderText()

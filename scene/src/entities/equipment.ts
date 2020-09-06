@@ -2,6 +2,7 @@ import { ship } from '../game'
 import { playerIsTraitor } from './SpaceShip'
 import { fixCounter, minutesCounter } from '../HUD'
 import * as ui from '../../node_modules/@dcl/ui-utils/index'
+import { MiniGameMachine } from '../minigames/MiniGameMachine'
 
 //Reusable materials
 export let neutralMaterial = new Material()
@@ -22,6 +23,7 @@ export class Equipment extends Entity {
   //   fixable: boolean
   //   breakable: boolean
   id: number
+  miniGameMachine: MiniGameMachine
   changeListener: (state: boolean) => void
 
   constructor(
@@ -40,6 +42,13 @@ export class Equipment extends Entity {
     this.addComponent(new ConeShape())
     engine.addEntity(this)
 
+    this.miniGameMachine = this.addComponent(new MiniGameMachine(this, () => {
+      this.alterState(false)
+      this.changeListener(this.broken)
+    }, false))
+
+    this.alterState(startBroken)
+
     if (this.broken) {
       this.addComponentOrReplace(redMaterial)
     } else {
@@ -49,19 +58,8 @@ export class Equipment extends Entity {
     this.addComponentOrReplace(
       new OnPointerDown(
         () => {
-          log('clicked by ', playerIsTraitor ? 'traitor' : 'crew memeber')
-          //   if (playerIsTraitor && !this.broken) {
-          //     // BREAK
-          //     this.changeListener(true)
-          //   } else
-          if (!playerIsTraitor && this.broken) {
-            // FIX
-            this.changeListener(false)
-          } else if (playerIsTraitor) {
-            ui.displayAnnouncement(
-              "You don't want to help these horrible humans",
-              5
-            )
+          if(this.broken) {
+            this.miniGameMachine.minigame.Start()
           }
         },
         {
@@ -83,6 +81,8 @@ export class Equipment extends Entity {
       }
     }
     this.broken = isBroken
+
+    // this.changeListener(this.broken)
   }
 
   reset() {

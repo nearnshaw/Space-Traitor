@@ -13,7 +13,7 @@ export enum MessageType {
 export class EquiptmentData {
   transform: TranformConstructorArgs
   //type: EquiptmentType
-  startBroken?: boolean
+  startBroken?: boolean = true
 }
 
 // export enum EquiptmentType {

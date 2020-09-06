@@ -15,8 +15,8 @@ export class BugClicker extends MiniGame {
       ButtonStyles.ROUNDSILVER
     )
   
-    constructor() {
-      super()
+    constructor(onWinCallback: () => any) {
+      super(onWinCallback)
   
       this.bugButton.image.width = 30
       this.bugButton.image.height = 30

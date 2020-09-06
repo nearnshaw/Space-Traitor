@@ -13,6 +13,11 @@ export class MiniGame {
   prompt = new  ui.CustomPrompt(PromptStyles.DARK, this.promptWidth, this.promptHeight)
   headerText = this.prompt.addText('', 0, 260, Color4.Green(), 30)
   successesText = this.prompt.addText('SUCCESS: 0/' + this.successesNeeded, 0, -250, Color4.Yellow(), 30)
+  onWinCallback: () => any
+
+  constructor(onWinCallback: () => any) {
+    this.onWinCallback = onWinCallback
+  }
 
   Reset() {
     this.currentSuccesses = 0
@@ -22,6 +27,7 @@ export class MiniGame {
 
   Start() {
     this.started = true
+    this.UpdateSuccessText()
     this.prompt.reopen()
   }
 
@@ -54,6 +60,8 @@ export class MiniGame {
 
   Win() {
     this.Stop()
+
+    this.onWinCallback()
   }
 }
 
@@ -61,26 +69,28 @@ export class MiniGame {
 export class MiniGameMachine {
   minigame: MiniGame
   
-  constructor(entity: Entity) {
+  constructor(entity: Entity, onWinCallback: () => any, addOnPointerdown: boolean = true) {
     // Randomize instantiated MiniGame type
     const randomNumber = Math.floor(Scalar.RandomRange(0,3))
 
     switch (randomNumber) {
       case 1:
-        this.minigame = new BugClicker()
+        this.minigame = new BugClicker(onWinCallback)
         break;
       case 2:
-          this.minigame = new SwitchToggler()
+          this.minigame = new SwitchToggler(onWinCallback)
         break;
       default: // 0
-          this.minigame = new WordTyper()
+          this.minigame = new WordTyper(onWinCallback)
         break;
     }
 
-    entity.addComponent(
-      new OnPointerDown(async () => {
-        this.minigame.Start()
-      }))
+    if (addOnPointerdown) {
+      entity.addComponent(
+        new OnPointerDown(async () => {
+          this.minigame.Start()
+        }))
+    }
   }
 
   Update(dt: number) {

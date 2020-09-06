@@ -117,17 +117,6 @@ export async function joinGame() {
   await startSocketListeners()
 }
 
-// Spawn a minigame machine:
-let minigameMachineEntity = new Entity()
-minigameMachineEntity.addComponent(
-  new Transform({
-    position: new Vector3(24, 1, 8),
-  })
-)
-minigameMachineEntity.addComponent(new MiniGameMachine(minigameMachineEntity))
-minigameMachineEntity.addComponent(new BoxShape())
-engine.addEntity(minigameMachineEntity)
-
 export function finishGame(traitorWon: boolean) {
   ship.active = false
   movePlayerTo({ x: 1, y: 1, z: 1 })

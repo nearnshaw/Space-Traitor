@@ -10,8 +10,8 @@ export class SwitchToggler extends MiniGame {
     headerText = this.prompt.addText('TURN EVERYTHING ' + (this.targetState? 'ON' : 'OFF'), 0, 250, Color4.Green(), 40)
     switches: CustomPromptSwitch[] = new Array()
   
-    constructor() {
-      super()
+    constructor(onWinCallback: () => any) {
+      super(onWinCallback)
   
       this.SetupSwitches()
       
