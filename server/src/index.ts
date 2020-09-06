@@ -278,6 +278,9 @@ wss.on('connection', (clientWs, request) => {
       console.log('user ' + id + ' left game')
       delete CLIENTS[id]
       removeFromTeams(id, room)
+      if (room.players.length < 1) {
+        resetGame(ws.room)
+      }
     })
   })
 })
