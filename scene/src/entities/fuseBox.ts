@@ -1,5 +1,6 @@
 import { MultiplayerEntity } from './MultiplayerEntity'
 import { ship } from '../game'
+import { playerIsTraitor } from './SpaceShip'
 
 @Component('org.decentraland.CableBox')
 export class CableBox {
@@ -41,6 +42,9 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
   redCable: Entity
   blueCable: Entity
   greenCable: Entity
+  redClip: AnimationState
+  blueClip: AnimationState
+  greenClip: AnimationState
 
   constructor(
     id: number,
@@ -104,8 +108,8 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
         position: new Vector3(-0.21, 0.15, -0.25),
       })
     )
-    const redClip = new AnimationState('CableRedAction', { looping: false })
-    this.redCable.addComponent(new Animator()).addClip(redClip)
+    this.redClip = new AnimationState('CableRedAction', { looping: false })
+    this.redCable.addComponent(new Animator()).addClip(this.redClip)
     this.redCable.addComponent(new GLTFShape('models/RedCable.glb'))
     this.redCable.addComponent(
       new OnPointerDown(
@@ -114,6 +118,7 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
           this.propagateChange({
             id: this.id,
             redCut: true,
+            isTraitor: playerIsTraitor,
           })
         },
         {
@@ -123,6 +128,7 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
         }
       )
     )
+    this.redClip.stop()
 
     this.greenCable = new Entity()
     this.greenCable.setParent(this)
@@ -132,10 +138,10 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
         position: new Vector3(0, 0.15, -0.25),
       })
     )
-    const greenClip = new AnimationState('CableGreenAction', {
+    this.greenClip = new AnimationState('CableGreenAction', {
       looping: false,
     })
-    this.greenCable.addComponent(new Animator()).addClip(greenClip)
+    this.greenCable.addComponent(new Animator()).addClip(this.greenClip)
     this.greenCable.addComponent(new GLTFShape('models/GreenCable.glb'))
     this.greenCable.addComponent(
       new OnPointerDown(
@@ -144,6 +150,7 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
           this.propagateChange({
             id: this.id,
             greenCut: true,
+            isTraitor: playerIsTraitor,
           })
         },
         {
@@ -153,6 +160,7 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
         }
       )
     )
+    this.greenClip.stop()
 
     this.blueCable = new Entity()
     this.blueCable.setParent(this)
@@ -162,8 +170,8 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
         position: new Vector3(0.21, 0.15, -0.25),
       })
     )
-    const blueClip = new AnimationState('CableBlueAction', { looping: false })
-    this.blueCable.addComponent(new Animator()).addClip(blueClip)
+    this.blueClip = new AnimationState('CableBlueAction', { looping: false })
+    this.blueCable.addComponent(new Animator()).addClip(this.blueClip)
     this.blueCable.addComponent(new GLTFShape('models/BlueCable.glb'))
     this.blueCable.addComponent(
       new OnPointerDown(
@@ -172,6 +180,7 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
           this.propagateChange({
             id: this.id,
             blueCut: true,
+            isTraitor: playerIsTraitor,
           })
         },
         {
@@ -182,9 +191,7 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
       )
     )
 
-    blueClip.stop()
-    redClip.stop()
-    greenClip.stop()
+    this.blueClip.stop()
   }
 
   reset() {
@@ -206,22 +213,21 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
       toggleCable(this, true, CableColors.Red)
     }
     if (`blueCut` in change) {
-      toggleCable(this, change.blueCut, CableColors.Blue)
+      toggleCable(this, true, CableColors.Blue)
     }
     if (`greenCut` in change) {
-      toggleCable(this, change.greenCut, CableColors.Green)
+      toggleCable(this, true, CableColors.Green)
     }
   }
 
   protected loadFullState(fullState: FullFuseState): void {
     if (fullState.id != this.id) return
     log('fuse gets  full state ', fullState)
+    ship.timeLeft = fullState.timeLeft
     toggleBox(this, fullState.doorOpen)
     toggleCable(this, fullState.redCut, CableColors.Red)
     toggleCable(this, fullState.blueCut, CableColors.Blue)
     toggleCable(this, fullState.greenCut, CableColors.Green)
-
-    ship.timeLeft = fullState.timeLeft
   }
 }
 
@@ -252,44 +258,52 @@ export function toggleBox(entity: Entity, value: boolean, playSound = true) {
 }
 
 export function toggleCable(
-  entity: Entity,
+  entity: FuseBox,
   value: boolean,
   color: CableColors,
   playSound = true
 ) {
-  let boxState = entity.getParent().getComponent(CableBox)
-  if (playSound && value) {
-    const source = new AudioSource(this.sparkSoundClip)
-    entity.addComponentOrReplace(source)
-    source.playing = true
-  }
-  const animator = entity.getComponent(Animator)
-  let cableClip: AnimationState
+  let boxState = entity.getComponent(CableBox)
+  //   if (playSound && value) {
+  //     const source = new AudioSource(this.sparkSoundClip)
+  //     entity.addComponentOrReplace(source)
+  //     source.playing = true
+  //   }
 
+  let cableClip: AnimationState
+  let animator: Animator
   switch (color) {
     case CableColors.Red:
+      log('cut red calbe')
       //if (boxState.redCableCut === value) return
-      cableClip = new AnimationState('CableRedAction', { looping: false })
-      animator.addClip(cableClip)
+      //   cableClip = new AnimationState('CableRedAction', { looping: false })
+      //   animator = entity.redCable.getComponent(Animator)
+      //   animator.addClip(cableClip)
+      cableClip = entity.redClip
       boxState.redCableCut = value
       break
 
     case CableColors.Green:
       //if (boxState.greenCableCut === value) return
-      cableClip = new AnimationState('CableGreenAction', { looping: false })
-      animator.addClip(cableClip)
+      //   cableClip = new AnimationState('CableGreenAction', { looping: false })
+      //   animator = entity.greenCable.getComponent(Animator)
+      //   animator.addClip(cableClip)
+      cableClip = entity.greenClip
       boxState.greenCableCut = value
       break
 
     case CableColors.Blue:
       //if (boxState.blueCableCut === value) return
-      cableClip = new AnimationState('CableBlueAction', { looping: false })
-      animator.addClip(cableClip)
+      //   cableClip = new AnimationState('CableBlueAction', { looping: false })
+      //   animator = entity.blueCable.getComponent(Animator)
+      //   animator.addClip(cableClip)
+      cableClip = entity.blueClip
       boxState.blueCableCut = value
       break
   }
 
   if (value) {
+    cableClip.stop()
     cableClip.play()
   } else {
     cableClip.stop()
@@ -321,6 +335,7 @@ type FuseChange = {
   redCut?: boolean
   greenCut?: boolean
   blueCut?: boolean
+  isTraitor?: boolean
 }
 
 type FullFuseState = {

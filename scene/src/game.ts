@@ -109,6 +109,11 @@ export async function joinGame() {
 
   // initate any other multiplayer things
 
+  //   ship.start()
+  //   fuse1.start()
+  // fuse2.start()
+  // fuse3.start()
+
   await startSocketListeners()
 }
 
@@ -142,7 +147,3 @@ export function finishGame(traitorWon: boolean) {
     )
   }
 }
-
-// fuse1.start()
-// fuse2.start()
-// fuse3.start()

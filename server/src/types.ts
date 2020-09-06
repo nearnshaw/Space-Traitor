@@ -102,4 +102,5 @@ type FullFuseState = {
   greenCut: boolean
   blueCut: boolean
   timeLeft?: number
+  broken?: boolean
 }

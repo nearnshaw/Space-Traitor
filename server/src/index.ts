@@ -148,12 +148,7 @@ wss.on('connection', (clientWs, request) => {
       case 'FuseBox-singleChange':
         if (room.gameActive) {
           if (`doorOpen` in msg.data) {
-            console.log(
-              'door ',
-              msg.data.id,
-              ' to ',
-              msg.data.doorOpen ? 'open' : 'close'
-            )
+            room.fuseBoxes[msg.data.id].doorOpen = msg.data.doorOpen
             sendAll(
               JSON.stringify({
                 type: 'FuseBox-singleChange',
@@ -162,13 +157,9 @@ wss.on('connection', (clientWs, request) => {
               ws.room
             )
           } else {
-            let playerIndex = 0
-            for (let i = 0; i > room.players.length; i++) {
-              if (id == room.players[i].id) {
-                playerIndex = i
-              }
-            }
-            if (room.players[playerIndex].isTraitor) {
+            if (msg.data.isTraitor) {
+              if (room.fuseBoxes[msg.data.id].broken) return
+
               if (!room.fuseBoxes[msg.data.id].redCut && msg.data.redCut) {
                 room.fuseBoxes[msg.data.id].redCut = true
               }
@@ -186,13 +177,13 @@ wss.on('connection', (clientWs, request) => {
                 ws.room
               )
 
-              // fully destroyed?
               if (
                 room.fuseBoxes[msg.data.id].redCut &&
                 room.fuseBoxes[msg.data.id].blueCut &&
                 room.fuseBoxes[msg.data.id].greenCut
               ) {
                 room.timeLeft -= sabotagePenalty
+                room.fuseBoxes[msg.data.id].broken = true
                 sendAll(
                   JSON.stringify({
                     type: 'FuseBox-fullStateRes',
@@ -429,6 +420,7 @@ export async function resetGame(room: string) {
       redCut: false,
       greenCut: false,
       blueCut: false,
+      broken: false,
     }
   }
 }
