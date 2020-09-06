@@ -75,6 +75,7 @@ export class Equipment extends Entity {
         },
         {
           hoverText: playerIsTraitor ? 'Human stuff' : 'Fix',
+          distance: 4,
         }
       )
     )
