@@ -130,7 +130,6 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
         }
       )
     )
-    this.redClip.stop()
 
     this.greenCable = new Entity()
     this.greenCable.setParent(this)
@@ -162,7 +161,6 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
         }
       )
     )
-    this.greenClip.stop()
 
     this.blueCable = new Entity()
     this.blueCable.setParent(this)
@@ -193,6 +191,8 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
       )
     )
 
+    this.redClip.stop()
+    this.greenClip.stop()
     this.blueClip.stop()
   }
 

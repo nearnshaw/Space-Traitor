@@ -149,13 +149,3 @@ export function finishGame(traitorWon: boolean) {
     satelliteUI.openDialogWindow(MissionControlTips, 3)
   }
 }
-
-// let infoCube = new Entity()
-// infoCube.addComponent(new BoxShape())
-// infoCube.addComponent(new Transform({ position: new Vector3(2, 1, 1) }))
-// engine.addEntity(infoCube)
-// infoCube.addComponent(
-//   new OnPointerDown(() => {
-//     satelliteUI.openDialogWindow(MissionControl, 0)
-//   })
-// )

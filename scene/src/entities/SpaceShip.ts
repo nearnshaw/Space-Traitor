@@ -102,6 +102,9 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     } else if (!fullState.active && this.active) {
       // finish game
     }
+    for (let i = 0; i < this.toFix.length; i++) {
+      this.toFix[i].alterState(fullState.toFix[i].broken)
+    }
     playerIsTraitor = fullState.playerIsTraitor
     this.active = fullState.active
     this.timeLeft = fullState.timeLeft
@@ -116,10 +119,6 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     // for (let i = 0; i < this.toFix.length; i++) {
     //   this.toFix[i].adapt(playerIsTraitor)
     // }
-
-    for (let i = 0; i < this.toFix.length; i++) {
-      this.toFix[i].alterState(fullState.toFix[i].broken)
-    }
   }
 
   resetAllGame(): void {
@@ -129,17 +128,17 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     }
   }
 
-  countFixes(): number[] {
-    let fixCount = [0, 0]
-    for (let i = 0; i < this.toFix.length; i++) {
-      if (this.toFix[i].broken == true) {
-        fixCount[0]++
-      } else {
-        fixCount[1]++
-      }
-    }
-    return fixCount
-  }
+  //   countFixes(): number[] {
+  //     let fixCount = [0, 0]
+  //     for (let i = 0; i < this.toFix.length; i++) {
+  //       if (this.toFix[i].broken == true) {
+  //         fixCount[0]++
+  //       } else {
+  //         fixCount[1]++
+  //       }
+  //     }
+  //     return fixCount
+  //   }
 }
 
 type EquiptmentChange = {

@@ -7,7 +7,9 @@ import { Player, MessageType } from './types'
 import { socket } from './entities/MultiplayerEntity'
 import { setTimeout } from './Utils'
 import { userName } from './getUser'
-import { timer } from './HUD'
+import { timer, robotUI, satelliteUI } from './HUD'
+import { playerIsTraitor } from './entities/SpaceShip'
+import { EvilRobotTips, MissionControlTips } from './dialogs'
 
 let votingUI: ui.CustomPrompt
 export let playerVoted: boolean = false
@@ -80,11 +82,13 @@ export function closeVotingUI(playerToKick: string, isTraitor: boolean) {
     setTimeout(3000, () => {
       timer.running = true
       if (isTraitor) {
-        ui.displayAnnouncement(playerToKick + ' was the traitor, you win!')
+        satelliteUI.openDialogWindow(MissionControlTips, 5)
+        //ui.displayAnnouncement(playerToKick + ' was the traitor, you win!')
       } else {
-        ui.displayAnnouncement(
-          playerToKick + ' was NOT an android, it still is among you'
-        )
+        if (playerIsTraitor) {
+          robotUI.openDialogWindow(EvilRobotTips, 2)
+        } else {
+        }
       }
     })
   }
@@ -106,4 +110,6 @@ export function vote(votedPlayer: number) {
       },
     })
   )
+
+  votingUI.addText('Waiting for others', 0, -150, Color4.Red(), 20)
 }

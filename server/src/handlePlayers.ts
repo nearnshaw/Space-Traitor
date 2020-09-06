@@ -23,10 +23,10 @@ export async function playerJoin(
         data: {
           text:
             room.players.length +
-            ' Players are ready \n' +
-            'You need at least ' +
+            ' Players ready \n' +
+            'At least ' +
             MINIMUM_PLAYERS +
-            ' to start a game.\n Invite your friends/nemesis!',
+            ' needed to start.\n Invite your friends/nemesis!',
         },
       }),
       roomName,

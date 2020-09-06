@@ -47,8 +47,8 @@ export class Equipment extends Entity {
       new MiniGameMachine(
         this,
         () => {
-          this.alterState(false)
-          this.changeListener(this.broken)
+          //this.alterState(false)
+          this.changeListener(false)
         },
         false
       )
@@ -67,14 +67,14 @@ export class Equipment extends Entity {
         () => {
           if (this.broken) {
             if (playerIsTraitor) {
-              robotUI.openDialogWindow(EvilRobotTips, 0)
+              robotUI.openDialogWindow(EvilRobotTips, 1)
               return
             }
             this.miniGameMachine.minigame.Start()
           }
         },
         {
-          hoverText: 'Fix',
+          hoverText: playerIsTraitor ? 'Human stuff' : 'Fix',
         }
       )
     )

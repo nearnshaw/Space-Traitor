@@ -137,7 +137,7 @@ wss.on('connection', (clientWs, request) => {
               playerIsTraitor: room.players[playerIndex]
                 ? room.players[playerIndex].isTraitor
                 : false,
-              timeleft: room.timeLeft,
+              timeLeft: room.timeLeft,
               fixCount: room.fixCount,
             },
           })

@@ -3,12 +3,39 @@ import { SFHeavyFont } from '../node_modules/@dcl/ui-utils/utils/default-ui-como
 import { ship } from './game'
 import { MissionControlBrief, EvilRobotBrief } from './dialogs'
 
-export let fixUIBck: ui.LargeIcon
-export let fixIcon: ui.LargeIcon
-export let fixCounter: ui.UICounter
-export let secondsCounter: ui.UICounter
-export let timerSeparaor: ui.CornerLabel
-export let minutesCounter: ui.UICounter
+export let fixUIBck = new ui.LargeIcon('images/ui-gem.png', -20, 50, 256, 128, {
+  sourceWidth: 512,
+  sourceHeight: 256,
+})
+fixUIBck.image.visible = false
+export let fixIcon = new ui.LargeIcon(
+  'images/tool2.png',
+  -210,
+  65,
+  128 * 0.92,
+  128 * 0.92,
+  {
+    sourceWidth: 128,
+    sourceHeight: 128,
+  }
+)
+fixIcon.image.visible = false
+export let fixCounter = new ui.UICounter(
+  0,
+  -135,
+  105,
+  Color4.Purple(),
+  48,
+  true
+)
+fixCounter.uiText.visible = false
+fixCounter.uiText.font = SFHeavyFont
+export let secondsCounter = new ui.UICounter(0, -14, 49, Color4.Black())
+secondsCounter.uiText.visible = false
+export let timerSeparaor = new ui.CornerLabel(':', -39, 49, Color4.Black())
+timerSeparaor.uiText.visible = false
+export let minutesCounter = new ui.UICounter(0, -64, 49, Color4.Black())
+minutesCounter.uiText.visible = false
 
 export let satelliteUI = new ui.DialogWindow({
   path: 'images/radio3.png',
@@ -24,35 +51,21 @@ let totalFixes = 10
 let firstTime: boolean = true
 
 export function startUI(time: number) {
+  fixUIBck.image.visible = true
+  fixIcon.image.visible = true
+  fixCounter.uiText.visible = true
+  secondsCounter.uiText.visible = true
+  timerSeparaor.uiText.visible = true
+  minutesCounter.uiText.visible = true
+  fixCounter.set(0)
+  secondsCounter.set(time % 60)
+  minutesCounter.set(time / 60)
+
   if (firstTime == true) {
-    fixUIBck = new ui.LargeIcon('images/ui-gem.png', -20, 50, 256, 128, {
-      sourceWidth: 512,
-      sourceHeight: 256,
-    })
-    fixIcon = new ui.LargeIcon(
-      'images/tool2.png',
-      -210,
-      65,
-      128 * 0.92,
-      128 * 0.92,
-      {
-        sourceWidth: 128,
-        sourceHeight: 128,
-      }
-    )
-    //let gemsLabel = new ui.CornerLabel('Gems found:', -100, 50, Color4.Purple())
-    fixCounter = new ui.UICounter(0, -135, 105, Color4.Purple(), 48, true)
-    fixCounter.uiText.font = SFHeavyFont
-    secondsCounter = new ui.UICounter(0, -14, 49, Color4.Black())
-    timerSeparaor = new ui.CornerLabel(':', -39, 49, Color4.Black())
-    minutesCounter = new ui.UICounter(time / 60, -64, 49, Color4.Black())
     timer = new CountdownSystem()
     engine.addSystem(timer)
     firstTime = false
   } else {
-    fixCounter.set(0)
-    secondsCounter.set(0)
-    minutesCounter.set(5)
     timer.running = true
   }
 }
