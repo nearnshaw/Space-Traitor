@@ -106,6 +106,10 @@ export let MissionControlTips: Dialog[] = [
       'The ship has passed the point of no return. Mission failed, evacuate!!',
     isEndOfDialog: true,
   },
+  {
+    text: 'Congratulations, you have found the impostor and saved the ship!',
+    isEndOfDialog: true,
+  },
 ]
 
 export let EvilRobotTips: Dialog[] = [

@@ -22,7 +22,8 @@ import {
 
 let doorBell = new Button(
   {
-    position: new Vector3(4, 1, 4),
+    position: new Vector3(4, 1, 10.9),
+    rotation: Quaternion.Euler(0, 270 + 45, 90),
   },
   new GLTFShape('models/Green_SciFi_Button.glb'),
   async () => {
@@ -112,16 +113,15 @@ export async function joinGame() {
   messageActions.push(endVote)
 
   ship = new SpaceShip()
-  let fuse1 = new FuseBox(0, { position: new Vector3(15, 1, 15) })
-  let fuse2 = new FuseBox(1, { position: new Vector3(17, 1, 15) })
-  let fuse3 = new FuseBox(2, { position: new Vector3(19, 1, 15) })
-
-  // initate any other multiplayer things
-
-  //   ship.start()
-  //   fuse1.start()
-  // fuse2.start()
-  // fuse3.start()
+  let fuse1 = new FuseBox(0, { position: new Vector3(8.5, 1, 39) })
+  let fuse2 = new FuseBox(1, {
+    position: new Vector3(46, 1, 14),
+    rotation: Quaternion.Euler(0, 270, 0),
+  })
+  let fuse3 = new FuseBox(2, {
+    position: new Vector3(41, 1, 38.5),
+    rotation: Quaternion.Euler(0, 270, 0),
+  })
 
   await startSocketListeners()
 }
@@ -149,3 +149,8 @@ export function finishGame(traitorWon: boolean) {
     satelliteUI.openDialogWindow(MissionControlTips, 3)
   }
 }
+
+Input.instance.subscribe('BUTTON_DOWN', ActionButton.PRIMARY, false, (e) => {
+  log(`pos: `, Camera.instance.position)
+  log(`rot: `, Camera.instance.rotation)
+})
