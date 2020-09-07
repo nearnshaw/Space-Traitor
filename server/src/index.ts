@@ -13,6 +13,7 @@ import {
   GAME_DURATION,
   sabotagePenalty,
   FIXES_TO_WIN,
+  VOTING_TIME,
 } from './config'
 
 export const wss = new WebSocket.Server({ port: PORT })
@@ -37,6 +38,8 @@ wss.on('connection', (clientWs, request) => {
   console.log('connection is established : ' + id)
   CLIENTS[id] = ws
   CLIENTS.push(ws)
+
+  let votingTimeout: NodeJS.Timeout
 
   ws.on('message', function incoming(message) {
     const msg = JSON.parse(message.toString())
@@ -213,6 +216,9 @@ wss.on('connection', (clientWs, request) => {
         }
         break
       case MessageType.STARTVOTE:
+        votingTimeout = setTimeout(() => {
+          endVotes(ws.room)
+        }, VOTING_TIME * 1000)
         let playersAlive = 0
         for (let player of room.players) {
           if (player.alive) playersAlive++
@@ -228,6 +234,7 @@ wss.on('connection', (clientWs, request) => {
               type: MessageType.STARTVOTE,
               data: {
                 players: room.players,
+                timeLeft: VOTING_TIME,
               },
             }),
             ws.room
@@ -260,6 +267,7 @@ wss.on('connection', (clientWs, request) => {
           }
 
           if (voteCount >= room.players.length) {
+            clearTimeout(votingTimeout)
             endVotes(ws.room)
           } else {
             console.log(

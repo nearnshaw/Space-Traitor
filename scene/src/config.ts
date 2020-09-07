@@ -1,5 +1,5 @@
 // use server in localhost or on the web
-const local: boolean = false
+const local: boolean = true
 
 const server = local
   ? 'ws://localhost:8081'
