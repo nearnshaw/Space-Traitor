@@ -35,7 +35,8 @@ export function openVotingUI(players: Player[], timeLeft: number) {
     -200
   )
 
-  votingTimer.running = true
+  //   engine.addSystem(votingTimer)
+  //   votingTimer.running = true
 
   let offset = 30
   for (let i = 0; i < players.length; i++) {
@@ -89,7 +90,7 @@ export function updateVotingUI(
 
 export function closeVotingUI(playerToKick: string, isTraitor: boolean) {
   votingUI.close()
-  votingTimer.running = false
+  //votingTimer.running = false
 
   if (!playerToKick) {
     ui.displayAnnouncement('No one was kicked')
@@ -131,25 +132,24 @@ export function vote(votedPlayer: number) {
   votingUI.addText('Waiting for others to vote', 0, -140, Color4.Red(), 20)
 }
 
-class VOTINGCountdownSystem implements ISystem {
-  running: boolean = true
-  timer: number = 1
-  update(dt: number) {
-    if (this.running == false) return
-    this.timer -= dt
-    if (this.timer <= 0) {
-      this.timer = 1
-      votingTimeLeft -= 1
-      voteSeconds.text.value = (votingTimeLeft % 60).toString()
-      voteMinutes.text.value = Math.floor(votingTimeLeft / 60).toString()
+// class VOTINGCountdownSystem implements ISystem {
+//   running: boolean = true
+//   timer: number = 1
+//   update(dt: number) {
+//     if (this.running == false) return
+//     this.timer -= dt
+//     if (this.timer <= 0) {
+//       this.timer = 1
+//       votingTimeLeft -= 1
+//       voteSeconds.text.value = (votingTimeLeft % 60).toString()
+//       voteMinutes.text.value = Math.floor(votingTimeLeft / 60).toString()
 
-      if (votingTimeLeft < 0) {
-        this.running = false
-        // end voting
-      }
-    }
-  }
-}
+//       if (votingTimeLeft < 0) {
+//         this.running = false
+//         // end voting
+//       }
+//     }
+//   }
+// }
 
-let votingTimer = new VOTINGCountdownSystem()
-engine.addSystem(votingTimer)
+// let votingTimer = new VOTINGCountdownSystem()

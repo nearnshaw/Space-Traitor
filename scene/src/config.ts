@@ -7,9 +7,3 @@ const server = local
 
 const toFix = 10
 const toSabbotage = 3
-
-// const TILE_SIZE = 42 / GRIDX
-// const GAP_BETWEEN_TILES = 0
-
-// const xOffset = 2.5
-// const zOffset = 2.5
