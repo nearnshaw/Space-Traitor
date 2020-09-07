@@ -10,28 +10,28 @@ export let playerIsAlive: boolean = true
 
 let equiptMentList: EquiptmentData[] = [
   {
-    transform: { position: new Vector3(1.7, 1, 28) },
+    transform: { position: new Vector3(14.5, 1, 19.6) },
   },
   {
-    transform: { position: new Vector3(12, 1, 37) },
+    transform: { position: new Vector3(18, 1, 6) },
   },
   {
-    transform: { position: new Vector3(9, 1, 34) },
+    transform: { position: new Vector3(11, 1, 33.8) },
   },
   {
-    transform: { position: new Vector3(3, 1, 32) },
+    transform: { position: new Vector3(33, 1, 27) },
   },
   {
-    transform: { position: new Vector3(26, 1, 35) },
+    transform: { position: new Vector3(26, 1, 12) },
   },
   {
-    transform: { position: new Vector3(26, 1, 25) },
+    transform: { position: new Vector3(35, 1, 2) },
   },
   {
-    transform: { position: new Vector3(37, 1, 20) },
+    transform: { position: new Vector3(21.5, 6, 9.5) },
   },
   {
-    transform: { position: new Vector3(26, 1, 13) },
+    transform: { position: new Vector3(34, 1, 38.8) },
   },
 ]
 
@@ -67,7 +67,7 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
 
     let panicButton = new Button(
       {
-        position: new Vector3(12, 1, 20),
+        position: new Vector3(12, 1, 28),
       },
       new GLTFShape('models/Danger_SciFi_Button.glb'),
       () => {

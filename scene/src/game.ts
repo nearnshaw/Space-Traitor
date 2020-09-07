@@ -113,14 +113,21 @@ export async function joinGame() {
   messageActions.push(endVote)
 
   ship = new SpaceShip()
-  let fuse1 = new FuseBox(0, { position: new Vector3(8.5, 1, 39) })
+  let fuse1 = new FuseBox(0, {
+    position: new Vector3(35.5, 1, 23.65),
+    rotation: Quaternion.Euler(-180, 0, 180),
+  })
   let fuse2 = new FuseBox(1, {
-    position: new Vector3(46, 1, 14),
-    rotation: Quaternion.Euler(0, 270, 0),
+    position: new Vector3(22, 1, 47.25),
+    rotation: Quaternion.Euler(0, 180, 0),
   })
   let fuse3 = new FuseBox(2, {
-    position: new Vector3(41, 1, 38.5),
-    rotation: Quaternion.Euler(0, 270, 0),
+    position: new Vector3(34.5, 5.5, 39),
+    rotation: Quaternion.Euler(0, 180, 0),
+  })
+  let fuse4 = new FuseBox(3, {
+    position: new Vector3(19, 1, 8.5),
+    rotation: Quaternion.Euler(0, 0, 0),
   })
 
   await startSocketListeners()
@@ -151,8 +158,24 @@ export function finishGame(traitorWon: boolean) {
 }
 
 Input.instance.subscribe('BUTTON_DOWN', ActionButton.PRIMARY, false, (e) => {
-  log(`pos: `, Camera.instance.position)
-  log(`rot: `, Camera.instance.rotation)
+  log(
+    `pos:  new Vector3(`,
+    Camera.instance.position.x,
+    `,`,
+    Camera.instance.position.y,
+    `,`,
+    Camera.instance.position.z,
+    `)`
+  )
+  log(
+    `rot: Quaternion.Euler(`,
+    Camera.instance.rotation.eulerAngles.x,
+    `,`,
+    Camera.instance.rotation.eulerAngles.y,
+    `,`,
+    Camera.instance.rotation.eulerAngles.z,
+    `)`
+  )
 })
 
 // Setup Environemnt

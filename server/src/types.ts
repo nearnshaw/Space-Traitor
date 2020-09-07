@@ -31,6 +31,13 @@ export class roomData {
       greenCut: false,
       blueCut: false,
     },
+    {
+      id: 3,
+      doorOpen: false,
+      redCut: false,
+      greenCut: false,
+      blueCut: false,
+    },
   ]
 }
 
