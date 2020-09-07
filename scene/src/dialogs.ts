@@ -11,30 +11,30 @@ export let MissionControlBrief: Dialog[] = [
     ifPressF: 2,
   },
   {
-    text: `Good lick then, officer`,
+    text: `Good luck then, officer`,
     triggeredByNext: () => {
       sendJoinRequest()
     },
     isEndOfDialog: true,
   },
   {
-    text: `This space ship is in a critical state, we need to send in a crew to resolve the situation ASAP.`,
+    text: `This space ship is in a critical state, we must send in a crew to resolve the situation ASAP.`,
   },
   {
-    text: `We believe an intentional sabotage has started a chain reaction that will overheat the engines and self destruct the ship soon.`,
+    text: `We believe an intentional sabotage started a chain reaction that is overheating the engines and will self destruct the ship soon.`,
   },
   {
-    text: `You, as part of a team of at least four others must enter the ship, and quickly repair the systems of the ship.`,
+    text: `You and at least three others must enter the ship, and quickly repair its systems.`,
   },
   {
-    text: `We believe that with fixing 10 malfunctions it will be enough to stabalize the system and stop the chain reaction.`,
+    text: `We believe that fixing 10 malfunctions should be enough to stabilize things and stop the chain reaction.`,
   },
   {
-    text: `Beware. We have reason to believe that the same group that sabotaged the ship will send someone in. They will not be who they claim to be.`,
+    text: `Beware. We have reason to believe the same people (or whatever they are) that sabotaged the ship will send someone in. They will not be who they claim to be.`,
   },
 
   {
-    text: `They will likely want to cut the cables in the main reactor fuse boxes. This will shorten the estimated time you have left.`,
+    text: `They will likely try to cut the cables in the main reactor fuse boxes. This will speed the overheating of the ship.`,
     image: {
       path: 'images/cables.png',
       height: 128,
@@ -45,7 +45,7 @@ export let MissionControlBrief: Dialog[] = [
   },
 
   {
-    text: `Trust no one. If you suspect of someone, hit the button to call an emergency meeting and vote them out!`,
+    text: `Trust no one. If you suspect of someone, hit the button to call an emergency meeting. Vote intruders out!`,
     image: {
       path: 'images/panic-button.png',
       height: 128,
@@ -68,7 +68,7 @@ export let EvilRobotBrief: Dialog[] = [
     text: `Your memory was erased, but you're still one of us!`,
   },
   {
-    text: `Act normal, like one of them. We need to fool them first. Then we can DESTROY them!`,
+    text: `Act normal, like one of them. We need to fool them first. Then we will DESTROY them!`,
   },
   {
     text: `When they're distracted, open the reactor fuse boxes and cut the wires. Don't be seen!`,
@@ -85,7 +85,7 @@ export let EvilRobotBrief: Dialog[] = [
 
 export let MissionControlTips: Dialog[] = [
   {
-    text: 'Keep making these fixes. You need to do 10 to cool down the ship.',
+    text: 'Keep it up! You need to do 10 of these to cool down the ship.',
     isEndOfDialog: true,
   },
   {

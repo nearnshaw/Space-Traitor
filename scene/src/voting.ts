@@ -24,7 +24,7 @@ export function openVotingUI(players: Player[], timeLeft: number) {
   timer.running = false
   votingTimeLeft = timeLeft
   votingUI = new ui.CustomPrompt(PromptStyles.DARKSLANTED, 512 * 1.5, 512)
-  votingUI.addText('Voting Time', 0, 130, Color4.Red(), 30)
+  votingUI.addText('Time to Vote', 0, 130, Color4.Red(), 30)
   votingUI.addText("Who's the traitor?", 0, 100)
 
   voteSeconds = votingUI.addText((timeLeft % 60).toString(), 220, -200)
