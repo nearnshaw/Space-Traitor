@@ -67,7 +67,7 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
 
     let panicButton = new Button(
       {
-        position: new Vector3(20, 1, 20),
+        position: new Vector3(12, 1, 20),
       },
       new GLTFShape('models/Danger_SciFi_Button.glb'),
       () => {

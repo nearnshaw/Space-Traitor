@@ -22,7 +22,7 @@ import {
 
 let doorBell = new Button(
   {
-    position: new Vector3(4, 1, 10.9),
+    position: new Vector3(1.25, 1, 4.5),
     rotation: Quaternion.Euler(0, 270 + 45, 90),
   },
   new GLTFShape('models/Green_SciFi_Button.glb'),
@@ -76,7 +76,7 @@ export async function joinGame() {
     tag: MessageType.STARTVOTE,
     action: (data) => {
       if (!playerIsAlive) return
-      openVotingUI(data.players)
+      openVotingUI(data.players, data.timeLeft)
       ship.active = false
     },
   }
@@ -157,8 +157,10 @@ Input.instance.subscribe('BUTTON_DOWN', ActionButton.PRIMARY, false, (e) => {
 
 // Setup Environemnt
 const environmentEntity = new Entity()
-environmentEntity.addComponent(new Transform({
-  position: Vector3.Zero(),
-}))
+environmentEntity.addComponent(
+  new Transform({
+    position: Vector3.Zero(),
+  })
+)
 environmentEntity.addComponent(new GLTFShape('models/Environment.glb'))
 engine.addEntity(environmentEntity)
