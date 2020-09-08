@@ -88,9 +88,20 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
       this.toFix.push(eq)
     }
 
+    let buttonPedestal = new Entity()
+    buttonPedestal.addComponent(
+      new Transform({
+        position: new Vector3(12, 0, 28),
+      })
+    )
+    buttonPedestal.addComponent(new GLTFShape('models/Pedestal.glb'))
+    engine.addEntity(buttonPedestal)
+
     let panicButton = new Button(
       {
         position: new Vector3(12, 1, 28),
+        rotation: Quaternion.Euler(0, 0, 25),
+        scale: new Vector3(1.2, 1.2, 1.2),
       },
       new GLTFShape('models/Danger_SciFi_Button.glb'),
       () => {
