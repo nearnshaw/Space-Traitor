@@ -6,55 +6,64 @@ import { startUI, fixCounter, satelliteUI, robotUI } from '../HUD'
 import { EvilRobotBrief } from '../dialogs'
 import { Door } from './door'
 import { setTimeout } from '../Utils'
+import { music } from '../game'
 
 export let playerIsTraitor: boolean = false
 export let playerIsAlive: boolean = true
 
 let equiptMentList: EquiptmentData[] = [
   {
-    transform: { position: new Vector3(15.2, 1, 19) },  startBroken: true
+    transform: { position: new Vector3(15.2, 1, 19) },
+    startBroken: true,
   },
   {
     transform: {
       position: new Vector3(24, 1, 7.2),
       rotation: Quaternion.Euler(0, 270, 0),
-    }, startBroken: true
+    },
+    startBroken: true,
   },
   {
     transform: {
       position: new Vector3(12, 1, 33),
       rotation: Quaternion.Euler(0, 90, 0),
-    }, startBroken: true
+    },
+    startBroken: true,
   },
   {
     transform: {
       position: new Vector3(36.4, 1, 31.2),
       rotation: Quaternion.Euler(0, 270, 0),
-    }, startBroken: true
+    },
+    startBroken: true,
   },
   {
     transform: {
       position: new Vector3(25, 1, 12),
       rotation: Quaternion.Euler(0, 180, 0),
-    }, startBroken: true
+    },
+    startBroken: true,
   },
   {
     transform: {
       position: new Vector3(35, 1, 0.9),
       rotation: Quaternion.Euler(0, 90, 0),
-    }, startBroken: true
+    },
+    startBroken: true,
   },
   {
     transform: {
       position: new Vector3(21.5, 5.3, 8.9),
       rotation: Quaternion.Euler(0, 90, 0),
-    }, startBroken: true
+    },
+    startBroken: true,
   },
   {
     transform: {
       position: new Vector3(36.4, 1, 39.4),
       rotation: Quaternion.Euler(0, 270, 0),
-    }, startBroken: true
+    },
+    startBroken: true,
   },
 ]
 
@@ -140,6 +149,8 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
       setTimeout(30000, () => {
         mainDoor.close()
       })
+
+      music.playSong('suspense-tension-trap-loop.mp3')
 
       //resetAllBoxes()
     } else if (!fullState.active && this.active) {

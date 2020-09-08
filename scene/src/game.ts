@@ -19,6 +19,7 @@ import {
   EvilRobotTips,
   MissionControlTips,
 } from './dialogs'
+import { MusicPlayer } from './musicPlayer'
 
 let doorBell = new Button(
   {
@@ -95,6 +96,8 @@ export async function joinGame() {
   let endVote: MessageAction = {
     tag: MessageType.ENDVOTE,
     action: (data) => {
+      music.playSong('tyops_game-movie-suspense-theme.mp3')
+
       if (!playerIsAlive) return
       closeVotingUI(
         data.kickedPlayer ? data.kickedPlayer : null,
@@ -191,3 +194,6 @@ environmentEntity.addComponent(
 )
 environmentEntity.addComponent(new GLTFShape('models/Environment.glb'))
 engine.addEntity(environmentEntity)
+
+export let music = new MusicPlayer()
+music.playSong('tyops_game-movie-suspense-theme.mp3')
