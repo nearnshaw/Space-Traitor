@@ -1,5 +1,5 @@
 import { MultiplayerEntity } from './MultiplayerEntity'
-import { ship, fuse1, fuse2, fuse3, fuse4 } from '../game'
+import { ship, fuse1, fuse2, fuse3, fuse4, music } from '../game'
 import { playerIsTraitor } from './SpaceShip'
 import { robotUI } from '../HUD'
 import { EvilRobotTips } from '../dialogs'
@@ -311,11 +311,11 @@ export function toggleCable(
       break
   }
 
-  if (value) {
+  if (value == true) {
     cableClip.stop()
     cableClip.play()
   } else {
-    cableClip.stop()
+    cableClip.reset()
   }
 
   if (boxState.blueCableCut && boxState.redCableCut && boxState.greenCableCut) {
@@ -324,6 +324,7 @@ export function toggleCable(
       robotUI.openDialogWindow(EvilRobotTips, 0)
     }
 
+    music.playSong('tyops_scary-suspense.mp3', 1, true)
     log('ALL THREE CABLES CUT')
   }
 }
