@@ -1,5 +1,7 @@
 import { Dialog } from '../node_modules/@dcl/ui-utils/utils/types'
-import { sendJoinRequest } from './game'
+import { sendJoinRequest, music } from './game'
+import { mainDoor } from './entities/SpaceShip'
+import * as ui from '../node_modules/@dcl/ui-utils/index'
 
 export let MissionControlBrief: Dialog[] = [
   {
@@ -54,12 +56,31 @@ export let MissionControlBrief: Dialog[] = [
       section: { sourceHeight: 256, sourceWidth: 256 },
     },
   },
+
+  {
+    text:
+      'Can you assemble a crew, or do you want to at least explore the premises alone?',
+
+    isQuestion: true,
+    ifPressE: 10,
+    ifPressF: 11,
+    labelE: { label: `Crew`, offsetX: 12 },
+    labelF: { label: `Solo`, offsetX: 12 },
+  },
   {
     text: 'Good luck officer, we trust your judgement.',
-    isEndOfDialog: true,
     triggeredByNext: () => {
       sendJoinRequest()
     },
+    isEndOfDialog: true,
+  },
+  {
+    text: 'You can explore, \n but need others to join to play.',
+    triggeredByNext: () => {
+      mainDoor.open()
+      music.playSong('Space-Traitor-3.mp3', 0.25)
+    },
+    isEndOfDialog: true,
   },
 ]
 
