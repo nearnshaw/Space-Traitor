@@ -118,15 +118,15 @@ export async function joinGame() {
 
   ship = new SpaceShip()
   fuse1 = new FuseBox(0, {
-    position: new Vector3(35.5, 1, 23.65),
-    rotation: Quaternion.Euler(-180, 0, 180),
+    position: new Vector3(38.5, 1.5, 8.65),
+    rotation: Quaternion.Euler(0, 0, 0),
   })
   fuse2 = new FuseBox(1, {
     position: new Vector3(22, 1, 47.25),
     rotation: Quaternion.Euler(0, 180, 0),
   })
   fuse3 = new FuseBox(2, {
-    position: new Vector3(34.5, 5.5, 39),
+    position: new Vector3(22, 5.5, 39),
     rotation: Quaternion.Euler(0, 180, 0),
   })
   fuse4 = new FuseBox(3, {

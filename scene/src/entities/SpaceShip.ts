@@ -16,7 +16,7 @@ let equiptMentList: EquiptmentData[] = [
   },
   {
     transform: {
-      position: new Vector3(20, 1, 7.2),
+      position: new Vector3(24, 1, 7.2),
       rotation: Quaternion.Euler(0, 270, 0),
     },
   },
@@ -28,8 +28,8 @@ let equiptMentList: EquiptmentData[] = [
   },
   {
     transform: {
-      position: new Vector3(33.4, 1, 28),
-      rotation: Quaternion.Euler(0, 180, 0),
+      position: new Vector3(36.4, 1, 31.2),
+      rotation: Quaternion.Euler(0, 270, 0),
     },
   },
   {
@@ -52,7 +52,7 @@ let equiptMentList: EquiptmentData[] = [
   },
   {
     transform: {
-      position: new Vector3(36.5, 1, 39.5),
+      position: new Vector3(36.4, 1, 39.4),
       rotation: Quaternion.Euler(0, 270, 0),
     },
   },
