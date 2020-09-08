@@ -4,35 +4,57 @@ import { EquiptmentData, MessageType } from '../types'
 import { Button } from './Button'
 import { startUI, fixCounter, satelliteUI, robotUI } from '../HUD'
 import { EvilRobotBrief } from '../dialogs'
-import { resetAllBoxes } from './fuseBox'
+import { Door } from './door'
+import { setTimeout } from '../Utils'
 
 export let playerIsTraitor: boolean = false
 export let playerIsAlive: boolean = true
 
 let equiptMentList: EquiptmentData[] = [
   {
-    transform: { position: new Vector3(14.5, 1, 19.6) }, startBroken: true
+    transform: { position: new Vector3(15.2, 1, 19) },  startBroken: true
   },
   {
-    transform: { position: new Vector3(18, 1, 6) }, startBroken: true
+    transform: {
+      position: new Vector3(24, 1, 7.2),
+      rotation: Quaternion.Euler(0, 270, 0),
+    }, startBroken: true
   },
   {
-    transform: { position: new Vector3(11, 1, 33.8) }, startBroken: true
+    transform: {
+      position: new Vector3(12, 1, 33),
+      rotation: Quaternion.Euler(0, 90, 0),
+    }, startBroken: true
   },
   {
-    transform: { position: new Vector3(33, 1, 27) }, startBroken: true
+    transform: {
+      position: new Vector3(36.4, 1, 31.2),
+      rotation: Quaternion.Euler(0, 270, 0),
+    }, startBroken: true
   },
   {
-    transform: { position: new Vector3(26, 1, 12) }, startBroken: true
+    transform: {
+      position: new Vector3(25, 1, 12),
+      rotation: Quaternion.Euler(0, 180, 0),
+    }, startBroken: true
   },
   {
-    transform: { position: new Vector3(35, 1, 2) }, startBroken: true
+    transform: {
+      position: new Vector3(35, 1, 0.9),
+      rotation: Quaternion.Euler(0, 90, 0),
+    }, startBroken: true
   },
   {
-    transform: { position: new Vector3(21.5, 6, 9.5) }, startBroken: true
+    transform: {
+      position: new Vector3(21.5, 5.3, 8.9),
+      rotation: Quaternion.Euler(0, 90, 0),
+    }, startBroken: true
   },
   {
-    transform: { position: new Vector3(34, 1, 38.8) }, startBroken: true
+    transform: {
+      position: new Vector3(36.4, 1, 39.4),
+      rotation: Quaternion.Euler(0, 270, 0),
+    }, startBroken: true
   },
 ]
 
@@ -66,9 +88,20 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
       this.toFix.push(eq)
     }
 
+    let buttonPedestal = new Entity()
+    buttonPedestal.addComponent(
+      new Transform({
+        position: new Vector3(12, 0, 28),
+      })
+    )
+    buttonPedestal.addComponent(new GLTFShape('models/Pedestal.glb'))
+    engine.addEntity(buttonPedestal)
+
     let panicButton = new Button(
       {
         position: new Vector3(12, 1, 28),
+        rotation: Quaternion.Euler(0, 0, 25),
+        scale: new Vector3(1.2, 1.2, 1.2),
       },
       new GLTFShape('models/Danger_SciFi_Button.glb'),
       () => {
@@ -98,9 +131,15 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
       startUI(fullState.timeLeft)
       playerIsTraitor = fullState.playerIsTraitor
       if (fullState.playerIsTraitor) {
-        satelliteUI.closeDialogWindow()
+        if (satelliteUI.isDialogOpen) {
+          satelliteUI.closeDialogWindow()
+        }
         robotUI.openDialogWindow(EvilRobotBrief, 0)
       }
+      mainDoor.open()
+      setTimeout(30000, () => {
+        mainDoor.close()
+      })
 
       //resetAllBoxes()
     } else if (!fullState.active && this.active) {
@@ -126,7 +165,6 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     for (let i = 0; i < this.toFix.length; i++) {
       this.toFix[i].reset()
     }
-    resetAllBoxes()
   }
 }
 
@@ -144,3 +182,14 @@ type FullState = {
   fixCount: number
   playerIsTraitor?: boolean
 }
+
+let mainDoor = new Door(
+  {
+    position: new Vector3(4.5, 0, 4.3),
+    rotation: Quaternion.Euler(0, 45 + 90, 0),
+  },
+  new GLTFShape('models/MainDoor.glb'),
+  new Vector3(2, 0, -2)
+)
+
+mainDoor.open()

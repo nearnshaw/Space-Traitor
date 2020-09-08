@@ -38,7 +38,7 @@ export class Equipment extends Entity {
     this.changeListener = changeListener
 
     this.addComponent(new Transform(transform))
-    this.addComponent(new BoxShape())
+    this.addComponent(new GLTFShape('models/TerminalWall.glb'))
     engine.addEntity(this)
 
     this.siren = new Siren(this, new Vector3(0, 2, 1))

@@ -1,5 +1,5 @@
 import { MultiplayerEntity } from './MultiplayerEntity'
-import { ship } from '../game'
+import { ship, fuse1, fuse2, fuse3, fuse4 } from '../game'
 import { playerIsTraitor } from './SpaceShip'
 import { robotUI } from '../HUD'
 import { EvilRobotTips } from '../dialogs'
@@ -25,6 +25,8 @@ export class CableBox {
   }
 }
 
+const fuseBoxes = engine.getComponentGroup(CableBox)
+
 export enum CableColors {
   Blue,
   Green,
@@ -39,20 +41,19 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
   id: number
   changeListener: (state: boolean) => void
 
-  broken: boolean = false
-
   redCable: Entity
   blueCable: Entity
   greenCable: Entity
   redClip: AnimationState
   blueClip: AnimationState
   greenClip: AnimationState
+  openClip: AnimationState
+  closeClip: AnimationState
 
   constructor(
     id: number,
-    transform: TranformConstructorArgs,
+    transform: TranformConstructorArgs
     //changeListener: (state: boolean) => void,
-    startBroken?: boolean
   ) {
     super('FuseBox')
 
@@ -65,16 +66,14 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
     this.addComponent(boxState)
 
     const animator = new Animator()
-    const openClip = new AnimationState('open', { looping: false })
-    const closeClip = new AnimationState('close', { looping: false })
-    animator.addClip(openClip)
-    animator.addClip(closeClip)
+    this.openClip = new AnimationState('open', { looping: false })
+    this.closeClip = new AnimationState('close', { looping: false })
+    animator.addClip(this.openClip)
+    animator.addClip(this.closeClip)
     this.addComponent(animator)
 
     this.addComponent(new GLTFShape('models/Cable_Box.glb'))
     engine.addEntity(this)
-
-    if (startBroken) this.broken = true
 
     let thisBox = this
 
@@ -197,10 +196,15 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
   }
 
   reset() {
-    toggleBox(this, false)
-    toggleCable(this, false, CableColors.Red)
-    toggleCable(this, false, CableColors.Blue)
-    toggleCable(this, false, CableColors.Green)
+    this.redClip.stop()
+    this.greenClip.stop()
+    this.blueClip.stop()
+    this.openClip.stop()
+
+    this.getComponent(CableBox).blueCableCut = false
+    this.getComponent(CableBox).redCableCut = false
+    this.getComponent(CableBox).greenCableCut = false
+    this.getComponent(CableBox).doorOpen = false
   }
 
   protected reactToSingleChanges(change: FuseChange): void {
@@ -223,8 +227,19 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
   }
 
   protected loadFullState(fullState: FullFuseState): void {
+    if (fullState.id == 1000) {
+      fuse1.reset()
+      fuse2.reset()
+      fuse3.reset()
+      fuse4.reset()
+
+      //resetAllBoxes()
+      log('sucessfully reset all boxes')
+      return
+    }
+
     if (fullState.id != this.id) return
-    log('fuse gets  full state ', fullState)
+    log('fuse gets full state ', fullState)
     ship.timeLeft = fullState.timeLeft
     toggleBox(this, fullState.doorOpen)
     toggleCable(this, fullState.redCut, CableColors.Red)
@@ -233,7 +248,7 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
   }
 }
 
-export function toggleBox(entity: Entity, value: boolean, playSound = true) {
+export function toggleBox(entity: FuseBox, value: boolean, playSound = true) {
   let boxState = entity.getComponent(CableBox)
   if (boxState.doorOpen === value) return
 
@@ -257,6 +272,10 @@ export function toggleBox(entity: Entity, value: boolean, playSound = true) {
   clip.play()
 
   boxState.doorOpen = value
+
+  toggleCable(entity, boxState.redCableCut, CableColors.Red)
+  toggleCable(entity, boxState.blueCableCut, CableColors.Blue)
+  toggleCable(entity, boxState.greenCableCut, CableColors.Green)
 }
 
 export function toggleCable(
@@ -277,28 +296,16 @@ export function toggleCable(
   switch (color) {
     case CableColors.Red:
       log('cut red calbe')
-      //if (boxState.redCableCut === value) return
-      //   cableClip = new AnimationState('CableRedAction', { looping: false })
-      //   animator = entity.redCable.getComponent(Animator)
-      //   animator.addClip(cableClip)
       cableClip = entity.redClip
       boxState.redCableCut = value
       break
 
     case CableColors.Green:
-      //if (boxState.greenCableCut === value) return
-      //   cableClip = new AnimationState('CableGreenAction', { looping: false })
-      //   animator = entity.greenCable.getComponent(Animator)
-      //   animator.addClip(cableClip)
       cableClip = entity.greenClip
       boxState.greenCableCut = value
       break
 
     case CableColors.Blue:
-      //if (boxState.blueCableCut === value) return
-      //   cableClip = new AnimationState('CableBlueAction', { looping: false })
-      //   animator = entity.blueCable.getComponent(Animator)
-      //   animator.addClip(cableClip)
       cableClip = entity.blueClip
       boxState.blueCableCut = value
       break
@@ -352,3 +359,9 @@ type FullFuseState = {
   blueCut: boolean
   timeLeft?: number
 }
+
+// export function resetAllBoxes() {
+//   for (let fuse of fuseBoxes.entities) {
+//     fuse.reset()
+//   }
+// }

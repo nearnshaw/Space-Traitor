@@ -393,6 +393,21 @@ export async function newGame(room: string) {
       room
     )
 
+    sendAllPlayers(
+      JSON.stringify({
+        type: 'FuseBox-fullStateRes',
+        data: {
+          id: 1000,
+          doorOpen: false,
+          redCut: false,
+          greenCut: false,
+          blueCut: false,
+          timeLeft: false,
+        },
+      }),
+      room
+    )
+
     startCountdown(room, GAME_DURATION)
 
     // setTimeout(function () {
@@ -413,9 +428,7 @@ export async function endGame(room: string) {
   }
 
   let traitorWon =
-    rooms[room].fixCount < FIXES_TO_WIN && traitorAlive
-      ? 'Traitor won'
-      : 'Humans won'
+    rooms[room].fixCount < FIXES_TO_WIN && traitorAlive ? true : false
 
   console.log(
     'FINISHED GAME in room ',
@@ -424,7 +437,7 @@ export async function endGame(room: string) {
     rooms[room].timeLeft,
     ' fix count: ',
     rooms[room].fixCount,
-    'FINAL RESULT ',
+    ' traitor won: ',
     traitorWon
   )
 
