@@ -7,17 +7,17 @@ import { EvilRobotTips } from '../dialogs'
 import { Siren } from './Siren'
 
 //Reusable materials
-export let neutralMaterial = new Material()
-neutralMaterial.roughness = 1.0
-neutralMaterial.albedoColor = Color3.FromInts(400, 250, 100) // Amber glow
+// export let neutralMaterial = new Material()
+// neutralMaterial.roughness = 1.0
+// neutralMaterial.albedoColor = Color3.FromInts(400, 250, 100) // Amber glow
 
-let greenMaterial = new Material()
-greenMaterial.roughness = 1
-greenMaterial.albedoColor = Color3.Green()
+// let greenMaterial = new Material()
+// greenMaterial.roughness = 1
+// greenMaterial.albedoColor = Color3.Green()
 
-let redMaterial = new Material()
-redMaterial.roughness = 1
-redMaterial.albedoColor = Color3.FromInts(500, 150, 180) // Pink glow
+// let redMaterial = new Material()
+// redMaterial.roughness = 1
+// redMaterial.albedoColor = Color3.FromInts(500, 150, 180) // Pink glow
 
 export class Equipment extends Entity {
   broken: boolean = false
@@ -26,6 +26,7 @@ export class Equipment extends Entity {
   siren: Siren
   changeListener: (state: boolean) => void
 
+  fixSound = new AudioClip('sounds/console.mp3')
   constructor(
     id: number,
     transform: TranformConstructorArgs,
@@ -41,7 +42,10 @@ export class Equipment extends Entity {
     this.addComponent(new GLTFShape('models/TerminalWall.glb'))
     engine.addEntity(this)
 
-    this.siren = new Siren(this, { position: new Vector3(0.5, 2, 0), rotation: Quaternion.Euler(0, 0, 90), })
+    this.siren = new Siren(this, {
+      position: new Vector3(0.5, 2, 0),
+      rotation: Quaternion.Euler(0, 0, 90),
+    })
 
     this.miniGameMachine = this.addComponent(
       new MiniGameMachine(
@@ -77,16 +81,22 @@ export class Equipment extends Entity {
   }
 
   alterState(isBroken: boolean) {
-    if (this.broken != isBroken) {
-      if (isBroken) {
-        this.addComponentOrReplace(redMaterial)
-      } else {
-        this.addComponentOrReplace(greenMaterial)
-      }
-    }
+    // if (this.broken != isBroken) {
+    //   if (isBroken) {
+    //     this.addComponentOrReplace(redMaterial)
+    //   } else {
+    //     this.addComponentOrReplace(greenMaterial)
+    //   }
+    // }
     this.broken = isBroken
 
     this.siren.toggle(this.broken)
+
+    if (!isBroken) {
+      const source = new AudioSource(this.fixSound)
+      this.addComponentOrReplace(source)
+      source.playing = true
+    }
   }
 
   reset() {
