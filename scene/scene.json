@@ -1,10 +1,11 @@
 {
   "display": {
-    "title": "interactive-text",
-    "favicon": "favicon_asset"
+    "title": "Space Traitor",
+    "favicon": "favicon_asset",
+    "navmapThumbnail": "https://raw.githubusercontent.com/nearnshaw/Space-Traitor/master/screenshot.jpeg"
   },
   "contact": {
-    "name": "author-name",
+    "name": "Pravus, Mauri & Nico E: the dream team",
     "email": ""
   },
   "owner": "",
@@ -32,9 +33,7 @@
     "voiceEnabled": true,
     "blacklist": []
   },
-  "requiredPermissions": [
-    "ALLOW_TO_MOVE_PLAYER_INSIDE_SCENE"
-  ],
+  "requiredPermissions": ["ALLOW_TO_MOVE_PLAYER_INSIDE_SCENE"],
   "main": "bin/game.js",
   "tags": [],
   "spawnPoints": [
