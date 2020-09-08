@@ -9,8 +9,18 @@
   },
   "owner": "",
   "scene": {
-    "parcels": ["0,0", "0,1", "0,2", "1,0", "1,1", "1,2", "2,0", "2,1", "2,2"],
-    "base": "0,0"
+    "parcels": [
+      "-64,-34",
+      "-64,-33",
+      "-64,-32",
+      "-63,-34",
+      "-63,-33",
+      "-63,-32",
+      "-62,-34",
+      "-62,-33",
+      "-62,-32"
+    ],
+    "base": "-64,-34"
   },
   "communications": {
     "type": "webrtc",
@@ -22,7 +32,9 @@
     "voiceEnabled": true,
     "blacklist": []
   },
-  "requiredPermissions": ["ALLOW_TO_MOVE_PLAYER_INSIDE_SCENE"],
+  "requiredPermissions": [
+    "ALLOW_TO_MOVE_PLAYER_INSIDE_SCENE"
+  ],
   "main": "bin/game.js",
   "tags": [],
   "spawnPoints": [
