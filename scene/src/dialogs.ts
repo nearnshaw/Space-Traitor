@@ -18,23 +18,23 @@ export let MissionControlBrief: Dialog[] = [
     isEndOfDialog: true,
   },
   {
-    text: `This space ship is in a critical state, we must send in a crew to resolve the situation ASAP.`,
+    text: `This space station is in a critical state, we must send in a crew to resolve the situation ASAP.`,
   },
   {
-    text: `We believe an intentional sabotage started a chain reaction that is overheating the engines and will self destruct the ship soon.`,
+    text: `We believe an intentional sabotage started a chain reaction that is overheating the engines and will self destruct the station soon.`,
   },
   {
-    text: `You and at least three others must enter the ship, and quickly repair its systems.`,
+    text: `You and at least three others must enter the station, and quickly repair its systems.`,
   },
   {
     text: `We believe that fixing 10 malfunctions should be enough to stabilize things and stop the chain reaction.`,
   },
   {
-    text: `Beware. We have reason to believe the same people (or whatever they are) that sabotaged the ship will send someone in. They will not be who they claim to be.`,
+    text: `Beware. We have reason to believe the same people (or whatever they are) that sabotaged the station will send someone in. They will not be who they claim to be.`,
   },
 
   {
-    text: `They will likely try to cut the cables in the main reactor fuse boxes. This will speed the overheating of the ship.`,
+    text: `They will likely try to cut the cables in the main fuse boxes. This will speed the overheating of the reactor.`,
     image: {
       path: 'images/cables.png',
       height: 128,
@@ -85,7 +85,7 @@ export let EvilRobotBrief: Dialog[] = [
 
 export let MissionControlTips: Dialog[] = [
   {
-    text: 'Keep it up! You need to do 10 of these to cool down the ship.',
+    text: 'Keep it up! You need to do 10 of these to cool down the reactor.',
     isEndOfDialog: true,
   },
   {
@@ -93,28 +93,29 @@ export let MissionControlTips: Dialog[] = [
     isEndOfDialog: true,
   },
   {
-    text: 'The person you ejected was a human. The enemy is still in the ship!',
+    text:
+      'The person you ejected was a human. The enemy is still in the station!',
     isEndOfDialog: true,
   },
   {
     text:
-      'Congratulations! You have stopped the chain reaction and saved the ship!',
+      'Congratulations! You have stopped the chain reaction and saved the station!',
     isEndOfDialog: true,
   },
   {
     text:
-      'The ship has passed the point of no return. Mission failed, evacuate!!',
+      'The reactor has passed the point of no return. Mission failed, evacuate!!',
     isEndOfDialog: true,
   },
   {
-    text: 'Congratulations, you have found the impostor and saved the ship!',
+    text: 'Congratulations, you have found the impostor and saved the station!',
     isEndOfDialog: true,
   },
 ]
 
 export let EvilRobotTips: Dialog[] = [
   {
-    text: 'Well done! They now have less time to fix the ship!',
+    text: 'Well done! They now have less time to fix the reactor!',
     isEndOfDialog: true,
   },
   {
