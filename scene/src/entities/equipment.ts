@@ -43,7 +43,7 @@ export class Equipment extends Entity {
     engine.addEntity(this)
 
     this.siren = new Siren(this, {
-      position: new Vector3(0.5, 2, 0),
+      position: new Vector3(0.5, 1.6, 0),
       rotation: Quaternion.Euler(0, 0, 90),
     })
 
