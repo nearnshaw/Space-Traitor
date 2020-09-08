@@ -324,7 +324,7 @@ export function toggleCable(
       robotUI.openDialogWindow(EvilRobotTips, 0)
     }
 
-    music.playSong('tyops_scary-suspense.mp3', 1, true)
+    //music.playSong('tyops_scary-suspense.mp3', 1, true)
     log('ALL THREE CABLES CUT')
   }
 }

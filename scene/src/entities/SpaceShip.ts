@@ -150,7 +150,7 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
         mainDoor.close()
       })
 
-      music.playSong('suspense-tension-trap-loop.mp3')
+      music.playSong('Space-Traitor-2.mp3')
 
       //resetAllBoxes()
     } else if (!fullState.active && this.active) {

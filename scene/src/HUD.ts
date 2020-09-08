@@ -1,6 +1,6 @@
 import * as ui from '../node_modules/@dcl/ui-utils/index'
 import { SFHeavyFont } from '../node_modules/@dcl/ui-utils/utils/default-ui-comopnents'
-import { ship } from './game'
+import { ship, music } from './game'
 import { MissionControlBrief, EvilRobotBrief } from './dialogs'
 
 export let fixUIBck = new ui.LargeIcon('images/ui-gem.png', -20, 50, 256, 128, {
@@ -36,7 +36,7 @@ export let timerSeparaor = new ui.CornerLabel(':', -39, 49, Color4.Black())
 timerSeparaor.uiText.visible = false
 export let minutesCounter = new ui.UICounter(0, -64, 49, Color4.Black())
 minutesCounter.uiText.visible = false
-
+secondsCounter.uiText.visible
 export let satelliteUI = new ui.DialogWindow({
   path: 'images/radio3.png',
   height: 220,
@@ -73,6 +73,7 @@ export function startUI(time: number) {
 class CountdownSystem implements ISystem {
   running: boolean = true
   timer: number = 1
+  crytical: boolean = false
   update(dt: number) {
     if (this.running == false) return
     this.timer -= dt
@@ -81,6 +82,11 @@ class CountdownSystem implements ISystem {
       ship.timeLeft -= 1
       secondsCounter.set(ship.timeLeft % 60)
       minutesCounter.set(Math.floor(ship.timeLeft / 60))
+
+      if (!this.crytical && ship.timeLeft < 90) {
+        music.playSong('Space-Traitor-3')
+        this.crytical = true
+      }
 
       if (ship.timeLeft < 0) {
         ship.active = false

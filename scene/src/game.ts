@@ -80,6 +80,7 @@ export async function joinGame() {
   let startVote: MessageAction = {
     tag: MessageType.STARTVOTE,
     action: (data) => {
+      music.playSong('tyops_game-movie-suspense-theme.mp3')
       if (!playerIsAlive) return
       openVotingUI(data.players, data.timeLeft)
       ship.active = false
@@ -96,7 +97,7 @@ export async function joinGame() {
   let endVote: MessageAction = {
     tag: MessageType.ENDVOTE,
     action: (data) => {
-      music.playSong('tyops_game-movie-suspense-theme.mp3')
+      music.playSong('Space-Traitor-3')
 
       if (!playerIsAlive) return
       closeVotingUI(
@@ -196,4 +197,4 @@ environmentEntity.addComponent(new GLTFShape('models/Environment.glb'))
 engine.addEntity(environmentEntity)
 
 export let music = new MusicPlayer()
-music.playSong('tyops_game-movie-suspense-theme.mp3')
+music.playSong('Space-Traitor-1.mp3')
