@@ -52,6 +52,10 @@ export async function sendJoinRequest() {
 engine.addEntity(doorBell)
 
 export let ship: SpaceShip
+export let fuse1: FuseBox
+export let fuse2: FuseBox
+export let fuse3: FuseBox
+export let fuse4: FuseBox
 
 joinGame()
 
@@ -113,19 +117,19 @@ export async function joinGame() {
   messageActions.push(endVote)
 
   ship = new SpaceShip()
-  let fuse1 = new FuseBox(0, {
+  fuse1 = new FuseBox(0, {
     position: new Vector3(35.5, 1, 23.65),
     rotation: Quaternion.Euler(-180, 0, 180),
   })
-  let fuse2 = new FuseBox(1, {
+  fuse2 = new FuseBox(1, {
     position: new Vector3(22, 1, 47.25),
     rotation: Quaternion.Euler(0, 180, 0),
   })
-  let fuse3 = new FuseBox(2, {
+  fuse3 = new FuseBox(2, {
     position: new Vector3(34.5, 5.5, 39),
     rotation: Quaternion.Euler(0, 180, 0),
   })
-  let fuse4 = new FuseBox(3, {
+  fuse4 = new FuseBox(3, {
     position: new Vector3(19, 1, 8.5),
     rotation: Quaternion.Euler(0, 0, 0),
   })
