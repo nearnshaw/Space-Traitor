@@ -8,6 +8,12 @@ export async function playerJoin(
   room: roomData,
   roomName: string
 ) {
+  for (let i = 0; i < room.players.length; i++) {
+    if (room.players[i].name == data.sender) {
+      room.players = room.players.splice(i, 1)
+    }
+  }
+
   let newPlayer = new Player(id, data.sender, data.thumb ? data.thumb : null)
 
   room.players.push(newPlayer)
