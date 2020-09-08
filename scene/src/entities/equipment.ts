@@ -40,7 +40,7 @@ export class Equipment extends Entity {
     this.changeListener = changeListener
 
     this.addComponent(new Transform(transform))
-    this.addComponent(new BoxShape())
+    this.addComponent(new GLTFShape('models/TerminalWall.glb'))
     engine.addEntity(this)
 
     this.miniGameMachine = this.addComponent(

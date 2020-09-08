@@ -12,28 +12,49 @@ export let playerIsAlive: boolean = true
 
 let equiptMentList: EquiptmentData[] = [
   {
-    transform: { position: new Vector3(14.5, 1, 19.6) },
+    transform: { position: new Vector3(15.2, 1, 19) },
   },
   {
-    transform: { position: new Vector3(18, 1, 6) },
+    transform: {
+      position: new Vector3(20, 1, 7.2),
+      rotation: Quaternion.Euler(0, 270, 0),
+    },
   },
   {
-    transform: { position: new Vector3(11, 1, 33.8) },
+    transform: {
+      position: new Vector3(12, 1, 33),
+      rotation: Quaternion.Euler(0, 90, 0),
+    },
   },
   {
-    transform: { position: new Vector3(33, 1, 27) },
+    transform: {
+      position: new Vector3(33.4, 1, 28),
+      rotation: Quaternion.Euler(0, 180, 0),
+    },
   },
   {
-    transform: { position: new Vector3(26, 1, 12) },
+    transform: {
+      position: new Vector3(25, 1, 12),
+      rotation: Quaternion.Euler(0, 180, 0),
+    },
   },
   {
-    transform: { position: new Vector3(35, 1, 2) },
+    transform: {
+      position: new Vector3(35, 1, 0.9),
+      rotation: Quaternion.Euler(0, 90, 0),
+    },
   },
   {
-    transform: { position: new Vector3(21.5, 6, 9.5) },
+    transform: {
+      position: new Vector3(21.5, 5.3, 8.9),
+      rotation: Quaternion.Euler(0, 90, 0),
+    },
   },
   {
-    transform: { position: new Vector3(34, 1, 38.8) },
+    transform: {
+      position: new Vector3(36.5, 1, 39.5),
+      rotation: Quaternion.Euler(0, 270, 0),
+    },
   },
 ]
 
@@ -159,3 +180,5 @@ let mainDoor = new Door(
   new GLTFShape('models/MainDoor.glb'),
   new Vector3(2, 0, -2)
 )
+
+mainDoor.open()
