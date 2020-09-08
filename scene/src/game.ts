@@ -22,7 +22,7 @@ import {
 
 let doorBell = new Button(
   {
-    position: new Vector3(1.25, 1, 4.5),
+    position: new Vector3(2.5, 1, 5.7),
     rotation: Quaternion.Euler(0, 270 + 45, 90),
   },
   new GLTFShape('models/Green_SciFi_Button.glb'),

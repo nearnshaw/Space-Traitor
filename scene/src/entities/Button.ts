@@ -30,7 +30,7 @@ export class Button extends Entity {
           action()
           this.play()
         },
-        { hoverText: caption }
+        { hoverText: caption, distance: 5 }
       )
     )
 
