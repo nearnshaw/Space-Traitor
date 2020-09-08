@@ -17,11 +17,11 @@ export class BugClicker extends MiniGame {
   
     constructor(onWinCallback: () => any) {
       super(onWinCallback)
-  
+
       this.bugButton.image.width = 30
       this.bugButton.image.height = 30
       this.RepositionBug()
-      
+
       this.prompt.close()
     }
 

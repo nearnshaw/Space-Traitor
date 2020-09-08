@@ -7,10 +7,9 @@ export class WordTyper extends MiniGame {
   
     constructor(onWinCallback: () => any) {
       super(onWinCallback)
-  
-      this.prompt.close()
+
       this.UpdateHeaderText()
-  
+      
       this.inputBox.fillInBox.onTextSubmit = new OnTextSubmit((x) => {
         const submittedText = x.text
       
@@ -20,6 +19,8 @@ export class WordTyper extends MiniGame {
       
         this.UpdateHeaderText()
       })
+
+      this.prompt.close()
     }
   
     UpdateHeaderText() {

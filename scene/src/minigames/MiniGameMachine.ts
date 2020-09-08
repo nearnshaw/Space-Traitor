@@ -1,7 +1,7 @@
-import { WordTyper } from "./WordTyper"
-import { BugClicker } from "./BugClicker"
 import * as ui from '../../node_modules/@dcl/ui-utils/index'
 import { PromptStyles } from "../../node_modules/@dcl/ui-utils/utils/types"
+import { WordTyper } from "./WordTyper"
+import { BugClicker } from "./BugClicker"
 import { SwitchToggler } from "./SwitchToggler"
 
 export class MiniGame {
@@ -10,7 +10,7 @@ export class MiniGame {
   currentSuccesses = 0
   promptWidth = 800
   promptHeight = 600
-  prompt = new  ui.CustomPrompt(PromptStyles.DARK, this.promptWidth, this.promptHeight)
+  prompt = new ui.CustomPrompt(PromptStyles.DARK, this.promptWidth, this.promptHeight)
   headerText = this.prompt.addText('', 0, 260, Color4.Green(), 30)
   successesText = this.prompt.addText('SUCCESS: 0/' + this.successesNeeded, 0, -250, Color4.Yellow(), 30)
   onWinCallback: () => any
@@ -42,6 +42,8 @@ export class MiniGame {
   }
 
   UpdateSuccessText() {
+    if(!this.successesText) return
+
     this.successesText.text.value = 'SUCCESS: ' + this.currentSuccesses + "/" + this.successesNeeded
   }
 
@@ -60,7 +62,7 @@ export class MiniGame {
 
   Win() {
     this.Stop()
-
+    
     this.onWinCallback()
   }
 }

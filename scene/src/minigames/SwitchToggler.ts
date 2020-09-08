@@ -12,9 +12,9 @@ export class SwitchToggler extends MiniGame {
   
     constructor(onWinCallback: () => any) {
       super(onWinCallback)
-  
+    
       this.SetupSwitches()
-      
+
       this.prompt.close()
     }
 

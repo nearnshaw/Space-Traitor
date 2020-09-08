@@ -4,6 +4,7 @@ import { fixCounter, minutesCounter, robotUI } from '../HUD'
 import * as ui from '../../node_modules/@dcl/ui-utils/index'
 import { MiniGameMachine } from '../minigames/MiniGameMachine'
 import { EvilRobotTips } from '../dialogs'
+import { Siren } from './Siren'
 
 //Reusable materials
 export let neutralMaterial = new Material()
@@ -20,17 +21,14 @@ redMaterial.albedoColor = Color3.FromInts(500, 150, 180) // Pink glow
 
 export class Equipment extends Entity {
   broken: boolean = false
-  //type: EquiptmentType
-  //   fixable: boolean
-  //   breakable: boolean
   id: number
   miniGameMachine: MiniGameMachine
+  siren: Siren
   changeListener: (state: boolean) => void
 
   constructor(
     id: number,
     transform: TranformConstructorArgs,
-    //type: EquiptmentType,
     changeListener: (state: boolean) => void,
     startBroken?: boolean
   ) {
@@ -43,11 +41,12 @@ export class Equipment extends Entity {
     this.addComponent(new BoxShape())
     engine.addEntity(this)
 
+    this.siren = new Siren(this, new Vector3(0, 2, 1))
+
     this.miniGameMachine = this.addComponent(
       new MiniGameMachine(
         this,
         () => {
-          //this.alterState(false)
           this.changeListener(false)
         },
         false
@@ -55,12 +54,7 @@ export class Equipment extends Entity {
     )
 
     this.alterState(startBroken)
-
-    if (this.broken) {
-      this.addComponentOrReplace(redMaterial)
-    } else {
-      this.addComponentOrReplace(greenMaterial)
-    }
+    this.changeListener(startBroken)
 
     this.addComponentOrReplace(
       new OnPointerDown(
@@ -82,32 +76,19 @@ export class Equipment extends Entity {
   }
 
   alterState(isBroken: boolean) {
-    //log('Equip was broken :', this.broken, ' and now is broken: ', isBroken)
     if (this.broken != isBroken) {
       if (isBroken) {
         this.addComponentOrReplace(redMaterial)
-        //minutesCounter.decrease()
       } else {
         this.addComponentOrReplace(greenMaterial)
-        //fixCounter.increase()
       }
     }
     this.broken = isBroken
 
-    // this.changeListener(this.broken)
+    this.siren.toggle(this.broken)
   }
 
   reset() {
-    this.broken = true
-    // switch (this.type) {
-    //   case EquiptmentType.CONSOLE:
-    //     this.fixable = true
-    //     this.broken = true
-    //     break
-    //   case EquiptmentType.REACTOR:
-    //     this.breakable = true
-    //     this.broken = false
-    //     break
-    // }
+    this.alterState(true)
   }
 }

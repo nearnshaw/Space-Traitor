@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "@dcl/ui-utils": "^1.2.1",
-    "decentraland-ecs-utils": "^1.1.4",
-    "decentraland-builder-scripts": "latest"
+    "decentraland": "^3.4.5",
+    "decentraland-builder-scripts": "latest",
+    "decentraland-ecs-utils": "^1.1.4"
   }
 }
