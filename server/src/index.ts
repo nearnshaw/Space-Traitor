@@ -147,6 +147,22 @@ wss.on('connection', (clientWs, request) => {
         )
         break
 
+      case 'FuseBox-fullStateReq':
+        ws.send(
+          JSON.stringify({
+            type: 'FuseBox-fullStateRes',
+            data: {
+              id: msg.data.id,
+              doorOpen: room.fuseBoxes[msg.data.id].doorOpen,
+              redCut: true,
+              greenCut: true,
+              blueCut: true,
+              timeLeft: room.timeLeft,
+            },
+          })
+        )
+        break
+
       case 'FuseBox-singleChange':
         if (room.gameActive) {
           if (`doorOpen` in msg.data) {
@@ -224,7 +240,20 @@ wss.on('connection', (clientWs, request) => {
           if (player.alive) playersAlive++
         }
 
-        if (room.gameActive && playersAlive > 2) {
+        if (room.gameActive) {
+          if (playersAlive <= 2) {
+            sendAllAlive(
+              JSON.stringify({
+                type: MessageType.MESSAGE,
+                data: {
+                  text: 'Too few players left to vote',
+                },
+              }),
+              ws.room
+            )
+            break
+          }
+
           for (let player of room.players) {
             player.votes = []
           }
@@ -284,11 +313,11 @@ wss.on('connection', (clientWs, request) => {
     }
     ws.on('close', function () {
       console.log('user ' + id + ' left game')
-      delete CLIENTS[id]
       removeFromTeams(id, room)
       if (room.players.length < 1) {
         resetGame(ws.room)
       }
+      delete CLIENTS[id]
     })
   })
 })

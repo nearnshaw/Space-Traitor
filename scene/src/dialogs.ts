@@ -40,7 +40,7 @@ export let MissionControlBrief: Dialog[] = [
       height: 128,
       width: 128,
       offsetX: -20,
-      section: { sourceHeight: 512, sourceWidth: 512 },
+      section: { sourceHeight: 256, sourceWidth: 256 },
     },
   },
 
@@ -51,7 +51,7 @@ export let MissionControlBrief: Dialog[] = [
       height: 128,
       width: 128,
       offsetX: -20,
-      section: { sourceHeight: 512, sourceWidth: 512 },
+      section: { sourceHeight: 256, sourceWidth: 256 },
     },
   },
   {
@@ -78,7 +78,7 @@ export let EvilRobotBrief: Dialog[] = [
       height: 128,
       width: 128,
       offsetX: -20,
-      section: { sourceHeight: 512, sourceWidth: 512 },
+      section: { sourceHeight: 256, sourceWidth: 256 },
     },
   },
 ]
@@ -126,7 +126,7 @@ export let EvilRobotTips: Dialog[] = [
     isEndOfDialog: true,
   },
   {
-    text: `Marvelous! You obliterated those horrible humans!`,
+    text: `Marvelous! You obliterated those horrible humans. Good job!`,
     isEndOfDialog: true,
   },
   {

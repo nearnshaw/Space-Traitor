@@ -149,7 +149,7 @@ export function finishGame(traitorWon: boolean) {
     // ui.displayAnnouncement(
     //   "Oh no, those ridiculously fragile humans beat you. What's wrong with you?"
     // )
-  } else {
+  } else if (!traitorWon && !playerIsTraitor) {
     // ui.displayAnnouncement(
     //   'Congratulations! You have saved the humanity from the evil android!'
     // )

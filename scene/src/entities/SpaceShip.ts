@@ -4,6 +4,7 @@ import { EquiptmentData, MessageType } from '../types'
 import { Button } from './Button'
 import { startUI, fixCounter, satelliteUI, robotUI } from '../HUD'
 import { EvilRobotBrief } from '../dialogs'
+import { resetAllBoxes } from './fuseBox'
 
 export let playerIsTraitor: boolean = false
 export let playerIsAlive: boolean = true
@@ -95,17 +96,20 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     if (fullState.active && !this.active) {
       // Start new game
       startUI(fullState.timeLeft)
+      playerIsTraitor = fullState.playerIsTraitor
       if (fullState.playerIsTraitor) {
         satelliteUI.closeDialogWindow()
         robotUI.openDialogWindow(EvilRobotBrief, 0)
       }
+
+      //resetAllBoxes()
     } else if (!fullState.active && this.active) {
       // finish game
     }
     for (let i = 0; i < this.toFix.length; i++) {
       this.toFix[i].alterState(fullState.toFix[i].broken)
     }
-    playerIsTraitor = fullState.playerIsTraitor
+
     this.active = fullState.active
     this.timeLeft = fullState.timeLeft
     if (fixCounter) {
@@ -115,10 +119,6 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     if (playerIsTraitor) {
       log('PLAYER IS TRAITOR')
     }
-
-    // for (let i = 0; i < this.toFix.length; i++) {
-    //   this.toFix[i].adapt(playerIsTraitor)
-    // }
   }
 
   resetAllGame(): void {
@@ -126,19 +126,8 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     for (let i = 0; i < this.toFix.length; i++) {
       this.toFix[i].reset()
     }
+    resetAllBoxes()
   }
-
-  //   countFixes(): number[] {
-  //     let fixCount = [0, 0]
-  //     for (let i = 0; i < this.toFix.length; i++) {
-  //       if (this.toFix[i].broken == true) {
-  //         fixCount[0]++
-  //       } else {
-  //         fixCount[1]++
-  //       }
-  //     }
-  //     return fixCount
-  //   }
 }
 
 type EquiptmentChange = {
