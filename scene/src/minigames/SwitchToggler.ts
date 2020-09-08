@@ -3,8 +3,8 @@ import { SwitchStyles } from "../../node_modules/@dcl/ui-utils/utils/types"
 import { CustomPromptSwitch } from "../../node_modules/@dcl/ui-utils/prompts/customPrompt/index"
 
 export class SwitchToggler extends MiniGame {
-    columns = Math.floor(Scalar.RandomRange(5, 7))
-    rows = Math.floor(Scalar.RandomRange(4, 7))
+    columns = Math.floor(Scalar.RandomRange(3, 5))
+    rows = Math.floor(Scalar.RandomRange(4, 5))
     successesNeeded = this.columns * this.rows
     targetState = Scalar.RandomRange(0, 1) > 0.5
     headerText = this.prompt.addText('TURN EVERYTHING ' + (this.targetState? 'ON' : 'OFF'), 0, 250, Color4.Green(), 40)

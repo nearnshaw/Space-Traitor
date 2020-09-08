@@ -8,7 +8,7 @@ export const GAME_DURATION: number = 60 * 5
 
 export const VOTING_TIME: number = 60 * 2
 
-export const randomBreakProbability: number = 15
+export const randomBreakProbability: number = 6
 // 30 = once every 30 seconds approx
 
 export const startBrokenArray = [true, true, true, true, true, true, true, true]
