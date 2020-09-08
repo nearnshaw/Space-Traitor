@@ -7,7 +7,12 @@ import {
 } from './entities/MultiplayerEntity'
 import { MessageType } from './types'
 import * as ui from '../node_modules/@dcl/ui-utils/index'
-import { SpaceShip, playerIsAlive, playerIsTraitor } from './entities/SpaceShip'
+import {
+  SpaceShip,
+  playerIsAlive,
+  playerIsTraitor,
+  mainDoor,
+} from './entities/SpaceShip'
 import { openVotingUI, updateVotingUI, closeVotingUI } from './voting'
 import { getUserInfo, userName } from './getUser'
 import { MiniGameMachine } from './minigames/MiniGameMachine'
@@ -80,7 +85,7 @@ export async function joinGame() {
   let startVote: MessageAction = {
     tag: MessageType.STARTVOTE,
     action: (data) => {
-      music.playSong('tyops_game-movie-suspense-theme.mp3')
+      music.playSong('tyops_game-movie-suspense-theme.mp3', 0.5)
       if (!playerIsAlive) return
       openVotingUI(data.players, data.timeLeft)
       ship.active = false
@@ -97,7 +102,7 @@ export async function joinGame() {
   let endVote: MessageAction = {
     tag: MessageType.ENDVOTE,
     action: (data) => {
-      music.playSong('Space-Traitor-3')
+      music.playSong('Space-Traitor-3.mp3')
 
       if (!playerIsAlive) return
       closeVotingUI(
@@ -197,4 +202,4 @@ environmentEntity.addComponent(new GLTFShape('models/Environment.glb'))
 engine.addEntity(environmentEntity)
 
 export let music = new MusicPlayer()
-music.playSong('Space-Traitor-1.mp3')
+music.playSong('Space-Traitor-1.mp3', 0.25)

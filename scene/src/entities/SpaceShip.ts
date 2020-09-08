@@ -150,11 +150,12 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
         mainDoor.close()
       })
 
-      music.playSong('Space-Traitor-2.mp3')
+      music.playSong('Space-Traitor-2.mp3', 0.25)
 
       //resetAllBoxes()
     } else if (!fullState.active && this.active) {
       // finish game
+      mainDoor.open()
     }
     for (let i = 0; i < this.toFix.length; i++) {
       this.toFix[i].alterState(fullState.toFix[i].broken)
@@ -194,7 +195,7 @@ type FullState = {
   playerIsTraitor?: boolean
 }
 
-let mainDoor = new Door(
+export let mainDoor = new Door(
   {
     position: new Vector3(4.5, 0, 4.3),
     rotation: Quaternion.Euler(0, 45 + 90, 0),
@@ -203,4 +204,4 @@ let mainDoor = new Door(
   new Vector3(2, 0, -2)
 )
 
-mainDoor.open()
+// mainDoor.open()

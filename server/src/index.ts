@@ -311,6 +311,7 @@ wss.on('connection', (clientWs, request) => {
         }
         break
     }
+
     ws.on('close', function () {
       console.log('user ' + id + ' left game')
       removeFromTeams(id, room)

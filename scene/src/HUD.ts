@@ -84,7 +84,7 @@ class CountdownSystem implements ISystem {
       minutesCounter.set(Math.floor(ship.timeLeft / 60))
 
       if (!this.crytical && ship.timeLeft < 90) {
-        music.playSong('Space-Traitor-3')
+        music.playSong('Space-Traitor-3.mp3', 0.5)
         this.crytical = true
       }
 
