@@ -5,7 +5,7 @@ export class Siren {
     entity: Entity
     transform: Transform
   
-    constructor(parentEntity: Entity, localPosition: Vector3) {
+    constructor(parentEntity: Entity, transform: TranformConstructorArgs) {
       this.entity = new Entity(parentEntity.name + '-button')
       this.entity.setParent(parentEntity)
   
@@ -17,7 +17,7 @@ export class Siren {
       this.entity.addComponent(this.animator)
       this.deactivateClip.play()
 
-      this.entity.addComponent(new Transform({ position: localPosition }))
+      this.entity.addComponent(new Transform(transform))
   
       this.entity.addComponent(new GLTFShape('models/Siren.glb'))
     }
@@ -25,6 +25,8 @@ export class Siren {
     toggle(value: boolean) {
       this.activateClip.stop()
       this.deactivateClip.stop()
+      // this.deactivateClip = new AnimationState('deactivate', { looping: true })
+      // this.activateClip = new AnimationState('activate', { looping: true })
       const clip = value ? this.activateClip : this.deactivateClip
       clip.play()
     }

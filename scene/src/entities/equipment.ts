@@ -41,12 +41,13 @@ export class Equipment extends Entity {
     this.addComponent(new GLTFShape('models/TerminalWall.glb'))
     engine.addEntity(this)
 
-    this.siren = new Siren(this, new Vector3(0, 2, 1))
+    this.siren = new Siren(this, { position: new Vector3(0.5, 2, 0), rotation: Quaternion.Euler(0, 0, 90), })
 
     this.miniGameMachine = this.addComponent(
       new MiniGameMachine(
         this,
         () => {
+          this.alterState(false)
           this.changeListener(false)
         },
         false
