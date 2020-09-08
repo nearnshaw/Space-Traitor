@@ -4,7 +4,8 @@ import { EquiptmentData, MessageType } from '../types'
 import { Button } from './Button'
 import { startUI, fixCounter, satelliteUI, robotUI } from '../HUD'
 import { EvilRobotBrief } from '../dialogs'
-import { resetAllBoxes } from './fuseBox'
+import { Door } from './door'
+import { setTimeout } from '../Utils'
 
 export let playerIsTraitor: boolean = false
 export let playerIsAlive: boolean = true
@@ -98,9 +99,15 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
       startUI(fullState.timeLeft)
       playerIsTraitor = fullState.playerIsTraitor
       if (fullState.playerIsTraitor) {
-        satelliteUI.closeDialogWindow()
+        if (satelliteUI.isDialogOpen) {
+          satelliteUI.closeDialogWindow()
+        }
         robotUI.openDialogWindow(EvilRobotBrief, 0)
       }
+      mainDoor.open()
+      setTimeout(30000, () => {
+        mainDoor.close()
+      })
 
       //resetAllBoxes()
     } else if (!fullState.active && this.active) {
@@ -126,7 +133,6 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     for (let i = 0; i < this.toFix.length; i++) {
       this.toFix[i].reset()
     }
-    resetAllBoxes()
   }
 }
 
@@ -144,3 +150,12 @@ type FullState = {
   fixCount: number
   playerIsTraitor?: boolean
 }
+
+let mainDoor = new Door(
+  {
+    position: new Vector3(4.5, 0, 4.3),
+    rotation: Quaternion.Euler(0, 45 + 90, 0),
+  },
+  new GLTFShape('models/MainDoor.glb'),
+  new Vector3(2, 0, -2)
+)
