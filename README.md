@@ -18,12 +18,14 @@ https://play.decentraland.org/?position=-64,-34
 
 https://space-traitor.vercel.app/?position=-64,-34
 
-### Run locally
 
-- run `npm start` in server's folder
-- run `dcl start` in scene folder
-- open 3 or 4 tabs, click on the cube to register as a player
+### Run locally
+- run npm start in server's folder
+- change scene/src/config.ts const local: boolean = false to const local: boolean = true
+- run dcl start in scene folder
+- open 3 tabs at "http://127.94.0.1:8000/?SCENE_DEBUG_PANEL&position=-64,-34&realm=localhost-stub", click on the button by the door to register as a player
 - the traitor will be notified
-- ...
-- ...
-- ...
+
+### Test the scene as 1 player
+
+To be able to test the scene as 1 person you can choose the "F" option twice during the button dialogue
