@@ -1,4 +1,4 @@
-export const MINIMUM_PLAYERS = 2
+export const MINIMUM_PLAYERS = 3
 
 export const FIXES_TO_WIN = 10
 
