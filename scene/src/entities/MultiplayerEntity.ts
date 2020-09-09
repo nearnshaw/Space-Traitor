@@ -84,7 +84,7 @@ export abstract class MultiplayerEntity<
   }
 
   public propagateChange(change: SingleChange) {
-    if(socket.readyState === 0) return
+    if (socket.readyState === 0) return
 
     // Letting every else know
     socket.send(

@@ -76,6 +76,20 @@ wss.on('connection', (clientWs, request) => {
             })
           )
           return
+        } else if (checkAlredyInTeams(id, ws.room) == true) {
+          console.log(
+            'Player denied, already playing: ',
+            msg.data.sender,
+            ' existing in teams: ',
+            room.players
+          )
+          ws.send(
+            JSON.stringify({
+              type: MessageType.MESSAGE,
+              data: { text: 'You are already in the game' },
+            })
+          )
+          return
         } else {
           playerJoin(id, msg.data, room, ws.room)
         }
