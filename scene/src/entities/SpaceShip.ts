@@ -100,7 +100,9 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
     let buttonPedestal = new Entity()
     buttonPedestal.addComponent(
       new Transform({
-        position: new Vector3(12, 0, 28),
+        position: new Vector3(24, 0, 18),
+        rotation: Quaternion.Euler(0, 90, 0),
+        scale: new Vector3(1.5, 1.5, 1.5),
       })
     )
     buttonPedestal.addComponent(new GLTFShape('models/Pedestal.glb'))
@@ -108,9 +110,9 @@ export class SpaceShip extends MultiplayerEntity<EquiptmentChange, FullState> {
 
     let panicButton = new Button(
       {
-        position: new Vector3(12, 1, 28),
-        rotation: Quaternion.Euler(0, 0, 25),
-        scale: new Vector3(1.2, 1.2, 1.2),
+        position: new Vector3(24, 1.5, 18.1),
+        rotation: Quaternion.Euler(0, 90, 30),
+        scale: new Vector3(1.5, 1.5, 1.5),
       },
       new GLTFShape('models/Danger_SciFi_Button.glb'),
       () => {
