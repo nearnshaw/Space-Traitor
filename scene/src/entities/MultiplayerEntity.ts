@@ -14,7 +14,7 @@ export async function joinSocketsServer() {
   let realm = await getCurrentRealm()
   log('You are in the realm: ', realm.displayName)
   // Connect to ws server
-  socket = new WebSocket(server + '/' + realm.displayName)
+  socket = await new WebSocket(server + '/' + realm.displayName)
   return
 }
 
