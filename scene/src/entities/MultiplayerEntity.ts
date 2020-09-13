@@ -83,10 +83,18 @@ export abstract class MultiplayerEntity<
     //this.initialized = true
   }
 
-  public propagateChange(change: SingleChange) {
-    if (socket.readyState === 0) return
+  public async propagateChange(change: SingleChange) {
+    // if (socket.readyState === 0) return
+    if (socket.readyState === 0) {
+      log("Attempting to reconnect socket!")
+      socket = await new WebSocket(server + '/' + realm.displayName)
+      
+      await this.propagateChange(change)
+      
+      return
+    }
 
-    // Letting every else know
+    // Letting everyone else know
     socket.send(
       JSON.stringify({
         type: this.generateMessageId(SINGLE_CHANGE_EVENT),
