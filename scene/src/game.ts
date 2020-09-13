@@ -53,6 +53,13 @@ export async function sendJoinRequest() {
       },
     })
   )
+
+  if (!socket.OPEN) {
+    ui.displayAnnouncement(
+      'Server not responding.\nTry turning off Ad Blocker and reloading.',
+      10
+    )
+  }
 }
 
 engine.addEntity(doorBell)
