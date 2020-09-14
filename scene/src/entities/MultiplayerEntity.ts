@@ -87,6 +87,7 @@ export abstract class MultiplayerEntity<
     // if (socket.readyState === 0) return
     if (socket.readyState === 0) {
       log("Attempting to reconnect socket!")
+      let realm = await getCurrentRealm()
       socket = await new WebSocket(server + '/' + realm.displayName)
       
       await this.propagateChange(change)
