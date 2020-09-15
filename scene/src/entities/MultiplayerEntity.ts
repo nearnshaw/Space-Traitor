@@ -12,9 +12,25 @@ export let messageActions: MessageAction[] = []
 export async function joinSocketsServer() {
   // Fetch realm data to keep players in different realms separate
   let realm = await getCurrentRealm()
-  log('You are in the realm: ', realm.displayName)
+  log('Attempting to connect. You are in the realm: ', realm.displayName)
+  
   // Connect to ws server
   socket = await new WebSocket(server + '/' + realm.displayName)
+
+  socket.onerror = async function (e) {
+    log("connection error! " + e)
+    
+    await joinSocketsServer()
+  }
+  
+  setTimeout(5, function () {
+    if(socket.readyState === 1) {
+      log("connection is made!")
+    } else {
+      log("waiting for connection...")
+    }
+  })
+  
   return
 }
 
@@ -85,14 +101,22 @@ export abstract class MultiplayerEntity<
 
   public async propagateChange(change: SingleChange) {
     // if (socket.readyState === 0) return
-    if (socket.readyState === 0) {
-      log("Attempting to reconnect socket!")
+    
+    /*if (socket.readyState === 2 || socket.readyState === 3) {
+      log("propagateChange failed with readystate: " + socket.readyState)
       let realm = await getCurrentRealm()
       socket = await new WebSocket(server + '/' + realm.displayName)
       
       await this.propagateChange(change)
       
       return
+    }*/
+    
+    if (socket.readyState !== 1) {  
+      await new Promise(resolve => setTimeout(100, () => {
+        this.propagateChange(change)
+      }))      
+      return 
     }
 
     // Letting everyone else know
@@ -110,6 +134,14 @@ export abstract class MultiplayerEntity<
 
   private requestFullState() {
     if (!this.initialized) {
+
+      if (socket.readyState !== 1) {
+        new Promise(resolve => setTimeout(100, () => {
+          this.requestFullState()
+        }))
+        return
+      }
+      
       socket.send(
         JSON.stringify({
           type: this.generateMessageId(FULL_STATE_REQUEST),
