@@ -14,6 +14,8 @@ import {
   EquiptmentChange,
   FuseChange,
   Vote,
+  FuseBox,
+  Equiptment,
 } from './MyRoomState'
 
 const ROUND_DURATION = 60
@@ -39,18 +41,16 @@ export class MyRoom extends Room<MyRoomState> {
 
     this.onMessage('ready', (client: Client, data: JoinData) => {
       if (this.state.active) {
-        this.send(client, 'msg', 'Wait for the current game to end')
+        this.send(client, 'msg', { text: 'Wait for the current game to end' })
         return
       }
 
       const player = this.state.players.get(client.sessionId)
 
       if (player.ready) {
-        this.send(
-          client,
-          'msg',
-          "You're already in the game. Waiting for other players."
-        )
+        this.send(client, 'msg', {
+          text: "You're already in the game. Waiting for other players.",
+        })
         return
       }
 
@@ -74,7 +74,7 @@ export class MyRoom extends Room<MyRoomState> {
         ' players ready so far'
       )
 
-      if (playerCount > MINIMUM_PLAYERS) {
+      if (playerCount >= MINIMUM_PLAYERS) {
         this.clock.clear()
         console.log(
           'Starting new game on room ',
@@ -105,7 +105,14 @@ export class MyRoom extends Room<MyRoomState> {
 
       if (!player.isTraitor && data.broken) return
 
-      this.state.toFix[data.id].broken = data.broken
+      let eqpt: Equiptment = null
+      this.state.toFix.forEach((currenteqpt) => {
+        if (currenteqpt.id == data.id) {
+          eqpt = currenteqpt
+        }
+      })
+
+      eqpt.broken = data.broken
 
       if (!data.broken) {
         this.state.fixCount += 1
@@ -120,15 +127,23 @@ export class MyRoom extends Room<MyRoomState> {
         return
       }
 
-      const player = this.state.players.get(client.sessionId)
+      let box: FuseBox = null
+      this.state.fuseBoxes.forEach((currentBox) => {
+        if (currentBox.id == data.id) {
+          box = currentBox
+        }
+      })
 
-      let box = this.state.fuseBoxes[data.id]
+      if (!box) return
 
       if (data.doorOpen && data.doorOpen != box.doorOpen) {
         box.doorOpen = data.doorOpen
+        return
       }
 
       if (box.broken) return
+
+      const player = this.state.players.get(client.sessionId)
 
       if (player.isTraitor) {
         if (!box.redCut && data.redCut) {
@@ -146,11 +161,9 @@ export class MyRoom extends Room<MyRoomState> {
           box.broken = true
         }
       } else {
-        this.send(
-          client,
-          'msg',
-          'Only a traitor would sabotage their own ship like that.'
-        )
+        this.send(client, 'msg', {
+          text: 'Only a traitor would sabotage their own ship like that.',
+        })
       }
     })
 
