@@ -1,8 +1,9 @@
-import { MultiplayerEntity } from './MultiplayerEntity'
-import { ship, fuse1, fuse2, fuse3, fuse4, music } from '../game'
+
 import { playerIsTraitor } from './SpaceShip'
 import { robotUI } from '../HUD'
 import { EvilRobotTips } from '../dialogs'
+import { Room } from 'colyseus.js'
+import { FuseChange } from 'src/types'
 
 @Component('org.decentraland.CableBox')
 export class CableBox {
@@ -25,7 +26,7 @@ export class CableBox {
   }
 }
 
-const fuseBoxes = engine.getComponentGroup(CableBox)
+// const fuseBoxes = engine.getComponentGroup(CableBox)
 
 export enum CableColors {
   Blue,
@@ -37,7 +38,7 @@ let openAudioClip = new AudioClip('sounds/OpenChest.mp3')
 let closeAudioClip = new AudioClip('sounds/CloseChest.mp3')
 let sparkAudioClip = new AudioClip('sounds/Sparks_FX_03.mp3')
 
-export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
+export class FuseBox extends Entity {
   id: number
   changeListener: (state: boolean) => void
 
@@ -49,15 +50,17 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
   greenClip: AnimationState
   openClip: AnimationState
   closeClip: AnimationState
-
+  public room: Room
   constructor(
     id: number,
-    transform: TranformConstructorArgs
+    transform: TranformConstructorArgs,
+    room: Room
     //changeListener: (state: boolean) => void,
   ) {
     super('FuseBox')
 
     this.id = id
+    this.room = room
     //this.changeListener = changeListener
 
     this.addComponent(new Transform(transform))
@@ -80,17 +83,19 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
     this.addComponentOrReplace(
       new OnPointerDown(
         () => {
+          let data:FuseChange
           if (boxState.doorOpen) {
-            this.propagateChange({
+            data = {
               id: this.id,
               doorOpen: false,
-            })
+            }
           } else {
-            this.propagateChange({
+            data = {
               id: this.id,
               doorOpen: true,
-            })
+            }
           }
+          room.send("FuseBoxChange",data)
           //boxState.doorOpen = !boxState.doorOpen
         },
         {
@@ -116,11 +121,11 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
       new OnPointerDown(
         (e) => {
           if (boxState.redCableCut === true) return
-          this.propagateChange({
+          room.send("FuseBoxChange",{
             id: this.id,
             redCut: true,
-            isTraitor: playerIsTraitor,
-          })
+            //isTraitor: playerIsTraitor,
+          } )
         },
         {
           button: ActionButton.POINTER,
@@ -147,10 +152,10 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
       new OnPointerDown(
         (e) => {
           if (boxState.greenCableCut === true) return
-          this.propagateChange({
+          room.send("FuseBoxChange",{
             id: this.id,
             greenCut: true,
-            isTraitor: playerIsTraitor,
+            //isTraitor: playerIsTraitor,
           })
         },
         {
@@ -176,10 +181,10 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
       new OnPointerDown(
         (e) => {
           if (boxState.blueCableCut === true) return
-          this.propagateChange({
+          room.send("FuseBoxChange",{
             id: this.id,
             blueCut: true,
-            isTraitor: playerIsTraitor,
+            //isTraitor: playerIsTraitor,
           })
         },
         {
@@ -226,26 +231,26 @@ export class FuseBox extends MultiplayerEntity<FuseChange, FullFuseState> {
     }
   }
 
-  protected loadFullState(fullState: FullFuseState): void {
-    if (fullState.id == 1000) {
-      fuse1.reset()
-      fuse2.reset()
-      fuse3.reset()
-      fuse4.reset()
+  // protected loadFullState(fullState: FullFuseState): void {
+  //   if (fullState.id == 1000) {
+  //     fuse1.reset()
+  //     fuse2.reset()
+  //     fuse3.reset()
+  //     fuse4.reset()
 
-      //resetAllBoxes()
-      log('sucessfully reset all boxes')
-      return
-    }
+  //     //resetAllBoxes()
+  //     log('sucessfully reset all boxes')
+  //     return
+  //   }
 
-    if (fullState.id != this.id) return
-    log('fuse gets full state ', fullState)
-    ship.timeLeft = fullState.timeLeft
-    toggleBox(this, fullState.doorOpen)
-    toggleCable(this, fullState.redCut, CableColors.Red)
-    toggleCable(this, fullState.blueCut, CableColors.Blue)
-    toggleCable(this, fullState.greenCut, CableColors.Green)
-  }
+  //   if (fullState.id != this.id) return
+  //   log('fuse gets full state ', fullState)
+  //   ship.timeLeft = fullState.timeLeft
+  //   toggleBox(this, fullState.doorOpen)
+  //   toggleCable(this, fullState.redCut, CableColors.Red)
+  //   toggleCable(this, fullState.blueCut, CableColors.Blue)
+  //   toggleCable(this, fullState.greenCut, CableColors.Green)
+  // }
 }
 
 export function toggleBox(entity: FuseBox, value: boolean, playSound = true) {
@@ -343,23 +348,23 @@ export function toggleCable(
 
 // sceneMessageBus.on(`cutCable`, (e) => {})
 
-type FuseChange = {
-  id: number
-  doorOpen?: boolean
-  redCut?: boolean
-  greenCut?: boolean
-  blueCut?: boolean
-  isTraitor?: boolean
-}
+// type FuseChange = {
+//   id: number
+//   doorOpen?: boolean
+//   redCut?: boolean
+//   greenCut?: boolean
+//   blueCut?: boolean
+//   isTraitor?: boolean
+// }
 
-type FullFuseState = {
-  id: number
-  doorOpen: boolean
-  redCut: boolean
-  greenCut: boolean
-  blueCut: boolean
-  timeLeft?: number
-}
+// type FullFuseState = {
+//   id: number
+//   doorOpen: boolean
+//   redCut: boolean
+//   greenCut: boolean
+//   blueCut: boolean
+//   timeLeft?: number
+// }
 
 // export function resetAllBoxes() {
 //   for (let fuse of fuseBoxes.entities) {

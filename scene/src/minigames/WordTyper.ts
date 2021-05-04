@@ -20,7 +20,7 @@ export class WordTyper extends MiniGame {
         this.UpdateHeaderText()
       })
 
-      this.prompt.close()
+      this.prompt.hide()
     }
   
     UpdateHeaderText() {

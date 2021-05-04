@@ -11,14 +11,18 @@
     "ecs:install-next": "npm install --save-dev decentraland-ecs@next"
   },
   "devDependencies": {
-    "decentraland-ecs": "^6.5.1-20200909181244.commit-c7c1714"
+    "decentraland-ecs": "^6.6.5-20210430170019.commit-9921be0"
   },
   "dependencies": {
-    "@dcl/ui-utils": "^1.2.1",
-    "decentraland": "^3.4.5",
-    "decentraland-builder-scripts": "latest",
-    "decentraland-ecs-utils": "^1.1.4",
-    "@types/cannon": "^0.1.4",
-    "cannon": "github:schteppe/cannon.js"
-  }
+    "@dcl/ecs-scene-utils": "^1.6.2-20210408012032.commit-5921be1",
+    "@dcl/npc-scene-utils": "^1.4.1-20210429173759.commit-5ab9c8e",
+    "@dcl/ui-scene-utils": "^1.8.1-20210502145356.commit-74bc682",
+    "colyseus.js": "^0.14.12"
+  },
+  "bundleDependencies": [
+    "@dcl/ui-scene-utils",
+    "@dcl/ecs-scene-utils",
+    "@dcl/npc-scene-utils",
+    "colyseus.js"
+  ]
 }

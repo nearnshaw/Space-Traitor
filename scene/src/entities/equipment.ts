@@ -1,7 +1,6 @@
-import { ship } from '../game'
 import { playerIsTraitor } from './SpaceShip'
 import { fixCounter, minutesCounter, robotUI } from '../HUD'
-import * as ui from '../../node_modules/@dcl/ui-utils/index'
+import * as ui from '@dcl/ui-scene-utils'
 import { MiniGameMachine } from '../minigames/MiniGameMachine'
 import { EvilRobotTips } from '../dialogs'
 import { Siren } from './Siren'

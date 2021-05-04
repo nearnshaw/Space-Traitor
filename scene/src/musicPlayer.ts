@@ -1,3 +1,7 @@
+
+
+
+
 export class MusicPlayer extends Entity {
   constructor() {
     super('Equipment')
@@ -5,7 +9,7 @@ export class MusicPlayer extends Entity {
     this.addComponent(new Transform())
     engine.addEntity(this)
 
-    this.setParent(Attachable.PLAYER)
+    this.setParent(Attachable.AVATAR)
   }
 
   playSong(song: string, vol?: number, noLoop?: boolean) {
@@ -33,3 +37,7 @@ export class MusicPlayer extends Entity {
     this.getComponent(AudioSource).playing = false
   }
 }
+
+
+export let music = new MusicPlayer()
+music.playSong('Space-Traitor-1.mp3', 0.25)

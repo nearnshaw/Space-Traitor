@@ -1,5 +1,5 @@
 import { MiniGame } from "./MiniGameMachine"
-import { ButtonStyles } from "../../node_modules/@dcl/ui-utils/utils/types"
+import { ButtonStyles } from "@dcl/ui-scene-utils"
 
 export class BugClicker extends MiniGame {
     randomPositions = []
@@ -22,7 +22,7 @@ export class BugClicker extends MiniGame {
       this.bugButton.image.height = 30
       this.RepositionBug()
 
-      this.prompt.close()
+      this.prompt.hide()
     }
 
     Update(dt: number) {

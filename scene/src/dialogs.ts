@@ -1,16 +1,16 @@
-import { Dialog } from '../node_modules/@dcl/ui-utils/utils/types'
-import { sendJoinRequest, music } from './game'
+import * as npc from '@dcl/npc-scene-utils'
+import { sendJoinRequest } from './game'
 import { mainDoor } from './entities/SpaceShip'
-import * as ui from '../node_modules/@dcl/ui-utils/index'
+import * as ui from '@dcl/ui-scene-utils'
 
-export let MissionControlBrief: Dialog[] = [
+export let MissionControlBrief: npc.Dialog[] = [
   {
     text: `Greetings. This is mission control. Are you briefed on the situation?`,
     isQuestion: true,
-    labelE: { label: `Yes`, offsetX: 12 },
-    labelF: { label: `No`, offsetX: 12 },
-    ifPressE: 1,
-    ifPressF: 2,
+    buttons:[
+      {label:`Yes`,goToDialog:1},
+      {label:`No`,goToDialog:2},
+    ]
   },
   {
     text: `Good luck then, officer`,
@@ -62,10 +62,10 @@ export let MissionControlBrief: Dialog[] = [
       'Can you assemble a crew, or do you want to at least explore the premises alone?',
 
     isQuestion: true,
-    ifPressE: 10,
-    ifPressF: 11,
-    labelE: { label: `Crew`, offsetX: 12 },
-    labelF: { label: `Solo`, offsetX: 12 },
+    buttons:[
+      {label:`Crew`,goToDialog:10},
+      {label:`Solo`,goToDialog:11},
+    ]
   },
   {
     text: 'Good luck officer, we trust your judgement.',
@@ -78,13 +78,13 @@ export let MissionControlBrief: Dialog[] = [
     text: 'You can explore, \n but need others to join to play.',
     triggeredByNext: () => {
       mainDoor.open()
-      music.playSong('Space-Traitor-3.mp3', 0.25)
+      // music.playSong('Space-Traitor-3.mp3', 0.25)
     },
     isEndOfDialog: true,
   },
 ]
 
-export let EvilRobotBrief: Dialog[] = [
+export let EvilRobotBrief: npc.Dialog[] = [
   {
     text: `Your memory was erased, but you're still one of us!`,
   },
@@ -104,7 +104,7 @@ export let EvilRobotBrief: Dialog[] = [
   },
 ]
 
-export let MissionControlTips: Dialog[] = [
+export let MissionControlTips: npc.Dialog[] = [
   {
     text: 'Keep it up! You need to do 10 of these to cool down the reactor.',
     isEndOfDialog: true,
@@ -134,7 +134,7 @@ export let MissionControlTips: Dialog[] = [
   },
 ]
 
-export let EvilRobotTips: Dialog[] = [
+export let EvilRobotTips: npc.Dialog[] = [
   {
     text: 'Well done! They now have less time to fix the reactor!',
     isEndOfDialog: true,
