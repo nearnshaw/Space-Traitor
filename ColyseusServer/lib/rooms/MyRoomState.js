@@ -12,31 +12,38 @@ const config_1 = require("../config");
 class Player extends schema_1.Schema {
     constructor(name, thumb) {
         super();
+        this.votes = new schema_1.ArraySchema();
         this.name = name;
         this.thumb = thumb ? thumb : null;
         this.isTraitor = false;
         this.alive = true;
         this.ready = false;
-        this.votes = [];
+        this.votes = new schema_1.ArraySchema();
+    }
+    reset() {
+        this.ready = false;
+        this.alive = false;
+        this.isTraitor = false;
+        this.votes = new schema_1.ArraySchema();
     }
 }
 __decorate([
-    schema_1.type("string")
+    schema_1.type('string')
 ], Player.prototype, "name", void 0);
 __decorate([
-    schema_1.type("string")
+    schema_1.type('string')
 ], Player.prototype, "thumb", void 0);
 __decorate([
-    schema_1.type("boolean")
+    schema_1.type('boolean')
 ], Player.prototype, "isTraitor", void 0);
 __decorate([
-    schema_1.type("boolean")
+    schema_1.type('boolean')
 ], Player.prototype, "alive", void 0);
 __decorate([
-    schema_1.type("number")
+    schema_1.type(['string'])
 ], Player.prototype, "votes", void 0);
 __decorate([
-    schema_1.type("boolean")
+    schema_1.type('boolean')
 ], Player.prototype, "ready", void 0);
 exports.Player = Player;
 class Equiptment extends schema_1.Schema {
@@ -50,10 +57,10 @@ class Equiptment extends schema_1.Schema {
     }
 }
 __decorate([
-    schema_1.type("number")
+    schema_1.type('number')
 ], Equiptment.prototype, "id", void 0);
 __decorate([
-    schema_1.type("boolean")
+    schema_1.type('boolean')
 ], Equiptment.prototype, "broken", void 0);
 exports.Equiptment = Equiptment;
 class FuseBox extends schema_1.Schema {
@@ -75,22 +82,22 @@ class FuseBox extends schema_1.Schema {
     }
 }
 __decorate([
-    schema_1.type("number")
+    schema_1.type('number')
 ], FuseBox.prototype, "id", void 0);
 __decorate([
-    schema_1.type("boolean")
+    schema_1.type('boolean')
 ], FuseBox.prototype, "doorOpen", void 0);
 __decorate([
-    schema_1.type("boolean")
+    schema_1.type('boolean')
 ], FuseBox.prototype, "redCut", void 0);
 __decorate([
-    schema_1.type("boolean")
+    schema_1.type('boolean')
 ], FuseBox.prototype, "greenCut", void 0);
 __decorate([
-    schema_1.type("boolean")
+    schema_1.type('boolean')
 ], FuseBox.prototype, "blueCut", void 0);
 __decorate([
-    schema_1.type("boolean")
+    schema_1.type('boolean')
 ], FuseBox.prototype, "broken", void 0);
 exports.FuseBox = FuseBox;
 class MyRoomState extends schema_1.Schema {
@@ -114,22 +121,22 @@ class MyRoomState extends schema_1.Schema {
     }
 }
 __decorate([
-    schema_1.type("boolean")
+    schema_1.type('boolean')
 ], MyRoomState.prototype, "active", void 0);
 __decorate([
-    schema_1.type("boolean")
+    schema_1.type('boolean')
 ], MyRoomState.prototype, "paused", void 0);
 __decorate([
-    schema_1.type("number")
+    schema_1.type('number')
 ], MyRoomState.prototype, "fixCount", void 0);
 __decorate([
-    schema_1.type("number")
+    schema_1.type('number')
 ], MyRoomState.prototype, "traitors", void 0);
 __decorate([
-    schema_1.type("number")
+    schema_1.type('number')
 ], MyRoomState.prototype, "countdown", void 0);
 __decorate([
-    schema_1.type("number")
+    schema_1.type('number')
 ], MyRoomState.prototype, "votingCountdown", void 0);
 __decorate([
     schema_1.type([FuseBox])

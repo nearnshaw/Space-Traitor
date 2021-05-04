@@ -1,16 +1,15 @@
 import * as npc from '@dcl/npc-scene-utils'
 import { sendJoinRequest } from './game'
 import { mainDoor } from './entities/SpaceShip'
-import * as ui from '@dcl/ui-scene-utils'
 
 export let MissionControlBrief: npc.Dialog[] = [
   {
     text: `Greetings. This is mission control. Are you briefed on the situation?`,
     isQuestion: true,
-    buttons:[
-      {label:`Yes`,goToDialog:1},
-      {label:`No`,goToDialog:2},
-    ]
+    buttons: [
+      { label: `Yes`, goToDialog: 1 },
+      { label: `No`, goToDialog: 2 },
+    ],
   },
   {
     text: `Good luck then, officer`,
@@ -62,10 +61,10 @@ export let MissionControlBrief: npc.Dialog[] = [
       'Can you assemble a crew, or do you want to at least explore the premises alone?',
 
     isQuestion: true,
-    buttons:[
-      {label:`Crew`,goToDialog:10},
-      {label:`Solo`,goToDialog:11},
-    ]
+    buttons: [
+      { label: `Crew`, goToDialog: 10 },
+      { label: `Solo`, goToDialog: 11 },
+    ],
   },
   {
     text: 'Good luck officer, we trust your judgement.',

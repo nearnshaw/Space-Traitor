@@ -10,7 +10,7 @@ const monitor_1 = require("@colyseus/monitor");
  */
 const MyRoom_1 = require("./rooms/MyRoom");
 exports.default = arena_1.default({
-    getId: () => "Land_Flipper_Game",
+    getId: () => "Space_Traitor",
     initializeGameServer: (gameServer) => {
         /**
          * Define your room handlers:

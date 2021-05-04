@@ -18,18 +18,18 @@ class MyRoom extends colyseus_1.Room {
         // this.setPatchRate(33)  > 30 fps   (default 20 fps)
         // set-up the game!
         this.reset();
-        this.onMessage("join", (client, atIndex) => {
+        this.onMessage('join', (client, atIndex) => {
             // set player new position
             const player = this.state.players.get(client.sessionId);
         });
-        this.onMessage("ready", (client, data) => {
+        this.onMessage('ready', (client, data) => {
             if (this.state.active) {
-                this.send(client, "msg", "Wait for the current game to end");
+                this.send(client, 'msg', 'Wait for the current game to end');
                 return;
             }
             const player = this.state.players.get(client.sessionId);
             if (player.ready) {
-                this.send(client, "msg", "You're already in the game. Waiting for other players.");
+                this.send(client, 'msg', "You're already in the game. Waiting for other players.");
                 return;
             }
             player.ready = true;
@@ -38,22 +38,25 @@ class MyRoom extends colyseus_1.Room {
                 player.thumb = data.thumb;
             }
             let playerCount = 0;
-            this.state.players.forEach(player => {
+            this.state.players.forEach((player) => {
                 if (player.ready)
                     playerCount += 1;
             });
-            console.log(player.name, "is ready! ", playerCount, " players ready so far");
+            console.log(player.name, 'is ready! ', playerCount, ' players ready so far');
             if (playerCount > config_1.MINIMUM_PLAYERS) {
                 this.clock.clear();
-                console.log("Starting new game on room ", this.roomId, " with ", playerCount, " players");
+                console.log('Starting new game on room ', this.roomId, ' with ', playerCount, ' players');
                 this.setUp();
             }
             else {
-                let message = playerCount + " players read. At least " + config_1.MINIMUM_PLAYERS + " required. Invite your fiends/nemesis!";
+                let message = playerCount +
+                    ' players read. At least ' +
+                    config_1.MINIMUM_PLAYERS +
+                    ' required. Invite your fiends/nemesis!';
                 this.broadcast(message);
             }
         });
-        this.onMessage("Ship-singleChange", (client, data) => {
+        this.onMessage('shipChange', (client, data) => {
             const player = this.state.players.get(client.sessionId);
             if (!this.state.active) {
                 return;
@@ -70,7 +73,7 @@ class MyRoom extends colyseus_1.Room {
                 }
             }
         });
-        this.onMessage("FuseBox-singleChange", (client, data) => {
+        this.onMessage('FuseBoxChange', (client, data) => {
             if (!this.state.active) {
                 return;
             }
@@ -97,38 +100,38 @@ class MyRoom extends colyseus_1.Room {
                 }
             }
             else {
-                this.send(client, "msg", "Only a traitor would sabotage their own ship like that.");
+                this.send(client, 'msg', 'Only a traitor would sabotage their own ship like that.');
             }
         });
-        this.onMessage("startvote", (client) => {
+        this.onMessage('startvote', (client) => {
             if (!this.state.active || this.state.paused) {
-                console.log("room inactive or already voting");
+                console.log('room inactive or already voting');
                 return;
             }
             let playersAlive = 0;
-            this.state.players.forEach(player => {
+            this.state.players.forEach((player) => {
                 if (player.alive)
                     playersAlive++;
             });
             if (playersAlive <= 2) {
-                this.broadcast("msg", "too few players left to vote");
+                this.broadcast('msg', 'too few players left to vote');
                 return;
             }
             else {
                 this.state.paused = true;
                 this.state.votingCountdown = config_1.VOTING_TIME;
-                this.state.players.forEach(player => {
+                this.state.players.forEach((player) => {
                     player.votes = [];
                 });
-                this.broadcast("start-vote", {
+                this.broadcast('start-vote', {
                     timeLeft: config_1.VOTING_TIME,
-                    players: this.state.players
+                    players: this.state.players,
                 });
             }
         });
-        this.onMessage("vote", (client, data) => {
+        this.onMessage('vote', (client, data) => {
             if (!this.state.active || !this.state.paused) {
-                console.log("room inactive or not paused");
+                console.log('room inactive or not paused');
                 return;
             }
             const voter = this.state.players.get(data.voter);
@@ -137,11 +140,11 @@ class MyRoom extends colyseus_1.Room {
                 return;
             voted.votes.push(data.voter);
             let voteCount = 0;
-            this.state.players.forEach(player => {
+            this.state.players.forEach((player) => {
                 voteCount += player.votes.length;
             });
             let playersAlive = 0;
-            this.state.players.forEach(player => {
+            this.state.players.forEach((player) => {
                 if (player.alive)
                     playersAlive++;
             });
@@ -161,7 +164,7 @@ class MyRoom extends colyseus_1.Room {
         let playerWithMostVotes = null;
         let weHaveATie = false;
         let traitorKilled = false;
-        this.state.players.forEach(player => {
+        this.state.players.forEach((player) => {
             if (player.alive)
                 playersAlive++;
             let votesAgainst = player.votes.length;
@@ -182,14 +185,15 @@ class MyRoom extends colyseus_1.Room {
         });
         if (weHaveATie) {
             console.log("it's a tie! ", mostVotesAgainst);
+            this.broadcast('endvote', { voted: null, wasTraitor: false });
             return;
         }
         else if (playerWithMostVotes && playerWithMostVotes.alive) {
-            console.log('We have a victim! ', playerWithMostVotes, " is traitor? ", playerWithMostVotes.isTraitor);
+            console.log('We have a victim! ', playerWithMostVotes, ' is traitor? ', playerWithMostVotes.isTraitor);
             playerWithMostVotes.alive = false;
         }
         playersAlive = 0;
-        this.state.players.forEach(player => {
+        this.state.players.forEach((player) => {
             if (player.alive)
                 playersAlive++;
         });
@@ -198,13 +202,17 @@ class MyRoom extends colyseus_1.Room {
                 this.end();
             }
             else {
+                this.broadcast('endvote', {
+                    voted: playerWithMostVotes.name,
+                    wasTraitor: traitorKilled,
+                });
                 this.state.paused = false;
             }
         }, 3000);
     }
     pickTraitor() {
         let currentPlayers = 0;
-        this.state.players.forEach(player => {
+        this.state.players.forEach((player) => {
             if (player.ready)
                 currentPlayers++;
         });
@@ -218,24 +226,24 @@ class MyRoom extends colyseus_1.Room {
     setUp() {
         this.isFinished = false;
         this.state.paused = false;
-        this.state.fuseBoxes.forEach(box => {
+        this.state.fuseBoxes.forEach((box) => {
             box.reset();
         });
-        this.state.toFix.forEach(equipt => {
+        this.state.toFix.forEach((equipt) => {
             equipt.reset();
         });
-        this.broadcast("msg", { text: "Game starts in ..." });
+        this.broadcast('msg', { text: 'Game starts in ...' });
         this.state.countdown = 3;
         // make sure we clear previous interval
         this.clock.clear();
         this.clock.setTimeout(() => {
-            this.broadcast("msg", { text: "3" });
+            this.broadcast('msg', { text: '3' });
         }, 2000);
         this.clock.setTimeout(() => {
-            this.broadcast("msg", { text: "2" });
+            this.broadcast('msg', { text: '2' });
         }, 4000);
         this.clock.setTimeout(() => {
-            this.broadcast("msg", { text: "1" });
+            this.broadcast('msg', { text: '1' });
         }, 6000);
         this.clock.setTimeout(() => {
             this.startGame();
@@ -245,7 +253,7 @@ class MyRoom extends colyseus_1.Room {
         // pick traitor
         this.pickTraitor();
         // Maybe I can just add a listener in the scene
-        this.state.players.forEach(player => {
+        this.state.players.forEach((player) => {
             if (player.isTraitor) {
                 //this.send( this.clients[player.], "msg",'You are the treasoning android!')
             }
@@ -254,7 +262,7 @@ class MyRoom extends colyseus_1.Room {
             }
         });
         // maybe I dont need this eiter, listener to active = true
-        this.broadcast("new", { duration: ROUND_DURATION });
+        this.broadcast('new', { duration: ROUND_DURATION });
         this.state.active = true;
         // setup round countdown
         this.state.countdown = config_1.GAME_DURATION;
@@ -295,32 +303,34 @@ class MyRoom extends colyseus_1.Room {
         this.state.paused = false;
         this.isFinished = true;
         let traitorAlive = true;
-        this.state.players.forEach(player => {
+        this.state.players.forEach((player) => {
             if (player.isTraitor && !player.alive)
                 traitorAlive = false;
         });
         let traitorWon = this.state.fixCount < config_1.FIXES_TO_WIN && traitorAlive ? true : false;
         console.log('FINISHED GAME in room ', this.roomName, ' time remaining: ', this.state.countdown, ' fix count: ', this.state.fixCount, ' traitor won: ', traitorWon);
-        this.broadcast("end", { traitorWon: traitorWon, fixCount: this.state.fixCount, timeLeft: this.state.countdown });
+        this.broadcast('end', {
+            traitorWon: traitorWon,
+            fixCount: this.state.fixCount,
+            timeLeft: this.state.countdown,
+        });
         // reset after 10 seconds
         this.clock.setTimeout(() => {
             this.reset();
-            this.broadcast("reset");
+            this.broadcast('reset');
         }, 10000);
     }
     reset() {
-        this.state.players.clear();
+        //this.state.players.clear()
         this.state.active = false;
-        this.state.fuseBoxes.forEach(box => {
+        this.state.fuseBoxes.forEach((box) => {
             box.reset();
         });
-        this.state.toFix.forEach(equipt => {
+        this.state.toFix.forEach((equipt) => {
             equipt.reset();
         });
         this.state.players.forEach((player) => {
-            player.ready = false;
-            player.alive = false;
-            player.isTraitor = false;
+            player.reset();
         });
         this.state.fixCount = 0;
         this.state.traitors = 0;
@@ -346,16 +356,16 @@ class MyRoom extends colyseus_1.Room {
         }
     }
     onJoin(client, options) {
-        const newPlayer = new MyRoomState_1.Player(options.userData.displayName || "Anonymous", options.thumb || null);
+        const newPlayer = new MyRoomState_1.Player(options.userData.displayName || 'Anonymous', options.thumb || null);
         this.state.players.set(client.sessionId, newPlayer);
-        console.log(newPlayer.name, "joined! => ", options.userData);
+        console.log(newPlayer.name, 'joined! => ', options.userData);
     }
     onLeave(client, consented) {
         const player = this.state.players.get(client.sessionId);
-        console.log(player.name, "left!");
+        console.log(player.name, 'left!');
         this.state.players.delete(client.sessionId);
         let playersAlive = 0;
-        this.state.players.forEach(player => {
+        this.state.players.forEach((player) => {
             if (player.alive)
                 playersAlive++;
         });
@@ -364,7 +374,7 @@ class MyRoom extends colyseus_1.Room {
         }
     }
     onDispose() {
-        console.log("Disposing room...");
+        console.log('Disposing room...');
     }
 }
 exports.MyRoom = MyRoom;

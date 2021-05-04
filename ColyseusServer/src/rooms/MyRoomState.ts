@@ -1,46 +1,51 @@
-import { Schema, Context, ArraySchema, MapSchema, type } from "@colyseus/schema";
-import { EQUIPT_COUNT, FUSE_BOXES, GAME_DURATION, VOTING_TIME } from "../config";
+import { Schema, Context, ArraySchema, MapSchema, type } from '@colyseus/schema'
+import { EQUIPT_COUNT, FUSE_BOXES, GAME_DURATION, VOTING_TIME } from '../config'
 
 export class Player extends Schema {
-  @type("string") name: string;
-  @type("string") thumb: string|null;
-  @type("boolean") isTraitor: boolean;
-  @type("boolean") alive: boolean;
-  @type("number") votes: string[];
-  @type("boolean") ready: boolean;
-  constructor(name: string, thumb?:string){
+  @type('string') name: string
+  @type('string') thumb: string | null
+  @type('boolean') isTraitor: boolean
+  @type('boolean') alive: boolean
+  @type(['string']) votes: string[] = new ArraySchema<string>()
+  @type('boolean') ready: boolean
+  constructor(name: string, thumb?: string) {
     super()
     this.name = name
-    this.thumb = thumb? thumb : null
+    this.thumb = thumb ? thumb : null
     this.isTraitor = false
     this.alive = true
     this.ready = false
-    this.votes = []
+    this.votes = new ArraySchema<string>()
+  }
+  reset() {
+    this.ready = false
+    this.alive = false
+    this.isTraitor = false
+    this.votes = new ArraySchema<string>()
   }
 }
 
-
 export class Equiptment extends Schema {
-  @type("number") id: number;
-  @type("boolean") broken: boolean;
-  constructor(id: number){
+  @type('number') id: number
+  @type('boolean') broken: boolean
+  constructor(id: number) {
     super()
     this.id = id
     this.broken = false
   }
-  reset(){
+  reset() {
     this.broken = false
   }
 }
 
 export class FuseBox extends Schema {
-  @type("number") id: number;
-  @type("boolean") doorOpen: boolean;
-  @type("boolean") redCut: boolean;
-  @type("boolean") greenCut: boolean;
-  @type("boolean") blueCut: boolean;
-  @type("boolean") broken: boolean;
-  constructor(id: number){
+  @type('number') id: number
+  @type('boolean') doorOpen: boolean
+  @type('boolean') redCut: boolean
+  @type('boolean') greenCut: boolean
+  @type('boolean') blueCut: boolean
+  @type('boolean') broken: boolean
+  constructor(id: number) {
     super()
     this.id = id
     this.doorOpen = false
@@ -49,7 +54,7 @@ export class FuseBox extends Schema {
     this.blueCut = false
     this.broken = false
   }
-  reset(){
+  reset() {
     this.doorOpen = false
     this.redCut = false
     this.greenCut = false
@@ -58,11 +63,9 @@ export class FuseBox extends Schema {
   }
 }
 
-
 export type JoinData = {
   thumb?: string
 }
-
 
 export type EquiptmentChange = {
   id: number
@@ -82,20 +85,18 @@ export type Vote = {
   voted: string
 }
 
-
 export class MyRoomState extends Schema {
-  @type("boolean") active: boolean; 
-  @type("boolean") paused: boolean; 
-  @type("number") fixCount: number;
-  @type("number") traitors: number;
-  @type("number") countdown: number;
-  @type("number") votingCountdown: number;
-  @type([FuseBox]) fuseBoxes = new ArraySchema<FuseBox>();
-  @type([Equiptment]) toFix = new ArraySchema<Equiptment>();
-  @type({ map: Player }) players = new MapSchema<Player>();
-  
-  
-  constructor(boxCount: number = 4, equiptCount:number = 8){
+  @type('boolean') active: boolean
+  @type('boolean') paused: boolean
+  @type('number') fixCount: number
+  @type('number') traitors: number
+  @type('number') countdown: number
+  @type('number') votingCountdown: number
+  @type([FuseBox]) fuseBoxes = new ArraySchema<FuseBox>()
+  @type([Equiptment]) toFix = new ArraySchema<Equiptment>()
+  @type({ map: Player }) players = new MapSchema<Player>()
+
+  constructor(boxCount: number = 4, equiptCount: number = 8) {
     super()
     this.active = false
     this.paused = false
@@ -104,13 +105,11 @@ export class MyRoomState extends Schema {
     this.countdown = GAME_DURATION
     this.votingCountdown = VOTING_TIME
 
-
-
-    for (let i = 0; i < FUSE_BOXES; i ++ ){
+    for (let i = 0; i < FUSE_BOXES; i++) {
       this.fuseBoxes.push(new FuseBox(i))
     }
 
-    for (let j = 0; j < EQUIPT_COUNT; j ++ ){
+    for (let j = 0; j < EQUIPT_COUNT; j++) {
       this.toFix.push(new Equiptment(j))
     }
   }
