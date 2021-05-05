@@ -13,6 +13,10 @@ import { getUserData, UserData } from "@decentraland/Identity";
 
 export let userData:UserData
 
+export async function setUserData(){
+    userData = await getUserData();
+}
+
 export async function connect(roomName: string, options: any = {}) {
     const isPreview = await isPreviewMode();
     const realm = await getCurrentRealm();
@@ -21,7 +25,10 @@ export async function connect(roomName: string, options: any = {}) {
     // make sure users are matched together by the same "realm".
     //
     options.realm = realm?.displayName;
-    userData =await getUserData();
+
+    if(!userData){
+        await setUserData()
+    }
     options.userData = userData
 
     log("userData:", options.userData);

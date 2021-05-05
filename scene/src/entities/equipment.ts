@@ -4,6 +4,7 @@ import * as ui from '@dcl/ui-scene-utils'
 import { MiniGameMachine } from '../minigames/MiniGameMachine'
 import { EvilRobotTips } from '../dialogs'
 import { Siren } from './Siren'
+import {server} from  'game'
 
 //Reusable materials
 // export let neutralMaterial = new Material()
@@ -50,8 +51,9 @@ export class Equipment extends Entity {
       new MiniGameMachine(
         this,
         () => {
-          this.alterState(false)
+          // this.alterState(false)
           this.changeListener(false)
+          server.send("shipChange",{ id: this.id, broken: false})
         },
         false
       )

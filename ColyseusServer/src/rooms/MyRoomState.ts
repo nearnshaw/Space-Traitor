@@ -2,14 +2,16 @@ import { Schema, Context, ArraySchema, MapSchema, type } from '@colyseus/schema'
 import { EQUIPT_COUNT, FUSE_BOXES, GAME_DURATION, VOTING_TIME } from '../config'
 
 export class Player extends Schema {
+  @type('string') id: string
   @type('string') name: string
   @type('string') thumb: string | null
   @type('boolean') isTraitor: boolean
   @type('boolean') alive: boolean
   @type(['string']) votes: string[] = new ArraySchema<string>()
   @type('boolean') ready: boolean
-  constructor(name: string, thumb?: string) {
+  constructor(id: string, name: string, thumb?: string) {
     super()
+    this.id = id
     this.name = name
     this.thumb = thumb ? thumb : null
     this.isTraitor = false

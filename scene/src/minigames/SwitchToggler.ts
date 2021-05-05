@@ -46,7 +46,7 @@ export class SwitchToggler extends MiniGame {
             const newSwitch = this.prompt.addSwitch('', startingPos.x + column * spaceBetweenSwitches, startingPos.y + row * spaceBetweenSwitches,
               () => {
                 // log('switch deactivated')
-                if(!this.targetState) {
+                if(this.targetState) {
                   this.AddSuccess(1)
                 } else {
                   this.AddSuccess(-1)
@@ -54,7 +54,7 @@ export class SwitchToggler extends MiniGame {
               },
               () => {
                 // log('switch activated')
-                if(this.targetState) {
+                if(!this.targetState) {
                   this.AddSuccess(1)
                 } else {
                   this.AddSuccess(-1)

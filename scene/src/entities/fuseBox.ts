@@ -195,16 +195,16 @@ export class FuseBox extends Entity {
       )
     )
 
-    this.redClip.stop()
-    this.greenClip.stop()
-    this.blueClip.stop()
+    this.redClip.reset()
+    this.greenClip.reset()
+    this.blueClip.reset()
   }
 
   reset() {
-    this.redClip.stop()
-    this.greenClip.stop()
-    this.blueClip.stop()
-    this.openClip.stop()
+    this.redClip.reset()
+    this.greenClip.reset()
+    this.blueClip.reset()
+    this.openClip.reset()
 
     this.getComponent(CableBox).blueCableCut = false
     this.getComponent(CableBox).redCableCut = false
@@ -271,8 +271,6 @@ export function toggleBox(entity: FuseBox, value: boolean, playSound = true) {
   const closeClip = new AnimationState('close', { looping: false })
   animator.addClip(openClip)
   animator.addClip(closeClip)
-  openClip.stop()
-  closeClip.stop()
   const clip = value ? openClip : closeClip
   clip.play()
 
@@ -287,7 +285,7 @@ export function toggleCable(
   entity: FuseBox,
   value: boolean,
   color: CableColors,
-  playSound = true
+  //playSound = true
 ) {
   let boxState = entity.getComponent(CableBox)
   //   if (playSound && value) {
@@ -297,7 +295,7 @@ export function toggleCable(
   //   }
 
   let cableClip: AnimationState
-  let animator: Animator
+  //let animator: Animator
   switch (color) {
     case CableColors.Red:
       log('cut red calbe')
@@ -317,8 +315,7 @@ export function toggleCable(
   }
 
   if (value == true) {
-    cableClip.stop()
-    cableClip.play()
+    cableClip.play(true)
   } else {
     cableClip.reset()
   }

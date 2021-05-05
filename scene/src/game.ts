@@ -23,7 +23,7 @@ import {
   updateCountdown,
 } from './HUD'
 import { Button } from './entities/Button'
-import { CableColors, FuseBox, toggleBox } from './entities/fuseBox'
+import { CableColors, FuseBox, toggleBox, toggleCable } from './entities/fuseBox'
 import {
   MissionControlBrief,
   EvilRobotTips,
@@ -31,12 +31,13 @@ import {
   EvilRobotBrief,
 } from './dialogs'
 import { music, MusicPlayer } from './musicPlayer'
-import { connect, userData } from './connection'
+import { connect, setUserData, userData } from './connection'
 import { movePlayerTo } from '@decentraland/RestrictedActions'
 import { Room } from 'colyseus.js'
 import * as utils from '@dcl/ecs-scene-utils'
 
-let server: Room
+export let server: Room
+let fuseBoxes: FuseBox[] = []
 
 connect('my_room').then((room) => {
   log('Connected!')
@@ -76,6 +77,10 @@ connect('my_room').then((room) => {
     },
     room
   )
+  fuseBoxes.push(fuse1)
+  fuseBoxes.push(fuse2)
+  fuseBoxes.push(fuse3)
+  fuseBoxes.push(fuse4)
 
   room.onMessage('msg', (data) => {
     ui.displayAnnouncement(data.text, 10, Color4.Yellow())
@@ -117,24 +122,24 @@ connect('my_room').then((room) => {
     ship.active = true
   })
 
-  room.state.fuseboxes.onAdd = (box) => {
-    // log("Added tile => ", tile.id)
+  room.state.fuseBoxes.onAdd = (box) => {
+    log("Added fusebox => ", box.id)
     box.listen('doorOpen', (value) => {
       log('box open ', value)
 
-      // toggleBox(???, value, true)
+      toggleBox(fuseBoxes[box.id], value, true)
     })
     box.listen('redCut', (value) => {
       log('red cut ', value)
-      // toggleCable(???, value, CableColors.Red)
+      toggleCable(fuseBoxes[box.id], value, CableColors.Red)
     })
     box.listen('greenCut', (value) => {
       log('green cut ', value)
-      // toggleCable(???, value, CableColors.Green)
+      toggleCable(fuseBoxes[box.id], value, CableColors.Green)
     })
     box.listen('blueCut', (value) => {
       log('blue cut ', value)
-      // toggleCable(???, value, CableColors.Blue)
+      toggleCable(fuseBoxes[box.id], value, CableColors.Blue)
     })
     box.listen('broken', (value) => {
       log('broken ', value)
@@ -143,6 +148,7 @@ connect('my_room').then((room) => {
   }
 
   room.state.toFix.onAdd = (eqpt) => {
+    log("added eqpt ", eqpt.id)
     eqpt.listen('broken', (value) => {
       log('eqpt broken ', value)
       ship.reactToSingleChanges({ broken: value, id: eqpt.id })
@@ -166,6 +172,19 @@ connect('my_room').then((room) => {
       log('player died ', player.name)
       //if(player.name == myName){}
     })
+    if(player.name == userData.displayName){
+
+      player.listen('isTraitor',(value)=>{
+        log("YOU ARE THE TRAITOR ", value)
+        setPlayerIsTraitor(value)
+        if(value){
+          if (satelliteUI.isDialogOpen) {
+            satelliteUI.closeDialogWindow()
+          }
+          robotUI.openDialogWindow(EvilRobotBrief, 0)
+        }
+      })
+    }
   }
 
   room.state.listen('fixCount', (value) => {
@@ -231,23 +250,17 @@ export let fuse2: FuseBox
 export let fuse3: FuseBox
 export let fuse4: FuseBox
 
-export function newGame(room: Room) {
+
+export async function newGame(room: Room) {
   resetGame()
+  if(!userData){
+    await setUserData()
+  }
   startUI(room.state.countdown)
 
-  setPlayerIsTraitor(false)
+
   setPlayerIsAlive(true)
-  room.state.players.forEach((player) => {
-    if (player.name == userData.displayName) {
-      if (player.isTraitor) {
-        setPlayerIsTraitor(true)
-        if (satelliteUI.isDialogOpen) {
-          satelliteUI.closeDialogWindow()
-        }
-        robotUI.openDialogWindow(EvilRobotBrief, 0)
-      }
-    }
-  })
+
 
   mainDoor.open()
   utils.setTimeout(30000, () => {

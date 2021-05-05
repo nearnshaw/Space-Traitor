@@ -10,9 +10,10 @@ exports.MyRoomState = exports.FuseBox = exports.Equiptment = exports.Player = vo
 const schema_1 = require("@colyseus/schema");
 const config_1 = require("../config");
 class Player extends schema_1.Schema {
-    constructor(name, thumb) {
+    constructor(id, name, thumb) {
         super();
         this.votes = new schema_1.ArraySchema();
+        this.id = id;
         this.name = name;
         this.thumb = thumb ? thumb : null;
         this.isTraitor = false;
@@ -27,6 +28,9 @@ class Player extends schema_1.Schema {
         this.votes = new schema_1.ArraySchema();
     }
 }
+__decorate([
+    schema_1.type('string')
+], Player.prototype, "id", void 0);
 __decorate([
     schema_1.type('string')
 ], Player.prototype, "name", void 0);

@@ -24,12 +24,12 @@ class MyRoom extends colyseus_1.Room {
         });
         this.onMessage('ready', (client, data) => {
             if (this.state.active) {
-                this.send(client, 'msg', { text: 'Wait for the current game to end' });
+                client.send('msg', { text: 'Wait for the current game to end' });
                 return;
             }
             const player = this.state.players.get(client.sessionId);
             if (player.ready) {
-                this.send(client, 'msg', {
+                client.send('msg', {
                     text: "You're already in the game. Waiting for other players.",
                 });
                 return;
@@ -60,6 +60,7 @@ class MyRoom extends colyseus_1.Room {
         });
         this.onMessage('shipChange', (client, data) => {
             const player = this.state.players.get(client.sessionId);
+            console.log("equiptment ", data.id, " new broken state ", data.broken);
             if (!this.state.active) {
                 return;
             }
@@ -85,6 +86,7 @@ class MyRoom extends colyseus_1.Room {
             if (!this.state.active) {
                 return;
             }
+            console.log("fusebox ", data.id, " open ", data.doorOpen, "RGB", data.redCut, data.greenCut, data.blueCut);
             let box = null;
             this.state.fuseBoxes.forEach((currentBox) => {
                 if (currentBox.id == data.id) {
@@ -116,7 +118,7 @@ class MyRoom extends colyseus_1.Room {
                 }
             }
             else {
-                this.send(client, 'msg', {
+                client.send('msg', {
                     text: 'Only a traitor would sabotage their own ship like that.',
                 });
             }
@@ -126,6 +128,7 @@ class MyRoom extends colyseus_1.Room {
                 console.log('room inactive or already voting');
                 return;
             }
+            console.log("STARTING VOTES ", config_1.VOTING_TIME, " time left");
             let playersAlive = 0;
             this.state.players.forEach((player) => {
                 if (player.alive)
@@ -141,7 +144,7 @@ class MyRoom extends colyseus_1.Room {
                 this.state.players.forEach((player) => {
                     player.votes = [];
                 });
-                this.broadcast('start-vote', {
+                this.broadcast('startvote', {
                     timeLeft: config_1.VOTING_TIME,
                     players: this.state.players,
                 });
@@ -152,6 +155,7 @@ class MyRoom extends colyseus_1.Room {
                 console.log('room inactive or not paused');
                 return;
             }
+            console.log(data.voter, " VOTED FOR ", data.voted);
             const voter = this.state.players.get(data.voter);
             const voted = this.state.players.get(data.voted);
             if (!voter.alive || !voter.ready)
@@ -272,11 +276,17 @@ class MyRoom extends colyseus_1.Room {
         this.pickTraitor();
         // Maybe I can just add a listener in the scene
         this.state.players.forEach((player) => {
+            let currentClient;
+            this.clients.forEach((client) => {
+                if (client.id == player.id) {
+                    currentClient = client;
+                }
+            });
             if (player.isTraitor) {
-                //this.send( this.clients[player.], "msg",'You are the treasoning android!')
+                currentClient.send("msg", { text: 'You are the treasoning android!' });
             }
             else {
-                //this.send(this.clients[player.],  "msg",'One of your mates is a treacherous android.')
+                currentClient.send("msg", { text: 'One of your mates is a treacherous android.' });
             }
         });
         // maybe I dont need this eiter, listener to active = true
@@ -374,7 +384,7 @@ class MyRoom extends colyseus_1.Room {
         }
     }
     onJoin(client, options) {
-        const newPlayer = new MyRoomState_1.Player(options.userData.displayName || 'Anonymous', options.thumb || null);
+        const newPlayer = new MyRoomState_1.Player(client.id, options.userData.displayName || 'Anonymous', options.thumb || null);
         this.state.players.set(client.sessionId, newPlayer);
         console.log(newPlayer.name, 'joined! => ', options.userData);
     }
