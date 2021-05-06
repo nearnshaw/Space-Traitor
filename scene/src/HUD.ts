@@ -29,7 +29,7 @@ export let fixCounter = new ui.UICounter(
 )
 fixCounter.uiText.visible = false
 fixCounter.uiText.font = ui.SFHeavyFont
-export let secondsCounter = new ui.UICounter(0, -14, 49, Color4.Black())
+export let secondsCounter = new ui.UICounter(0, -14, 49, Color4.Black(), 25, false, 2)
 secondsCounter.uiText.visible = false
 export let timerSeparaor = new ui.CornerLabel(':', -39, 49, Color4.Black())
 timerSeparaor.uiText.visible = false

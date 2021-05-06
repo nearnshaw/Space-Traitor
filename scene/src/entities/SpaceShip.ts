@@ -120,6 +120,8 @@ export class SpaceShip extends Entity {
       },
       'Emergency Meeting'
     )
+
+    return
   }
 
 

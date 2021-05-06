@@ -187,6 +187,8 @@ export class FuseBox extends Entity {
     this.getComponent(CableBox).redCableCut = false
     this.getComponent(CableBox).greenCableCut = false
     this.getComponent(CableBox).doorOpen = false
+
+    return
   }
 
   reset() {

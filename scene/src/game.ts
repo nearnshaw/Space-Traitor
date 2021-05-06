@@ -81,6 +81,8 @@ connect('my_room').then((room) => {
   fuseBoxes.push(fuse3)
   fuseBoxes.push(fuse4)
 
+  let sceneLoaded = true
+
   room.onMessage('msg', (data) => {
     ui.displayAnnouncement(data.text, 12, Color4.Yellow())
   })
@@ -92,9 +94,7 @@ connect('my_room').then((room) => {
 
   room.onMessage('end', (data) => {
     log('END game')
-    // timer.running = false
-    finishGame(data.traitorWon)
-    // finishGame(data.traitorWon)
+    finishGame(data.traitorWon) 
   })
 
   room.onMessage('reset', (data) => {
@@ -104,6 +104,7 @@ connect('my_room').then((room) => {
 
   room.onMessage('startvote', (data) => {
     log('Starting Votes')
+    if(!sceneLoaded) return
     // if (!playerIsAlive) return
     music.playSong('tyops_game-movie-suspense-theme.mp3', 0.5)
     ship.active = false
@@ -112,6 +113,7 @@ connect('my_room').then((room) => {
 
   room.onMessage('endvote', (data) => {
     log('Ending votes')
+    if(!sceneLoaded) return
     // if (!playerIsAlive) return
     music.playSong('Space-Traitor-3.mp3')
     closeVotingUI(data.voted, data.wasTraitor)
@@ -128,23 +130,27 @@ connect('my_room').then((room) => {
     log("Added fusebox => ", box.id)
     box.listen('doorOpen', (value) => {
       log('box open ', box.id, value)
-
+      if(!sceneLoaded) return
       toggleBox(fuseBoxes[box.id], value, true)
     })
     box.listen('redCut', (value) => {
       log('red cut ',box.id, value)
+      if(!sceneLoaded) return
       toggleCable(fuseBoxes[box.id], value, CableColors.Red)
     })
     box.listen('greenCut', (value) => {
       log('green cut ',box.id, value)
+      if(!sceneLoaded) return
       toggleCable(fuseBoxes[box.id], value, CableColors.Green)
     })
     box.listen('blueCut', (value) => {
       log('blue cut ',box.id, value)
+      if(!sceneLoaded) return
       toggleCable(fuseBoxes[box.id], value, CableColors.Blue)
     })
     box.listen('broken', (value) => {
       log('broken ',box.id, value)
+      if(!sceneLoaded) return
       if (playerIsTraitor) {
         robotUI.openDialogWindow(EvilRobotTips, 0)
       }
@@ -154,6 +160,7 @@ connect('my_room').then((room) => {
   room.state.toFix.onAdd = (eqpt) => {
     log("added eqpt ", eqpt.id)
     eqpt.listen('broken', (value) => {
+      if(!sceneLoaded) return
       log('eqpt broken ', eqpt.id, value)
       ship.reactToSingleChanges({ broken: value, id: eqpt.id })
     })
@@ -220,6 +227,14 @@ connect('my_room').then((room) => {
     }
   })
 
+
+  // horrible hacks
+  toggleCable(fuseBoxes[0], false, CableColors.Red)
+  toggleCable(fuseBoxes[0], false, CableColors.Green)
+  toggleCable(fuseBoxes[0], false, CableColors.Blue)
+  ship.reactToSingleChanges({ broken: false, id: 0 })
+
+
 })
 
 let doorBell = new Button(
@@ -242,11 +257,6 @@ export async function sendJoinRequest() {
     thumb: userInfo? userInfo.face128
       : 'https://peer.decentraland.org/content/contents/QmcHi6q7N6Ltse4YgFv2WPTMDpKCup3SQAUgQJ2Tjxkitg',
   })
-  // on error
-  // ui.displayAnnouncement(
-  //   'Server not responding.\nTry turning off Ad Blocker and reloading.',
-  //   10
-  // )
 }
 
 engine.addEntity(doorBell)
@@ -298,21 +308,15 @@ export function finishGame(traitorWon: boolean) {
   movePlayerTo({ x: 1, y: 1, z: 1 })
   if (traitorWon && playerIsTraitor) {
     robotUI.openDialogWindow(EvilRobotTips, 3)
-    // ui.displayAnnouncement(
-    //   'Congratulations! You obliterated those horrible humans!'
-    // )
+  
   } else if (traitorWon && !playerIsTraitor) {
     satelliteUI.openDialogWindow(MissionControlTips, 4)
-    //ui.displayAnnouncement('Oh no, the android has defeated you.')
+  
   } else if (!traitorWon && playerIsTraitor) {
     robotUI.openDialogWindow(EvilRobotTips, 4)
-    // ui.displayAnnouncement(
-    //   "Oh no, those ridiculously fragile humans beat you. What's wrong with you?"
-    // )
+  
   } else if (!traitorWon && !playerIsTraitor) {
-    // ui.displayAnnouncement(
-    //   'Congratulations! You have saved the humanity from the evil android!'
-    // )
+  
     satelliteUI.openDialogWindow(MissionControlTips, 3)
   }
 }

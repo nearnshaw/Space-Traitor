@@ -6,6 +6,7 @@ import { EvilRobotTips, MissionControlTips } from './dialogs'
 import { Room } from 'colyseus.js'
 import { userData } from './connection'
 
+
 let votingUI: ui.CustomPrompt
 export let playerVoted: boolean = false
 let votingTimeLeft: number
@@ -24,7 +25,10 @@ export function openVotingUI(room: Room) {
   votingUI.addText('Time to Vote', 0, 130, Color4.Red(), 30)
   votingUI.addText("Who's the traitor?", 0, 100)
 
-  voteSeconds = votingUI.addText((votingTimeLeft % 60).toString(), 220, -200)
+  let seconds = (votingTimeLeft % 60).toString()
+  if(seconds.length < 2){ seconds = "0" + seconds }
+
+  voteSeconds = votingUI.addText(seconds, 220, -200)
   voteText = votingUI.addText('Voting time left          :', 130, -200)
   voteMinutes = votingUI.addText(
     Math.floor(votingTimeLeft / 60).toString(),
@@ -93,7 +97,11 @@ export function updateVotingUI(
 }
 
 export function updateVotingTimer(timeLeft: number){
-  voteSeconds.text.value = (timeLeft % 60).toString()
+
+  let seconds = (votingTimeLeft % 60).toString()
+  if(seconds.length < 2){ seconds = "0".concat(seconds) }
+
+  voteSeconds.text.value = seconds
   voteText.text.value = 'Voting time left          :'
   voteMinutes.text.value = Math.floor(timeLeft / 60).toString()
 }

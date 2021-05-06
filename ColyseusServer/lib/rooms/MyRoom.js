@@ -185,7 +185,9 @@ class MyRoom extends colyseus_1.Room {
                 voteCount += player.votes.length;
             });
             if (voteCount >= playersAlive) {
-                this.endVotes();
+                setTimeout(() => {
+                    this.endVotes();
+                }, 2000);
             }
             else {
                 console.log('We have ', voteCount, ' votes, we need ', playersAlive);
@@ -385,14 +387,20 @@ class MyRoom extends colyseus_1.Room {
         let brokeSomething = false;
         while (!brokeSomething) {
             let randomI = Math.floor(Math.random() * this.state.toFix.length);
-            if (!this.state.toFix[randomI].broken) {
-                this.state.toFix[randomI].broken = true;
+            let eqpt;
+            this.state.toFix.forEach(element => {
+                if (element.id == randomI)
+                    eqpt = element;
+            });
+            if (!eqpt.broken) {
+                eqpt.broken = true;
                 brokeSomething = true;
                 console.log('Randomly breaking equiptment ', randomI);
             }
             else {
                 attempts++;
                 if (attempts > 10) {
+                    console.log('Nothing broke this time');
                     brokeSomething = true;
                 }
             }
