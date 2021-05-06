@@ -13,8 +13,7 @@ import {
   closeVotingUI,
   updateVotingTimer,
 } from './voting'
-import { getUserInfo, userName } from './getUser'
-import { MiniGameMachine } from './minigames/MiniGameMachine'
+import { getUserInfo } from './getUser'
 import {
   startUI,
   satelliteUI,
@@ -30,7 +29,7 @@ import {
   MissionControlTips,
   EvilRobotBrief,
 } from './dialogs'
-import { music, MusicPlayer } from './musicPlayer'
+import { music } from './musicPlayer'
 import { connect, setUserData, userData } from './connection'
 import { movePlayerTo } from '@decentraland/RestrictedActions'
 import { Room } from 'colyseus.js'
@@ -83,7 +82,7 @@ connect('my_room').then((room) => {
   fuseBoxes.push(fuse4)
 
   room.onMessage('msg', (data) => {
-    ui.displayAnnouncement(data.text, 10, Color4.Yellow())
+    ui.displayAnnouncement(data.text, 12, Color4.Yellow())
   })
 
   room.onMessage('new', (data) => {
@@ -116,8 +115,11 @@ connect('my_room').then((room) => {
     // if (!playerIsAlive) return
     music.playSong('Space-Traitor-3.mp3')
     closeVotingUI(data.voted, data.wasTraitor)
-    if (data.voted == userName) {
+    if (data.voted == userData.displayName) {
       movePlayerTo({ x: 1, y: 1, z: 1 })
+      if(!playerIsTraitor){
+        satelliteUI.openDialogWindow(MissionControlTips, "dead")
+      }
     }
     ship.active = true
   })
@@ -125,32 +127,34 @@ connect('my_room').then((room) => {
   room.state.fuseBoxes.onAdd = (box) => {
     log("Added fusebox => ", box.id)
     box.listen('doorOpen', (value) => {
-      log('box open ', value)
+      log('box open ', box.id, value)
 
       toggleBox(fuseBoxes[box.id], value, true)
     })
     box.listen('redCut', (value) => {
-      log('red cut ', value)
+      log('red cut ',box.id, value)
       toggleCable(fuseBoxes[box.id], value, CableColors.Red)
     })
     box.listen('greenCut', (value) => {
-      log('green cut ', value)
+      log('green cut ',box.id, value)
       toggleCable(fuseBoxes[box.id], value, CableColors.Green)
     })
     box.listen('blueCut', (value) => {
-      log('blue cut ', value)
+      log('blue cut ',box.id, value)
       toggleCable(fuseBoxes[box.id], value, CableColors.Blue)
     })
     box.listen('broken', (value) => {
-      log('broken ', value)
-      // play a non-positional boom sound??  ... or not
+      log('broken ',box.id, value)
+      if (playerIsTraitor) {
+        robotUI.openDialogWindow(EvilRobotTips, 0)
+      }
     })
   }
 
   room.state.toFix.onAdd = (eqpt) => {
     log("added eqpt ", eqpt.id)
     eqpt.listen('broken', (value) => {
-      log('eqpt broken ', value)
+      log('eqpt broken ', eqpt.id, value)
       ship.reactToSingleChanges({ broken: value, id: eqpt.id })
     })
   }
@@ -158,18 +162,10 @@ connect('my_room').then((room) => {
   room.state.players.onAdd = (player) => {
     log('Added player => ', player.name)
     player.listen('ready', (value) => {
-      log('player is ready ', player.name)
-    })
-    player.listen('votes', (value) => {
-      log('player has morevotes ', player.name)
-
-      if (room.state.paused) {
-        // TODO fetch thumb of voter
-        updateVotingUI(player.name, value, player.votes.length(), null)
-      }
+      log('player is ready ', player.name, value)
     })
     player.listen('alive', (value) => {
-      log('player died ', player.name)
+      log('player died ', player.name, value)
       //if(player.name == myName){}
     })
     if(player.name == userData.displayName){
@@ -184,6 +180,20 @@ connect('my_room').then((room) => {
           robotUI.openDialogWindow(EvilRobotBrief, 0)
         }
       })
+    }
+    player.votes.onAdd = (voter)=>{
+      log('player ', player.name, " has a new vote from ", voter)
+      if (room.state.paused) {
+        let voterThumb: string = null
+        let votedPosition: number = 0
+        let votedPlayerFound: boolean = false
+        room.state.players.forEach(iteratedPlayer => {
+          if(iteratedPlayer.name == voter) voterThumb = iteratedPlayer.thumb
+          if(iteratedPlayer.name == player.name) votedPlayerFound = true 
+          if(iteratedPlayer.alive && !votedPlayerFound) votedPosition++
+        });
+        updateVotingUI(votedPosition, 0, player.votes.length, voterThumb)
+      }
     }
   }
 
@@ -200,6 +210,7 @@ connect('my_room').then((room) => {
   room.state.listen('countdown', (value) => {
     if (!room.state.paused) {
       updateCountdown(value)
+
     }
   })
 
@@ -209,9 +220,6 @@ connect('my_room').then((room) => {
     }
   })
 
-  // on active change
-  // on paused change
-  // on fixcount change
 })
 
 let doorBell = new Button(
@@ -230,10 +238,9 @@ export async function sendJoinRequest() {
   let userInfo = await getUserInfo()
   log(userInfo)
   server.send('ready', {
-    sender: userName,
-    thumb: userInfo.id
-      ? userInfo.metadata.avatars[0].avatar.snapshots.face128
-      : 'Qmbqv4pZvhypGj3KiCisvxn9UazodQ8aQStiBEy6HvxuJz',
+    sender: userData.displayName,
+    thumb: userInfo? userInfo.face128
+      : 'https://peer.decentraland.org/content/contents/QmcHi6q7N6Ltse4YgFv2WPTMDpKCup3SQAUgQJ2Tjxkitg',
   })
   // on error
   // ui.displayAnnouncement(

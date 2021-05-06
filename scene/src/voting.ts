@@ -1,10 +1,10 @@
 import * as ui from '@dcl/ui-scene-utils'
 import * as utils from '@dcl/ecs-scene-utils'
-import { userName } from './getUser'
 import {  robotUI, satelliteUI } from './HUD'
 import { playerIsTraitor } from './entities/SpaceShip'
 import { EvilRobotTips, MissionControlTips } from './dialogs'
 import { Room } from 'colyseus.js'
+import { userData } from './connection'
 
 let votingUI: ui.CustomPrompt
 export let playerVoted: boolean = false
@@ -14,8 +14,11 @@ let voteMinutes: ui.CustomPromptText
 let voteText: ui.CustomPromptText
 
 export function openVotingUI(room: Room) {
+  // if(votingUI){
+  //   votingUI.show()
+  //   return
+  // }
   playerVoted = false
-  // timer.running = false
   votingTimeLeft = room.state.votingCountdown
   votingUI = new ui.CustomPrompt(ui.PromptStyles.DARKSLANTED, 512 * 1.5, 512)
   votingUI.addText('Time to Vote', 0, 130, Color4.Red(), 30)
@@ -29,27 +32,28 @@ export function openVotingUI(room: Room) {
     -200
   )
 
-  //   engine.addSystem(votingTimer)
-  //   votingTimer.running = true
-
   let offset = 30
-  for (let i = 0; i < room.state.players.length; i++) {
-    let player = room.state.players[i]
+  let i = 0
+  room.state.players.forEach(player => {
+
     if(player.ready && player.alive){
+      let PlayerName = player.name
       votingUI.addButton(
-        player.name,
+        PlayerName,
         0,
         offset,
         () => {
-          log('Voted for ', player.name, i)
-          vote(i, room)
+          log('Voted for ', PlayerName, i)
+          vote(PlayerName, room)
         },
         ui.ButtonStyles.SQUARESILVER
       )
+      i ++
     }
    
     votingUI.addIcon(
-      'https://peer.decentraland.org/content/contents/' + room.state.players[i].thumb,
+      // 'https://peer.decentraland.org/content/contents/' + player.thumb,
+      player.thumb,
       -100,
       offset,
       64 * 0.7,
@@ -61,7 +65,9 @@ export function openVotingUI(room: Room) {
     )
     // Player icon
     offset -= 50
-  }
+  
+    
+  });
 }
 
 export function updateVotingUI(
@@ -73,7 +79,8 @@ export function updateVotingUI(
   // add player icon
 
   votingUI.addIcon(
-    'https://peer.decentraland.org/content/contents/' + thumb,
+    // 'https://peer.decentraland.org/content/contents/' + thumb,
+    thumb,
     70 + votes * 40,
     30 + voted * -50,
     64 * 0.5,
@@ -86,23 +93,20 @@ export function updateVotingUI(
 }
 
 export function updateVotingTimer(timeLeft: number){
-  voteSeconds = votingUI.addText((timeLeft % 60).toString(), 220, -200)
-  voteText = votingUI.addText('Voting time left          :', 130, -200)
-  voteMinutes = votingUI.addText(
-    Math.floor(timeLeft / 60).toString(),
-    180,
-    -200
-  )
+  voteSeconds.text.value = (timeLeft % 60).toString()
+  voteText.text.value = 'Voting time left          :'
+  voteMinutes.text.value = Math.floor(timeLeft / 60).toString()
 }
 
 export function closeVotingUI(playerToKick: string|null, isTraitor: boolean) {
   votingUI.hide()
+ 
   //votingTimer.running = false
 
   if (!playerToKick) {
-    ui.displayAnnouncement('No one was kicked')
+    ui.displayAnnouncement('No one was kicked', 15)
   } else {
-    ui.displayAnnouncement(playerToKick + 'was ejected out into space')
+    ui.displayAnnouncement(playerToKick + 'was ejected out into space', 15)
 
     utils.setTimeout(3000, () => {
       // timer.running = true
@@ -119,7 +123,7 @@ export function closeVotingUI(playerToKick: string|null, isTraitor: boolean) {
   }
 }
 
-export function vote(votedPlayer: number, room: Room) {
+export function vote(votedPlayer: string, room: Room) {
   if (playerVoted) {
     return
   }
@@ -128,40 +132,9 @@ export function vote(votedPlayer: number, room: Room) {
 
 
   room.send("vote", {
-          voted: votedPlayer,
-          voter: userName,
-        })
-  // socket.send(
-  //   JSON.stringify({
-  //     type: MessageType.VOTE,
-  //     data: {
-  //       voted: votedPlayer,
-  //       voter: userName,
-  //     },
-  //   })
-  // )
+      voter: userData.displayName,
+      voted: votedPlayer,
+      })
 
   votingUI.addText('Waiting for others to vote', 0, -140, Color4.Red(), 20)
 }
-
-// class VOTINGCountdownSystem implements ISystem {
-//   running: boolean = true
-//   timer: number = 1
-//   update(dt: number) {
-//     if (this.running == false) return
-//     this.timer -= dt
-//     if (this.timer <= 0) {
-//       this.timer = 1
-//       votingTimeLeft -= 1
-//       voteSeconds.text.value = (votingTimeLeft % 60).toString()
-//       voteMinutes.text.value = Math.floor(votingTimeLeft / 60).toString()
-
-//       if (votingTimeLeft < 0) {
-//         this.running = false
-//         // end voting
-//       }
-//     }
-//   }
-// }
-
-// let votingTimer = new VOTINGCountdownSystem()

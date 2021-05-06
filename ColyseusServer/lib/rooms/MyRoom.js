@@ -5,8 +5,6 @@ const colyseus_1 = require("colyseus");
 const config_1 = require("../config");
 const MyRoomState_1 = require("./MyRoomState");
 const ROUND_DURATION = 60;
-// const ROUND_DURATION = 30;
-// const MAX_BLOCK_HEIGHT = 5;
 class MyRoom extends colyseus_1.Room {
     constructor() {
         super(...arguments);
@@ -60,7 +58,6 @@ class MyRoom extends colyseus_1.Room {
         });
         this.onMessage('shipChange', (client, data) => {
             const player = this.state.players.get(client.sessionId);
-            console.log("equiptment ", data.id, " new broken state ", data.broken);
             if (!this.state.active) {
                 return;
             }
@@ -74,11 +71,18 @@ class MyRoom extends colyseus_1.Room {
                     eqpt = currenteqpt;
                 }
             });
+            if (eqpt.broken == data.broken) {
+                console.log("equiptment ", data.id, " was already in the state ", data.broken);
+                return;
+            }
+            console.log("equiptment ", data.id, " new broken state ", data.broken);
             eqpt.broken = data.broken;
             if (!data.broken) {
                 this.state.fixCount += 1;
                 if (this.state.fixCount >= config_1.FIXES_TO_WIN) {
-                    this.end();
+                    setTimeout(() => {
+                        this.end();
+                    }, 2000);
                 }
             }
         });
@@ -95,7 +99,7 @@ class MyRoom extends colyseus_1.Room {
             });
             if (!box)
                 return;
-            if (data.doorOpen && data.doorOpen != box.doorOpen) {
+            if ('doorOpen' in data && data.doorOpen != box.doorOpen) {
                 box.doorOpen = data.doorOpen;
                 return;
             }
@@ -135,15 +139,17 @@ class MyRoom extends colyseus_1.Room {
                     playersAlive++;
             });
             if (playersAlive <= 2) {
-                this.broadcast('msg', 'too few players left to vote');
+                this.broadcast('msg', {
+                    text: 'too few players left to vote'
+                });
                 return;
             }
             else {
-                this.state.paused = true;
                 this.state.votingCountdown = config_1.VOTING_TIME;
                 this.state.players.forEach((player) => {
                     player.votes = [];
                 });
+                this.state.paused = true;
                 this.broadcast('startvote', {
                     timeLeft: config_1.VOTING_TIME,
                     players: this.state.players,
@@ -156,19 +162,27 @@ class MyRoom extends colyseus_1.Room {
                 return;
             }
             console.log(data.voter, " VOTED FOR ", data.voted);
-            const voter = this.state.players.get(data.voter);
-            const voted = this.state.players.get(data.voted);
+            let voter = null;
+            let voted = null;
+            let playersAlive = 0;
+            this.state.players.forEach((player) => {
+                if (player.alive)
+                    playersAlive++;
+                if (player.name == data.voter)
+                    voter = player;
+                if (player.name == data.voted)
+                    voted = player;
+            });
+            if (!voter || !voted)
+                return;
             if (!voter.alive || !voter.ready)
+                return;
+            if (!voted.alive || !voted.ready)
                 return;
             voted.votes.push(data.voter);
             let voteCount = 0;
             this.state.players.forEach((player) => {
                 voteCount += player.votes.length;
-            });
-            let playersAlive = 0;
-            this.state.players.forEach((player) => {
-                if (player.alive)
-                    playersAlive++;
             });
             if (voteCount >= playersAlive) {
                 this.endVotes();
@@ -211,7 +225,7 @@ class MyRoom extends colyseus_1.Room {
             return;
         }
         else if (playerWithMostVotes && playerWithMostVotes.alive) {
-            console.log('We have a victim! ', playerWithMostVotes, ' is traitor? ', playerWithMostVotes.isTraitor);
+            console.log('We have a victim! ', playerWithMostVotes.name, ' is traitor? ', playerWithMostVotes.isTraitor);
             playerWithMostVotes.alive = false;
         }
         playersAlive = 0;
@@ -220,16 +234,16 @@ class MyRoom extends colyseus_1.Room {
                 playersAlive++;
         });
         setTimeout(() => {
-            if (playersAlive < 2 || traitorKilled) {
-                this.end();
-            }
-            else {
-                this.broadcast('endvote', {
-                    voted: playerWithMostVotes.name,
-                    wasTraitor: traitorKilled,
-                });
-                this.state.paused = false;
-            }
+            this.broadcast('endvote', {
+                voted: playerWithMostVotes.name,
+                wasTraitor: traitorKilled,
+            });
+            this.state.paused = false;
+            setTimeout(() => {
+                if (playersAlive < 2 || traitorKilled) {
+                    this.end();
+                }
+            }, 3000);
         }, 3000);
     }
     pickTraitor() {
@@ -297,6 +311,7 @@ class MyRoom extends colyseus_1.Room {
         this.state.votingCountdown = config_1.VOTING_TIME;
         // make sure we clear previous interval
         this.clock.clear();
+        this.isFinished = true;
         this.clock.setInterval(() => {
             if (!this.isFinished)
                 return;

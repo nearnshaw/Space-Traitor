@@ -1,8 +1,8 @@
 export const MINIMUM_PLAYERS = 2
 
-export const FIXES_TO_WIN = 10
+export const FIXES_TO_WIN = 8
 
-export const FUSE_BOXES = 3
+export const FUSE_BOXES = 4
 
 export const GAME_DURATION: number = 60 * 5
 

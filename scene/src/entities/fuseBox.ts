@@ -7,23 +7,10 @@ import { FuseChange } from 'src/types'
 
 @Component('org.decentraland.CableBox')
 export class CableBox {
-  redCable: boolean = true
-  greenCable: boolean = true
-  blueCable: boolean = true
   redCableCut: boolean = false
   greenCableCut: boolean = false
   blueCableCut: boolean = false
   doorOpen: boolean = false
-  constructor(
-    //public channel: IChannel,
-    redCable: boolean,
-    greenCable: boolean,
-    blueCable: boolean
-  ) {
-    this.redCable = redCable
-    this.greenCable = greenCable
-    this.blueCable = blueCable
-  }
 }
 
 // const fuseBoxes = engine.getComponentGroup(CableBox)
@@ -65,7 +52,7 @@ export class FuseBox extends Entity {
 
     this.addComponent(new Transform(transform))
 
-    let boxState = new CableBox(true, true, true)
+    let boxState = new CableBox()
     this.addComponent(boxState)
 
     const animator = new Animator()
@@ -78,8 +65,7 @@ export class FuseBox extends Entity {
     this.addComponent(new GLTFShape('models/Cable_Box.glb'))
     engine.addEntity(this)
 
-    let thisBox = this
-
+ 
     this.addComponentOrReplace(
       new OnPointerDown(
         () => {
@@ -120,7 +106,7 @@ export class FuseBox extends Entity {
     this.redCable.addComponent(
       new OnPointerDown(
         (e) => {
-          if (boxState.redCableCut === true) return
+          if (!boxState.doorOpen || boxState.redCableCut) return
           room.send("FuseBoxChange",{
             id: this.id,
             redCut: true,
@@ -151,11 +137,10 @@ export class FuseBox extends Entity {
     this.greenCable.addComponent(
       new OnPointerDown(
         (e) => {
-          if (boxState.greenCableCut === true) return
+          if (!boxState.doorOpen || boxState.greenCableCut) return
           room.send("FuseBoxChange",{
             id: this.id,
             greenCut: true,
-            //isTraitor: playerIsTraitor,
           })
         },
         {
@@ -180,11 +165,10 @@ export class FuseBox extends Entity {
     this.blueCable.addComponent(
       new OnPointerDown(
         (e) => {
-          if (boxState.blueCableCut === true) return
+          if (!boxState.doorOpen || boxState.blueCableCut) return
           room.send("FuseBoxChange",{
             id: this.id,
             blueCut: true,
-            //isTraitor: playerIsTraitor,
           })
         },
         {
@@ -195,9 +179,14 @@ export class FuseBox extends Entity {
       )
     )
 
-    this.redClip.reset()
-    this.greenClip.reset()
-    this.blueClip.reset()
+    this.redClip.stop()
+    this.greenClip.stop()
+    this.blueClip.stop()
+
+    this.getComponent(CableBox).blueCableCut = false
+    this.getComponent(CableBox).redCableCut = false
+    this.getComponent(CableBox).greenCableCut = false
+    this.getComponent(CableBox).doorOpen = false
   }
 
   reset() {
@@ -212,45 +201,25 @@ export class FuseBox extends Entity {
     this.getComponent(CableBox).doorOpen = false
   }
 
-  protected reactToSingleChanges(change: FuseChange): void {
-    if (change.id != this.id) return
-    log('fuse gets single update ', change)
+  // protected reactToSingleChanges(change: FuseChange): void {
+  //   if (change.id != this.id) return
+  //   log('fuse gets single update ', change)
 
-    if (`doorOpen` in change) {
-      toggleBox(this, change.doorOpen)
-    }
-
-    if (`redCut` in change) {
-      toggleCable(this, true, CableColors.Red)
-    }
-    if (`blueCut` in change) {
-      toggleCable(this, true, CableColors.Blue)
-    }
-    if (`greenCut` in change) {
-      toggleCable(this, true, CableColors.Green)
-    }
-  }
-
-  // protected loadFullState(fullState: FullFuseState): void {
-  //   if (fullState.id == 1000) {
-  //     fuse1.reset()
-  //     fuse2.reset()
-  //     fuse3.reset()
-  //     fuse4.reset()
-
-  //     //resetAllBoxes()
-  //     log('sucessfully reset all boxes')
-  //     return
+  //   if (`doorOpen` in change) {
+  //     toggleBox(this, change.doorOpen)
   //   }
 
-  //   if (fullState.id != this.id) return
-  //   log('fuse gets full state ', fullState)
-  //   ship.timeLeft = fullState.timeLeft
-  //   toggleBox(this, fullState.doorOpen)
-  //   toggleCable(this, fullState.redCut, CableColors.Red)
-  //   toggleCable(this, fullState.blueCut, CableColors.Blue)
-  //   toggleCable(this, fullState.greenCut, CableColors.Green)
+  //   if (`redCut` in change) {
+  //     toggleCable(this, true, CableColors.Red)
+  //   }
+  //   if (`blueCut` in change) {
+  //     toggleCable(this, true, CableColors.Blue)
+  //   }
+  //   if (`greenCut` in change) {
+  //     toggleCable(this, true, CableColors.Green)
+  //   }
   // }
+
 }
 
 export function toggleBox(entity: FuseBox, value: boolean, playSound = true) {
@@ -276,26 +245,20 @@ export function toggleBox(entity: FuseBox, value: boolean, playSound = true) {
 
   boxState.doorOpen = value
 
-  toggleCable(entity, boxState.redCableCut, CableColors.Red)
-  toggleCable(entity, boxState.blueCableCut, CableColors.Blue)
-  toggleCable(entity, boxState.greenCableCut, CableColors.Green)
+
+  // toggleCable(entity, boxState.redCableCut, CableColors.Red)
+  // toggleCable(entity, boxState.blueCableCut, CableColors.Blue)
+  // toggleCable(entity, boxState.greenCableCut, CableColors.Green)
 }
 
 export function toggleCable(
   entity: FuseBox,
   value: boolean,
   color: CableColors,
-  //playSound = true
 ) {
   let boxState = entity.getComponent(CableBox)
-  //   if (playSound && value) {
-  //     const source = new AudioSource(this.sparkSoundClip)
-  //     entity.addComponentOrReplace(source)
-  //     source.playing = true
-  //   }
 
   let cableClip: AnimationState
-  //let animator: Animator
   switch (color) {
     case CableColors.Red:
       log('cut red calbe')
@@ -320,51 +283,7 @@ export function toggleCable(
     cableClip.reset()
   }
 
-  if (boxState.blueCableCut && boxState.redCableCut && boxState.greenCableCut) {
-    // BREAK  WS MSG  ... or do on server better?
-    if (playerIsTraitor) {
-      robotUI.openDialogWindow(EvilRobotTips, 0)
-    }
-
-    //music.playSong('tyops_scary-suspense.mp3', 1, true)
-    log('ALL THREE CABLES CUT')
-  }
 }
 
 // if broken, add smoke??
 
-// sceneMessageBus.on(`openBox`, (e) => {
-//   log('opening box ', e.box)
-//   toggleBox(engine.entities[e.box], true, true)
-// })
-
-// sceneMessageBus.on(`closeBox`, (e) => {
-//   log('closing box ', e.box)
-//   toggleBox(e.box, false, true)
-// })
-
-// sceneMessageBus.on(`cutCable`, (e) => {})
-
-// type FuseChange = {
-//   id: number
-//   doorOpen?: boolean
-//   redCut?: boolean
-//   greenCut?: boolean
-//   blueCut?: boolean
-//   isTraitor?: boolean
-// }
-
-// type FullFuseState = {
-//   id: number
-//   doorOpen: boolean
-//   redCut: boolean
-//   greenCut: boolean
-//   blueCut: boolean
-//   timeLeft?: number
-// }
-
-// export function resetAllBoxes() {
-//   for (let fuse of fuseBoxes.entities) {
-//     fuse.reset()
-//   }
-// }

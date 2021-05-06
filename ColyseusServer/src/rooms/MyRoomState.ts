@@ -33,10 +33,10 @@ export class Equiptment extends Schema {
   constructor(id: number) {
     super()
     this.id = id
-    this.broken = false
+    this.broken = true
   }
   reset() {
-    this.broken = false
+    this.broken = true
   }
 }
 
@@ -107,11 +107,11 @@ export class MyRoomState extends Schema {
     this.countdown = GAME_DURATION
     this.votingCountdown = VOTING_TIME
 
-    for (let i = 0; i < FUSE_BOXES; i++) {
+    for (let i = 0; i <= FUSE_BOXES; i++) {
       this.fuseBoxes.push(new FuseBox(i))
     }
 
-    for (let j = 0; j < EQUIPT_COUNT; j++) {
+    for (let j = 0; j <= EQUIPT_COUNT; j++) {
       this.toFix.push(new Equiptment(j))
     }
   }

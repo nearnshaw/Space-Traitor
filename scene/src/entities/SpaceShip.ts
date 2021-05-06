@@ -68,7 +68,7 @@ let equiptMentList: EquiptmentData[] = [
 ]
 
 export class SpaceShip extends Entity {
-  public toFix: Equipment[]
+  public toFix: Equipment[] = []
   // public toSabbotage: Equipment[]
   public active: boolean = false
   public timeLeft: number
@@ -80,13 +80,10 @@ export class SpaceShip extends Entity {
 
     this.room = room
 
-    this.toFix = [] //new Array(equiptMentList.length)
-
     for (let i = 0; i < equiptMentList.length; i++) {
       let eq = new Equipment(
         i,
         equiptMentList[i].transform,
-        //equiptMentList[i].type,
         (state) => {
 
           let data: EquiptmentChange = {
@@ -129,9 +126,6 @@ export class SpaceShip extends Entity {
   reactToSingleChanges(change: EquiptmentChange): void {
     log('reacting to single change ', change)
     this.toFix[change.id].alterState(change.broken)
-    // this.timeLeft = change.timeLeft
-    // fixCounter.set(change.fixCount)
-    // UI changes
   }
 
   // protected loadFullState(fullState: FullState): void {

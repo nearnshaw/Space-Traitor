@@ -54,10 +54,10 @@ class Equiptment extends schema_1.Schema {
     constructor(id) {
         super();
         this.id = id;
-        this.broken = false;
+        this.broken = true;
     }
     reset() {
-        this.broken = false;
+        this.broken = true;
     }
 }
 __decorate([
@@ -116,10 +116,10 @@ class MyRoomState extends schema_1.Schema {
         this.traitors = 0;
         this.countdown = config_1.GAME_DURATION;
         this.votingCountdown = config_1.VOTING_TIME;
-        for (let i = 0; i < config_1.FUSE_BOXES; i++) {
+        for (let i = 0; i <= config_1.FUSE_BOXES; i++) {
             this.fuseBoxes.push(new FuseBox(i));
         }
-        for (let j = 0; j < config_1.EQUIPT_COUNT; j++) {
+        for (let j = 0; j <= config_1.EQUIPT_COUNT; j++) {
             this.toFix.push(new Equiptment(j));
         }
     }

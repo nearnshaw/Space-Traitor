@@ -1,21 +1,35 @@
 //import { getUserAccount } from '@decentraland/EthereumController'
 //import { getCurrentRealm } from '@decentraland/EnvironmentAPI'
-import { getUserData } from '@decentraland/Identity'
 
-export let userName: string
+import { getCurrentRealm, isPreviewMode } from '@decentraland/EnvironmentAPI';
+import { setUserData, userData } from './connection'
+
 
 export async function getUserInfo() {
   //const realm = await getCurrentRealm().then((r: any) => r.domain)
-  let userData = await getUserData()
-  userName = userData.displayName
-  log(
-    `https://peer.decentraland.org/content/entities/profiles?pointer=${userData.userId.toLowerCase()}`
-  )
+  if(!userData){
+    await setUserData()
+  }
+  const isPreview = await isPreviewMode();
+  const realm = await getCurrentRealm();
+  let dataURL = realm.domain + '/lambdas/profiles?field=snapshot&id=' + userData.userId.toLowerCase()
+  log("FETCHING THUMB FROM ", dataURL)
+  // log(
+  //   `https://peer.decentraland.org/content/entities/profiles?pointer=${userData.userId.toLowerCase()}`
+  // )
+
+  if (isPreview){
+    return {face128:'https://peer.decentraland.org/content/contents/QmcHi6q7N6Ltse4YgFv2WPTMDpKCup3SQAUgQJ2Tjxkitg'}
+  }
+
   return (await fetch(
-    `https://peer.decentraland.org/content/entities/profiles?pointer=${userData.userId.toLowerCase()}`
+    dataURL
   )
-    .then((res) => res.json())
-    .then((res) => (res.length ? res[0] : res))) as Profiles
+    .then((res) => { 
+      try{ return res.json()}
+      catch{ return null} 
+  } )
+    .then((res) => (res && res.length && res[0].avatars ? res[0].avatars[0].avatar.shapshots : null))) as Snapshots
 }
 
 export interface Profiles {

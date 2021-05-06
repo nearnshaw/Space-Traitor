@@ -131,6 +131,11 @@ export let MissionControlTips: npc.Dialog[] = [
     text: 'Congratulations, you have found the impostor and saved the station!',
     isEndOfDialog: true,
   },
+  {
+    name:"dead",
+    text: 'Looks like we were wrong about you. Well... hope the view out there is nice at least.',
+    isEndOfDialog: true,
+  },
 ]
 
 export let EvilRobotTips: npc.Dialog[] = [

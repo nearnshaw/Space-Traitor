@@ -53,13 +53,13 @@ export class Equipment extends Entity {
         () => {
           // this.alterState(false)
           this.changeListener(false)
-          server.send("shipChange",{ id: this.id, broken: false})
+          // server.send("shipChange",{ id: this.id, broken: false})
         },
         false
       )
     )
 
-    this.alterState(startBroken)
+    // this.alterState(startBroken)
     this.changeListener(startBroken)
 
     this.addComponentOrReplace(
@@ -71,6 +71,8 @@ export class Equipment extends Entity {
               return
             }
             this.miniGameMachine.minigame.Start()
+          } else {
+            log("Already fixed")
           }
         },
         {
