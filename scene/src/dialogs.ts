@@ -7,15 +7,15 @@ export let MissionControlBrief: npc.Dialog[] = [
     text: `Greetings. This is mission control. Are you briefed on the situation?`,
     isQuestion: true,
     buttons: [
-      { label: `Yes`, goToDialog: 1 },
+      { label: `Yes`, goToDialog: 1, triggeredActions:() => {
+        sendJoinRequest()
+      },
+     },
       { label: `No`, goToDialog: 2 },
     ],
   },
   {
     text: `Good luck then, officer`,
-    triggeredByNext: () => {
-      sendJoinRequest()
-    },
     isEndOfDialog: true,
   },
   {
@@ -62,15 +62,14 @@ export let MissionControlBrief: npc.Dialog[] = [
 
     isQuestion: true,
     buttons: [
-      { label: `Crew`, goToDialog: 10 },
+      { label: `Crew`, goToDialog: 10 , triggeredActions:() => {
+        sendJoinRequest()
+      } },
       { label: `Solo`, goToDialog: 11 },
     ],
   },
   {
     text: 'Good luck officer, we trust your judgement.',
-    triggeredByNext: () => {
-      sendJoinRequest()
-    },
     isEndOfDialog: true,
   },
   {
@@ -105,29 +104,35 @@ export let EvilRobotBrief: npc.Dialog[] = [
 
 export let MissionControlTips: npc.Dialog[] = [
   {
-    text: 'Keep it up! You need to do 10 of these to cool down the reactor.',
+    name:"firstFix",
+    text: 'Keep it up! You need to do 8 of these to cool down the reactor.',
     isEndOfDialog: true,
   },
   {
+    name:"voting",
     text: 'Time to vote someone out. Choose wisely.',
     isEndOfDialog: true,
   },
   {
+    name:"wrongVictim",
     text:
       'The person you ejected was a human. The enemy is still in the station!',
     isEndOfDialog: true,
   },
   {
+    name:"fixed",
     text:
       'Congratulations! You have stopped the chain reaction and saved the station!',
     isEndOfDialog: true,
   },
   {
+    name:"lost",
     text:
       'The reactor has passed the point of no return. Mission failed, evacuate!!',
     isEndOfDialog: true,
   },
   {
+    name:"impostor",
     text: 'Congratulations, you have found the impostor and saved the station!',
     isEndOfDialog: true,
   },

@@ -95,12 +95,15 @@ export function updateVotingUI(
 }
 
 export function updateVotingTimer(timeLeft: number) {
-  let seconds = (votingTimeLeft % 60).toString()
-  if (seconds.length < 2) {
-    seconds = '0'.concat(seconds)
-  }
+  // let seconds = (votingTimeLeft % 60).toString()
+  // let fullSeconds: string 
+  // if (seconds.length < 2) {
+  //   fullSeconds = "0" + seconds
+  // } else {
+  //   fullSeconds = seconds
+  // }
 
-  voteSeconds.text.value = seconds
+  voteSeconds.text.value = (votingTimeLeft % 60).toString()
   voteText.text.value = 'Voting time left          :'
   voteMinutes.text.value = Math.floor(timeLeft / 60).toString()
 }

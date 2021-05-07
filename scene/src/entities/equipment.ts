@@ -1,8 +1,8 @@
 import { playerIsTraitor } from './SpaceShip'
-import { fixCounter, minutesCounter, robotUI } from '../HUD'
+import { fixCounter, minutesCounter, robotUI, satelliteUI } from '../HUD'
 import * as ui from '@dcl/ui-scene-utils'
 import { MiniGameMachine } from '../minigames/MiniGameMachine'
-import { EvilRobotTips } from '../dialogs'
+import { EvilRobotTips, MissionControlTips } from '../dialogs'
 import { Siren } from './Siren'
 import { server } from 'game'
 
@@ -18,6 +18,8 @@ import { server } from 'game'
 // let redMaterial = new Material()
 // redMaterial.roughness = 1
 // redMaterial.albedoColor = Color3.FromInts(500, 150, 180) // Pink glow
+
+let firstFix:boolean = true
 
 export class Equipment extends Entity {
   broken: boolean = false
@@ -53,6 +55,10 @@ export class Equipment extends Entity {
         () => {
           // this.alterState(false)
           this.changeListener(false)
+          if(firstFix){
+            firstFix = false
+            satelliteUI.openDialogWindow(MissionControlTips, 'firstFix')
+          }
           // server.send("shipChange",{ id: this.id, broken: false})
         },
         false
@@ -99,6 +105,8 @@ export class Equipment extends Entity {
       const source = new AudioSource(this.fixSound)
       this.addComponentOrReplace(source)
       source.playing = true
+
+     
     }
   }
 

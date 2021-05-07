@@ -49,6 +49,17 @@ connect('my_room').then((room) => {
   server = room
 
   ship = new SpaceShip(room)
+
+  let dummyFUse = new FuseBox(
+   999,
+    {
+      position: new Vector3(0, -10,0),
+      rotation: Quaternion.Euler(0, 0, 0),
+    },
+    room
+  )
+
+
   fuse1 = new FuseBox(
     0,
     {
@@ -127,6 +138,17 @@ connect('my_room').then((room) => {
       if (!playerIsTraitor) {
         satelliteUI.openDialogWindow(MissionControlTips, 'dead')
       }
+    } else if(data.voted && !playerIsTraitor){
+      room.state.players.forEach(player => {
+        if(player.name == data.voted){
+          if(player.isTraitor){
+            satelliteUI.openDialogWindow(MissionControlTips, 'impostor')
+          } else {
+            satelliteUI.openDialogWindow(MissionControlTips, 'wrongVictim')
+          }
+        }
+      });
+      
     }
     ship.active = true
   })
@@ -302,7 +324,7 @@ export function resetGame() {
 
 export function finishGame(traitorWon: boolean) {
   ship.active = false
-  mainDoor.open()
+  mainDoor.close()
   movePlayerTo({ x: 1, y: 1, z: 1 })
   if (traitorWon && playerIsTraitor) {
     robotUI.openDialogWindow(EvilRobotTips, 3)
