@@ -1,6 +1,6 @@
 import * as ui from '@dcl/ui-scene-utils'
 import * as npc from '@dcl/npc-scene-utils'
-import {music} from './musicPlayer'
+import { music } from './musicPlayer'
 
 export let fixUIBck = new ui.LargeIcon('images/ui-gem.png', -20, 50, 256, 128, {
   sourceWidth: 512,
@@ -29,7 +29,15 @@ export let fixCounter = new ui.UICounter(
 )
 fixCounter.uiText.visible = false
 fixCounter.uiText.font = ui.SFHeavyFont
-export let secondsCounter = new ui.UICounter(0, -14, 49, Color4.Black(), 25, false, 2)
+export let secondsCounter = new ui.UICounter(
+  0,
+  -14,
+  49,
+  Color4.Black(),
+  25,
+  false,
+  2
+)
 secondsCounter.uiText.visible = false
 export let timerSeparaor = new ui.CornerLabel(':', -39, 49, Color4.Black())
 timerSeparaor.uiText.visible = false
@@ -66,14 +74,13 @@ export function startUI(time: number) {
     // engine.addSystem(timer)
     firstTime = false
   } else {
-   
     // timer.running = true
   }
 }
 
 export let timerCrytical: boolean = false
 
-export function updateCountdown(value:number){
+export function updateCountdown(value: number) {
   secondsCounter.set(value % 60)
   minutesCounter.set(Math.floor(value / 60))
   if (!timerCrytical && value < 90) {
@@ -81,37 +88,3 @@ export function updateCountdown(value:number){
     timerCrytical = true
   }
 }
-
-// class CountdownSystem implements ISystem {
-//   running: boolean = true
-//   timer: number = 1
-//   crytical: boolean = false
-//   update(dt: number) {
-//     if (this.running == false) return
-//     this.timer -= dt
-//     if (this.timer <= 0) {
-//       this.timer = 1
-//       ship.timeLeft -= 1
-//       secondsCounter.set(ship.timeLeft % 60)
-//       minutesCounter.set(Math.floor(ship.timeLeft / 60))
-
-//       if (!this.crytical && ship.timeLeft < 90) {
-//         music.playSong('Space-Traitor-3.mp3', 0.5)
-//         this.crytical = true
-//       }
-
-//       if (ship.timeLeft < 0) {
-//         ship.active = false
-//       }
-//       //   if (secondsCounter.read() < 0) {
-//       //     if (minutesCounter.read() <= 0) {
-//       //       // TIME UP
-//       //       // RESET
-//       //     } else {
-//       //       secondsCounter.set(59)
-//       //       minutesCounter.decrease()
-//       //     }
-//       //   }
-//     }
-//   }
-// }

@@ -14,7 +14,6 @@ export type JoinData = {
   thumb?: string
 }
 
-
 export type EquiptmentChange = {
   id: number
   broken: boolean

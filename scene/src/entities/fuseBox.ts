@@ -1,4 +1,3 @@
-
 import { playerIsTraitor } from './SpaceShip'
 import { robotUI } from '../HUD'
 import { EvilRobotTips } from '../dialogs'
@@ -65,11 +64,10 @@ export class FuseBox extends Entity {
     this.addComponent(new GLTFShape('models/Cable_Box.glb'))
     engine.addEntity(this)
 
- 
     this.addComponentOrReplace(
       new OnPointerDown(
         () => {
-          let data:FuseChange
+          let data: FuseChange
           if (boxState.doorOpen) {
             data = {
               id: this.id,
@@ -81,7 +79,7 @@ export class FuseBox extends Entity {
               doorOpen: true,
             }
           }
-          room.send("FuseBoxChange",data)
+          room.send('FuseBoxChange', data)
           //boxState.doorOpen = !boxState.doorOpen
         },
         {
@@ -107,11 +105,11 @@ export class FuseBox extends Entity {
       new OnPointerDown(
         (e) => {
           if (!boxState.doorOpen || boxState.redCableCut) return
-          room.send("FuseBoxChange",{
+          room.send('FuseBoxChange', {
             id: this.id,
             redCut: true,
             //isTraitor: playerIsTraitor,
-          } )
+          })
         },
         {
           button: ActionButton.POINTER,
@@ -138,7 +136,7 @@ export class FuseBox extends Entity {
       new OnPointerDown(
         (e) => {
           if (!boxState.doorOpen || boxState.greenCableCut) return
-          room.send("FuseBoxChange",{
+          room.send('FuseBoxChange', {
             id: this.id,
             greenCut: true,
           })
@@ -166,7 +164,7 @@ export class FuseBox extends Entity {
       new OnPointerDown(
         (e) => {
           if (!boxState.doorOpen || boxState.blueCableCut) return
-          room.send("FuseBoxChange",{
+          room.send('FuseBoxChange', {
             id: this.id,
             blueCut: true,
           })
@@ -221,7 +219,6 @@ export class FuseBox extends Entity {
   //     toggleCable(this, true, CableColors.Green)
   //   }
   // }
-
 }
 
 export function toggleBox(entity: FuseBox, value: boolean, playSound = true) {
@@ -247,7 +244,6 @@ export function toggleBox(entity: FuseBox, value: boolean, playSound = true) {
 
   boxState.doorOpen = value
 
-
   // toggleCable(entity, boxState.redCableCut, CableColors.Red)
   // toggleCable(entity, boxState.blueCableCut, CableColors.Blue)
   // toggleCable(entity, boxState.greenCableCut, CableColors.Green)
@@ -256,7 +252,7 @@ export function toggleBox(entity: FuseBox, value: boolean, playSound = true) {
 export function toggleCable(
   entity: FuseBox,
   value: boolean,
-  color: CableColors,
+  color: CableColors
 ) {
   let boxState = entity.getComponent(CableBox)
 
@@ -284,8 +280,6 @@ export function toggleCable(
   } else {
     cableClip.reset()
   }
-
 }
 
 // if broken, add smoke??
-

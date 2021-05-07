@@ -1,11 +1,10 @@
 import * as ui from '@dcl/ui-scene-utils'
 import * as utils from '@dcl/ecs-scene-utils'
-import {  robotUI, satelliteUI } from './HUD'
+import { robotUI, satelliteUI } from './HUD'
 import { playerIsTraitor } from './entities/SpaceShip'
 import { EvilRobotTips, MissionControlTips } from './dialogs'
 import { Room } from 'colyseus.js'
 import { userData } from './connection'
-
 
 let votingUI: ui.CustomPrompt
 export let playerVoted: boolean = false
@@ -26,7 +25,9 @@ export function openVotingUI(room: Room) {
   votingUI.addText("Who's the traitor?", 0, 100)
 
   let seconds = (votingTimeLeft % 60).toString()
-  if(seconds.length < 2){ seconds = "0" + seconds }
+  if (seconds.length < 2) {
+    seconds = '0' + seconds
+  }
 
   voteSeconds = votingUI.addText(seconds, 220, -200)
   voteText = votingUI.addText('Voting time left          :', 130, -200)
@@ -38,9 +39,8 @@ export function openVotingUI(room: Room) {
 
   let offset = 30
   let i = 0
-  room.state.players.forEach(player => {
-
-    if(player.ready && player.alive){
+  room.state.players.forEach((player) => {
+    if (player.ready && player.alive) {
       let PlayerName = player.name
       votingUI.addButton(
         PlayerName,
@@ -52,9 +52,9 @@ export function openVotingUI(room: Room) {
         },
         ui.ButtonStyles.SQUARESILVER
       )
-      i ++
+      i++
     }
-   
+
     votingUI.addIcon(
       // 'https://peer.decentraland.org/content/contents/' + player.thumb,
       player.thumb,
@@ -69,9 +69,7 @@ export function openVotingUI(room: Room) {
     )
     // Player icon
     offset -= 50
-  
-    
-  });
+  })
 }
 
 export function updateVotingUI(
@@ -96,19 +94,20 @@ export function updateVotingUI(
   )
 }
 
-export function updateVotingTimer(timeLeft: number){
-
+export function updateVotingTimer(timeLeft: number) {
   let seconds = (votingTimeLeft % 60).toString()
-  if(seconds.length < 2){ seconds = "0".concat(seconds) }
+  if (seconds.length < 2) {
+    seconds = '0'.concat(seconds)
+  }
 
   voteSeconds.text.value = seconds
   voteText.text.value = 'Voting time left          :'
   voteMinutes.text.value = Math.floor(timeLeft / 60).toString()
 }
 
-export function closeVotingUI(playerToKick: string|null, isTraitor: boolean) {
+export function closeVotingUI(playerToKick: string | null, isTraitor: boolean) {
   votingUI.hide()
- 
+
   //votingTimer.running = false
 
   if (!playerToKick) {
@@ -138,11 +137,10 @@ export function vote(votedPlayer: string, room: Room) {
 
   playerVoted = true
 
-
-  room.send("vote", {
-      voter: userData.displayName,
-      voted: votedPlayer,
-      })
+  room.send('vote', {
+    voter: userData.displayName,
+    voted: votedPlayer,
+  })
 
   votingUI.addText('Waiting for others to vote', 0, -140, Color4.Red(), 20)
 }

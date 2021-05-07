@@ -132,8 +132,9 @@ export let MissionControlTips: npc.Dialog[] = [
     isEndOfDialog: true,
   },
   {
-    name:"dead",
-    text: 'Looks like we were wrong about you. Well... hope the view out there is nice at least.',
+    name: 'dead',
+    text:
+      'Looks like we were wrong about you. Well... hope the view out there is nice at least.',
     isEndOfDialog: true,
   },
 ]

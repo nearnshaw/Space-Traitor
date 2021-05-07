@@ -4,7 +4,7 @@ import * as ui from '@dcl/ui-scene-utils'
 import { MiniGameMachine } from '../minigames/MiniGameMachine'
 import { EvilRobotTips } from '../dialogs'
 import { Siren } from './Siren'
-import {server} from  'game'
+import { server } from 'game'
 
 //Reusable materials
 // export let neutralMaterial = new Material()
@@ -72,7 +72,7 @@ export class Equipment extends Entity {
             }
             this.miniGameMachine.minigame.Start()
           } else {
-            log("Already fixed")
+            log('Already fixed')
           }
         },
         {

@@ -22,7 +22,12 @@ import {
   updateCountdown,
 } from './HUD'
 import { Button } from './entities/Button'
-import { CableColors, FuseBox, toggleBox, toggleCable } from './entities/fuseBox'
+import {
+  CableColors,
+  FuseBox,
+  toggleBox,
+  toggleCable,
+} from './entities/fuseBox'
 import {
   MissionControlBrief,
   EvilRobotTips,
@@ -94,7 +99,7 @@ connect('my_room').then((room) => {
 
   room.onMessage('end', (data) => {
     log('END game')
-    finishGame(data.traitorWon) 
+    finishGame(data.traitorWon)
   })
 
   room.onMessage('reset', (data) => {
@@ -104,7 +109,7 @@ connect('my_room').then((room) => {
 
   room.onMessage('startvote', (data) => {
     log('Starting Votes')
-    if(!sceneLoaded) return
+    if (!sceneLoaded) return
     // if (!playerIsAlive) return
     music.playSong('tyops_game-movie-suspense-theme.mp3', 0.5)
     ship.active = false
@@ -113,44 +118,44 @@ connect('my_room').then((room) => {
 
   room.onMessage('endvote', (data) => {
     log('Ending votes')
-    if(!sceneLoaded) return
+    if (!sceneLoaded) return
     // if (!playerIsAlive) return
     music.playSong('Space-Traitor-3.mp3')
     closeVotingUI(data.voted, data.wasTraitor)
     if (data.voted == userData.displayName) {
       movePlayerTo({ x: 1, y: 1, z: 1 })
-      if(!playerIsTraitor){
-        satelliteUI.openDialogWindow(MissionControlTips, "dead")
+      if (!playerIsTraitor) {
+        satelliteUI.openDialogWindow(MissionControlTips, 'dead')
       }
     }
     ship.active = true
   })
 
   room.state.fuseBoxes.onAdd = (box) => {
-    log("Added fusebox => ", box.id)
+    log('Added fusebox => ', box.id)
     box.listen('doorOpen', (value) => {
       log('box open ', box.id, value)
-      if(!sceneLoaded) return
+      if (!sceneLoaded) return
       toggleBox(fuseBoxes[box.id], value, true)
     })
     box.listen('redCut', (value) => {
-      log('red cut ',box.id, value)
-      if(!sceneLoaded) return
+      log('red cut ', box.id, value)
+      if (!sceneLoaded) return
       toggleCable(fuseBoxes[box.id], value, CableColors.Red)
     })
     box.listen('greenCut', (value) => {
-      log('green cut ',box.id, value)
-      if(!sceneLoaded) return
+      log('green cut ', box.id, value)
+      if (!sceneLoaded) return
       toggleCable(fuseBoxes[box.id], value, CableColors.Green)
     })
     box.listen('blueCut', (value) => {
-      log('blue cut ',box.id, value)
-      if(!sceneLoaded) return
+      log('blue cut ', box.id, value)
+      if (!sceneLoaded) return
       toggleCable(fuseBoxes[box.id], value, CableColors.Blue)
     })
     box.listen('broken', (value) => {
-      log('broken ',box.id, value)
-      if(!sceneLoaded) return
+      log('broken ', box.id, value)
+      if (!sceneLoaded) return
       if (playerIsTraitor) {
         robotUI.openDialogWindow(EvilRobotTips, 0)
       }
@@ -158,9 +163,9 @@ connect('my_room').then((room) => {
   }
 
   room.state.toFix.onAdd = (eqpt) => {
-    log("added eqpt ", eqpt.id)
+    log('added eqpt ', eqpt.id)
     eqpt.listen('broken', (value) => {
-      if(!sceneLoaded) return
+      if (!sceneLoaded) return
       log('eqpt broken ', eqpt.id, value)
       ship.reactToSingleChanges({ broken: value, id: eqpt.id })
     })
@@ -175,12 +180,11 @@ connect('my_room').then((room) => {
       log('player died ', player.name, value)
       //if(player.name == myName){}
     })
-    if(player.name == userData.displayName){
-
-      player.listen('isTraitor',(value)=>{
-        log("YOU ARE THE TRAITOR ", value)
+    if (player.name == userData.displayName) {
+      player.listen('isTraitor', (value) => {
+        log('YOU ARE THE TRAITOR ', value)
         setPlayerIsTraitor(value)
-        if(value){
+        if (value) {
           if (satelliteUI.isDialogOpen) {
             satelliteUI.closeDialogWindow()
           }
@@ -188,17 +192,17 @@ connect('my_room').then((room) => {
         }
       })
     }
-    player.votes.onAdd = (voter)=>{
-      log('player ', player.name, " has a new vote from ", voter)
+    player.votes.onAdd = (voter) => {
+      log('player ', player.name, ' has a new vote from ', voter)
       if (room.state.paused) {
         let voterThumb: string = null
         let votedPosition: number = 0
         let votedPlayerFound: boolean = false
-        room.state.players.forEach(iteratedPlayer => {
-          if(iteratedPlayer.name == voter) voterThumb = iteratedPlayer.thumb
-          if(iteratedPlayer.name == player.name) votedPlayerFound = true 
-          if(iteratedPlayer.alive && !votedPlayerFound) votedPosition++
-        });
+        room.state.players.forEach((iteratedPlayer) => {
+          if (iteratedPlayer.name == voter) voterThumb = iteratedPlayer.thumb
+          if (iteratedPlayer.name == player.name) votedPlayerFound = true
+          if (iteratedPlayer.alive && !votedPlayerFound) votedPosition++
+        })
         updateVotingUI(votedPosition, 0, player.votes.length, voterThumb)
       }
     }
@@ -217,7 +221,6 @@ connect('my_room').then((room) => {
   room.state.listen('countdown', (value) => {
     if (!room.state.paused) {
       updateCountdown(value)
-
     }
   })
 
@@ -227,14 +230,11 @@ connect('my_room').then((room) => {
     }
   })
 
-
   // horrible hacks
   toggleCable(fuseBoxes[0], false, CableColors.Red)
   toggleCable(fuseBoxes[0], false, CableColors.Green)
   toggleCable(fuseBoxes[0], false, CableColors.Blue)
   ship.reactToSingleChanges({ broken: false, id: 0 })
-
-
 })
 
 let doorBell = new Button(
@@ -254,7 +254,8 @@ export async function sendJoinRequest() {
   log(userInfo)
   server.send('ready', {
     sender: userData.displayName,
-    thumb: userInfo? userInfo.face128
+    thumb: userInfo
+      ? userInfo.face128
       : 'https://peer.decentraland.org/content/contents/QmcHi6q7N6Ltse4YgFv2WPTMDpKCup3SQAUgQJ2Tjxkitg',
   })
 }
@@ -267,17 +268,14 @@ export let fuse2: FuseBox
 export let fuse3: FuseBox
 export let fuse4: FuseBox
 
-
 export async function newGame(room: Room) {
   resetGame()
-  if(!userData){
+  if (!userData) {
     await setUserData()
   }
   startUI(room.state.countdown)
 
-
   setPlayerIsAlive(true)
-
 
   mainDoor.open()
   utils.setTimeout(30000, () => {
@@ -308,15 +306,11 @@ export function finishGame(traitorWon: boolean) {
   movePlayerTo({ x: 1, y: 1, z: 1 })
   if (traitorWon && playerIsTraitor) {
     robotUI.openDialogWindow(EvilRobotTips, 3)
-  
   } else if (traitorWon && !playerIsTraitor) {
     satelliteUI.openDialogWindow(MissionControlTips, 4)
-  
   } else if (!traitorWon && playerIsTraitor) {
     robotUI.openDialogWindow(EvilRobotTips, 4)
-  
   } else if (!traitorWon && !playerIsTraitor) {
-  
     satelliteUI.openDialogWindow(MissionControlTips, 3)
   }
 }

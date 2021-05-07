@@ -1,4 +1,3 @@
-
 import { Equipment } from './equipment'
 import * as utils from '@dcl/ecs-scene-utils'
 import { Button } from './Button'
@@ -8,8 +7,6 @@ import { Door } from './door'
 import { EquiptmentChange, EquiptmentData } from 'src/types'
 import { movePlayerTo } from '@decentraland/RestrictedActions'
 import { Room } from 'colyseus.js'
-
-
 
 let equiptMentList: EquiptmentData[] = [
   {
@@ -85,12 +82,11 @@ export class SpaceShip extends Entity {
         i,
         equiptMentList[i].transform,
         (state) => {
-
           let data: EquiptmentChange = {
             id: i,
-            broken: state
+            broken: state,
           }
-          room.send("shipChange", data)
+          room.send('shipChange', data)
         },
         equiptMentList[i].startBroken
       )
@@ -116,14 +112,13 @@ export class SpaceShip extends Entity {
       },
       new GLTFShape('models/Danger_SciFi_Button.glb'),
       () => {
-        room.send("startvote")
+        room.send('startvote')
       },
       'Emergency Meeting'
     )
 
     return
   }
-
 
   reactToSingleChanges(change: EquiptmentChange): void {
     log('reacting to single change ', change)
@@ -132,41 +127,41 @@ export class SpaceShip extends Entity {
 
   // protected loadFullState(fullState: FullState): void {
   //   log('loading full state ', fullState)
-    // if (fullState.active && !this.active) {
-    //   // Start new game
-    //   startUI(fullState.timeLeft)
-    //   playerIsTraitor = fullState.playerIsTraitor
-    //   if (fullState.playerIsTraitor) {
-    //     if (satelliteUI.isDialogOpen) {
-    //       satelliteUI.closeDialogWindow()
-    //     }
-    //     robotUI.openDialogWindow(EvilRobotBrief, 0)
-    //   }
-    //   mainDoor.open()
-    //   utils.setTimeout(30000, () => {
-    //     mainDoor.close()
-    //   })
+  // if (fullState.active && !this.active) {
+  //   // Start new game
+  //   startUI(fullState.timeLeft)
+  //   playerIsTraitor = fullState.playerIsTraitor
+  //   if (fullState.playerIsTraitor) {
+  //     if (satelliteUI.isDialogOpen) {
+  //       satelliteUI.closeDialogWindow()
+  //     }
+  //     robotUI.openDialogWindow(EvilRobotBrief, 0)
+  //   }
+  //   mainDoor.open()
+  //   utils.setTimeout(30000, () => {
+  //     mainDoor.close()
+  //   })
 
-    //   music.playSong('Space-Traitor-2.mp3', 0.25)
+  //   music.playSong('Space-Traitor-2.mp3', 0.25)
 
-    //   //resetAllBoxes()
-    // } else if (!fullState.active && this.active) {
-    //   // finish game
-    //   //mainDoor.open()
-    // }
-    // for (let i = 0; i < this.toFix.length; i++) {
-    //   this.toFix[i].alterState(fullState.toFix[i].broken)
-    // }
+  //   //resetAllBoxes()
+  // } else if (!fullState.active && this.active) {
+  //   // finish game
+  //   //mainDoor.open()
+  // }
+  // for (let i = 0; i < this.toFix.length; i++) {
+  //   this.toFix[i].alterState(fullState.toFix[i].broken)
+  // }
 
-    // this.active = fullState.active
-    // this.timeLeft = fullState.timeLeft
-    // if (fixCounter) {
-    //   fixCounter.set(fullState.fixCount)
-    // }
+  // this.active = fullState.active
+  // this.timeLeft = fullState.timeLeft
+  // if (fixCounter) {
+  //   fixCounter.set(fullState.fixCount)
+  // }
 
-    // if (playerIsTraitor) {
-    //   log('PLAYER IS TRAITOR')
-    // }
+  // if (playerIsTraitor) {
+  //   log('PLAYER IS TRAITOR')
+  // }
   // }
 
   resetShip(): void {
@@ -180,11 +175,11 @@ export class SpaceShip extends Entity {
 export let playerIsTraitor: boolean = false
 export let playerIsAlive: boolean = true
 
-export function setPlayerIsTraitor(value:boolean){
+export function setPlayerIsTraitor(value: boolean) {
   playerIsTraitor = value
 }
 
-export function setPlayerIsAlive(value:boolean){
+export function setPlayerIsAlive(value: boolean) {
   playerIsAlive = value
 }
 
