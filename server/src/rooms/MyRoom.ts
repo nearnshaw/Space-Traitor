@@ -38,14 +38,14 @@ export class MyRoom extends Room<MyRoomState> {
 
     this.onMessage('ready', (client: Client, data: JoinData) => {
       if (this.state.active) {
-        client.send( 'msg', { text: 'Wait for the current game to end' })
+        client.send('msg', { text: 'Wait for the current game to end' })
         return
       }
 
       const player = this.state.players.get(client.sessionId)
 
       if (player.ready) {
-        client.send( 'msg', {
+        client.send('msg', {
           text: "You're already in the game. Waiting for other players.",
         })
         return
@@ -94,17 +94,14 @@ export class MyRoom extends Room<MyRoomState> {
     this.onMessage('shipChange', (client: Client, data: EquiptmentChange) => {
       const player = this.state.players.get(client.sessionId)
 
-
       if (!this.state.active) {
         return
       }
-
 
       if (player.isTraitor && !data.broken) return
 
       if (!player.isTraitor && data.broken) return
 
-      
       let eqpt: Equiptment = null
       this.state.toFix.forEach((currenteqpt) => {
         if (currenteqpt.id == data.id) {
@@ -112,13 +109,17 @@ export class MyRoom extends Room<MyRoomState> {
         }
       })
 
-      if(eqpt.broken == data.broken){
-        console.log("equiptment ", data.id, " was already in the state ", data.broken)
+      if (eqpt.broken == data.broken) {
+        console.log(
+          'equiptment ',
+          data.id,
+          ' was already in the state ',
+          data.broken
+        )
         return
       }
 
-      console.log("equiptment ", data.id, " new broken state ", data.broken)
-
+      console.log('equiptment ', data.id, ' new broken state ', data.broken)
 
       eqpt.broken = data.broken
 
@@ -127,7 +128,7 @@ export class MyRoom extends Room<MyRoomState> {
         if (this.state.fixCount >= FIXES_TO_WIN) {
           setTimeout(() => {
             this.end()
-          },2000)
+          }, 2000)
         }
       }
     })
@@ -136,7 +137,16 @@ export class MyRoom extends Room<MyRoomState> {
       if (!this.state.active) {
         return
       }
-      console.log("fusebox ", data.id, " open ", data.doorOpen, "RGB", data.redCut, data.greenCut, data.blueCut)
+      console.log(
+        'fusebox ',
+        data.id,
+        ' open ',
+        data.doorOpen,
+        'RGB',
+        data.redCut,
+        data.greenCut,
+        data.blueCut
+      )
 
       let box: FuseBox = null
       this.state.fuseBoxes.forEach((currentBox) => {
@@ -172,7 +182,7 @@ export class MyRoom extends Room<MyRoomState> {
           box.broken = true
         }
       } else {
-        client.send( 'msg', {
+        client.send('msg', {
           text: 'Only a traitor would sabotage their own ship like that.',
         })
       }
@@ -183,7 +193,7 @@ export class MyRoom extends Room<MyRoomState> {
         console.log('room inactive or already voting')
         return
       }
-      console.log("STARTING VOTES ", VOTING_TIME, " time left")
+      console.log('STARTING VOTES ', VOTING_TIME, ' time left')
 
       let playersAlive: number = 0
 
@@ -192,11 +202,11 @@ export class MyRoom extends Room<MyRoomState> {
       })
 
       if (playersAlive <= 2) {
-        this.broadcast('msg',{
-          text: 'too few players left to vote'})
+        this.broadcast('msg', {
+          text: 'too few players left to vote',
+        })
         return
       } else {
-       
         this.state.votingCountdown = VOTING_TIME
         this.state.players.forEach((player) => {
           player.votes = []
@@ -214,36 +224,38 @@ export class MyRoom extends Room<MyRoomState> {
         console.log('room inactive or not paused')
         return
       }
-      console.log(data.voter, " VOTED FOR ", data.voted)
+      console.log(data.voter, ' VOTED FOR ', data.voted)
 
-      let voter:Player = null
-      let voted:Player = null
-      let playersAlive: number = 0
+      let voter: Player = null
+      let voted: Player = null
+
       this.state.players.forEach((player) => {
-        if (player.alive) playersAlive++
-        if(player.name == data.voter) voter = player
-        if(player.name == data.voted) voted = player
+        if (player.name == data.voter) voter = player
+        if (player.name == data.voted) voted = player
       })
 
-      if(!voter || !voted) return
+      if (!voter || !voted) return
       if (!voter.alive || !voter.ready) return
       if (!voted.alive || !voted.ready) return
 
       voted.votes.push(data.voter)
 
       let voteCount = 0
+      let playersAlive: number = 0
       this.state.players.forEach((player) => {
-        voteCount += player.votes.length
+        if (player.alive) {
+          playersAlive++
+          voteCount += player.votes.length
+        }
       })
-     
+
       if (voteCount >= playersAlive) {
-          setTimeout(() => {
-            this.endVotes()
-          }, 2000)
+        setTimeout(() => {
+          this.endVotes()
+        }, 2000)
       } else {
-          console.log('We have ', voteCount, ' votes, we need ', playersAlive)
+        console.log('We have ', voteCount, ' votes, we need ', playersAlive)
       }
-    
     })
   }
 
@@ -294,17 +306,16 @@ export class MyRoom extends Room<MyRoomState> {
     })
 
     setTimeout(() => {
-     
-        this.broadcast('endvote', {
-          voted: playerWithMostVotes.name,
-          wasTraitor: traitorKilled,
-        })
-        this.state.paused = false
-        setTimeout(() => {
-          if (playersAlive < 2 || traitorKilled) {
-            this.end()
-          }
-        },3000)
+      this.broadcast('endvote', {
+        voted: playerWithMostVotes.name,
+        wasTraitor: traitorKilled,
+      })
+      this.state.paused = false
+      setTimeout(() => {
+        if (playersAlive < 2 || traitorKilled) {
+          this.end()
+        }
+      }, 3000)
     }, 3000)
   }
 
@@ -375,15 +386,17 @@ export class MyRoom extends Room<MyRoomState> {
     // Maybe I can just add a listener in the scene
     this.state.players.forEach((player) => {
       let currentClient: Client
-      this.clients.forEach((client)=>{
-        if (client.id == player.id){
+      this.clients.forEach((client) => {
+        if (client.id == player.id) {
           currentClient = client
         }
       })
       if (player.isTraitor) {
-        currentClient.send("msg", {text:'You are the treasoning android!'})
+        currentClient.send('msg', { text: 'You are the treasoning android!' })
       } else {
-        currentClient.send("msg", {text:'One of your mates is a treacherous android.'})
+        currentClient.send('msg', {
+          text: 'One of your mates is a treacherous android.',
+        })
       }
     })
 
@@ -496,10 +509,9 @@ export class MyRoom extends Room<MyRoomState> {
       let randomI = Math.floor(Math.random() * this.state.toFix.length)
 
       let eqpt: Equiptment
-      this.state.toFix.forEach(element => {
-        if(element.id == randomI) eqpt = element
-        
-      });
+      this.state.toFix.forEach((element) => {
+        if (element.id == randomI) eqpt = element
+      })
       if (!eqpt.broken) {
         eqpt.broken = true
         brokeSomething = true

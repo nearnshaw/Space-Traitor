@@ -37,7 +37,7 @@ export async function getUserInfo() {
     })
     .then((res) =>
       res && res.length && res[0].avatars
-        ? res[0].avatars[0].avatar.shapshots
+        ? res[0].avatars[0].avatar.snapshots
         : null
     )) as Snapshots
 }

@@ -20,6 +20,7 @@ import {
   robotUI,
   fixCounter,
   updateCountdown,
+  closeAllUIs,
 } from './HUD'
 import { Button } from './entities/Button'
 import {
@@ -51,14 +52,13 @@ connect('my_room').then((room) => {
   ship = new SpaceShip(room)
 
   let dummyFUse = new FuseBox(
-   999,
+    999,
     {
-      position: new Vector3(0, -10,0),
+      position: new Vector3(0, -10, 0),
       rotation: Quaternion.Euler(0, 0, 0),
     },
     room
   )
-
 
   fuse1 = new FuseBox(
     0,
@@ -110,18 +110,20 @@ connect('my_room').then((room) => {
 
   room.onMessage('end', (data) => {
     log('END game')
+    closeAllUIs(ship)
     finishGame(data.traitorWon)
   })
 
   room.onMessage('reset', (data) => {
     log('RESET game')
+    closeAllUIs(ship)
     resetGame()
   })
 
   room.onMessage('startvote', (data) => {
     log('Starting Votes')
     if (!sceneLoaded) return
-    // if (!playerIsAlive) return
+    closeAllUIs(ship)
     music.playSong('tyops_game-movie-suspense-theme.mp3', 0.5)
     ship.active = false
     openVotingUI(room)
@@ -130,25 +132,25 @@ connect('my_room').then((room) => {
   room.onMessage('endvote', (data) => {
     log('Ending votes')
     if (!sceneLoaded) return
-    // if (!playerIsAlive) return
+    closeAllUIs(ship)
     music.playSong('Space-Traitor-3.mp3')
     closeVotingUI(data.voted, data.wasTraitor)
     if (data.voted == userData.displayName) {
       movePlayerTo({ x: 1, y: 1, z: 1 })
+      setPlayerIsAlive(false)
       if (!playerIsTraitor) {
         satelliteUI.openDialogWindow(MissionControlTips, 'dead')
       }
-    } else if(data.voted && !playerIsTraitor){
-      room.state.players.forEach(player => {
-        if(player.name == data.voted){
-          if(player.isTraitor){
+    } else if (data.voted && !playerIsTraitor) {
+      room.state.players.forEach((player) => {
+        if (player.name == data.voted) {
+          if (player.isTraitor) {
             satelliteUI.openDialogWindow(MissionControlTips, 'impostor')
           } else {
             satelliteUI.openDialogWindow(MissionControlTips, 'wrongVictim')
           }
         }
-      });
-      
+      })
     }
     ship.active = true
   })
@@ -297,7 +299,12 @@ export async function newGame(room: Room) {
   }
   startUI(room.state.countdown)
 
-  setPlayerIsAlive(true)
+  setPlayerIsAlive(false)
+  room.state.players.forEach((player) => {
+    if (player.name == userData.displayName && player.alive) {
+      setPlayerIsAlive(true)
+    }
+  })
 
   mainDoor.open()
   utils.setTimeout(30000, () => {
@@ -326,6 +333,7 @@ export function finishGame(traitorWon: boolean) {
   ship.active = false
   mainDoor.close()
   movePlayerTo({ x: 1, y: 1, z: 1 })
+  setPlayerIsAlive(false)
   if (traitorWon && playerIsTraitor) {
     robotUI.openDialogWindow(EvilRobotTips, 3)
   } else if (traitorWon && !playerIsTraitor) {
@@ -333,7 +341,7 @@ export function finishGame(traitorWon: boolean) {
   } else if (!traitorWon && playerIsTraitor) {
     robotUI.openDialogWindow(EvilRobotTips, 4)
   } else if (!traitorWon && !playerIsTraitor) {
-    satelliteUI.openDialogWindow(MissionControlTips, 3)
+    satelliteUI.openDialogWindow(MissionControlTips, 'fixed')
   }
 }
 

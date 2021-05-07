@@ -1,7 +1,7 @@
 import * as ui from '@dcl/ui-scene-utils'
 import * as utils from '@dcl/ecs-scene-utils'
 import { robotUI, satelliteUI } from './HUD'
-import { playerIsTraitor } from './entities/SpaceShip'
+import { playerIsAlive, playerIsTraitor } from './entities/SpaceShip'
 import { EvilRobotTips, MissionControlTips } from './dialogs'
 import { Room } from 'colyseus.js'
 import { userData } from './connection'
@@ -47,6 +47,7 @@ export function openVotingUI(room: Room) {
         0,
         offset,
         () => {
+          if (!playerIsAlive) return
           log('Voted for ', PlayerName, i)
           vote(PlayerName, room)
         },
@@ -66,6 +67,7 @@ export function openVotingUI(room: Room) {
         }
       )
       portrait.image.onClick = new OnClick(() => {
+        if (!playerIsAlive) return
         log('Voted for ', PlayerName, i)
         vote(PlayerName, room)
       })

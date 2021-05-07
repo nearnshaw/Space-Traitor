@@ -11,4 +11,4 @@ exports.randomBreakProbability = 6;
 exports.EQUIPT_COUNT = 8;
 exports.startBrokenArray = [true, true, true, true, true, true, true, true];
 exports.PORT = 8081;
-exports.sabotagePenalty = 40;
+exports.sabotagePenalty = 60;

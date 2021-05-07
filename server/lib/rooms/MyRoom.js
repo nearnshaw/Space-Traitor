@@ -72,10 +72,10 @@ class MyRoom extends colyseus_1.Room {
                 }
             });
             if (eqpt.broken == data.broken) {
-                console.log("equiptment ", data.id, " was already in the state ", data.broken);
+                console.log('equiptment ', data.id, ' was already in the state ', data.broken);
                 return;
             }
-            console.log("equiptment ", data.id, " new broken state ", data.broken);
+            console.log('equiptment ', data.id, ' new broken state ', data.broken);
             eqpt.broken = data.broken;
             if (!data.broken) {
                 this.state.fixCount += 1;
@@ -90,7 +90,7 @@ class MyRoom extends colyseus_1.Room {
             if (!this.state.active) {
                 return;
             }
-            console.log("fusebox ", data.id, " open ", data.doorOpen, "RGB", data.redCut, data.greenCut, data.blueCut);
+            console.log('fusebox ', data.id, ' open ', data.doorOpen, 'RGB', data.redCut, data.greenCut, data.blueCut);
             let box = null;
             this.state.fuseBoxes.forEach((currentBox) => {
                 if (currentBox.id == data.id) {
@@ -132,7 +132,7 @@ class MyRoom extends colyseus_1.Room {
                 console.log('room inactive or already voting');
                 return;
             }
-            console.log("STARTING VOTES ", config_1.VOTING_TIME, " time left");
+            console.log('STARTING VOTES ', config_1.VOTING_TIME, ' time left');
             let playersAlive = 0;
             this.state.players.forEach((player) => {
                 if (player.alive)
@@ -140,7 +140,7 @@ class MyRoom extends colyseus_1.Room {
             });
             if (playersAlive <= 2) {
                 this.broadcast('msg', {
-                    text: 'too few players left to vote'
+                    text: 'too few players left to vote',
                 });
                 return;
             }
@@ -161,13 +161,10 @@ class MyRoom extends colyseus_1.Room {
                 console.log('room inactive or not paused');
                 return;
             }
-            console.log(data.voter, " VOTED FOR ", data.voted);
+            console.log(data.voter, ' VOTED FOR ', data.voted);
             let voter = null;
             let voted = null;
-            let playersAlive = 0;
             this.state.players.forEach((player) => {
-                if (player.alive)
-                    playersAlive++;
                 if (player.name == data.voter)
                     voter = player;
                 if (player.name == data.voted)
@@ -181,8 +178,12 @@ class MyRoom extends colyseus_1.Room {
                 return;
             voted.votes.push(data.voter);
             let voteCount = 0;
+            let playersAlive = 0;
             this.state.players.forEach((player) => {
-                voteCount += player.votes.length;
+                if (player.alive) {
+                    playersAlive++;
+                    voteCount += player.votes.length;
+                }
             });
             if (voteCount >= playersAlive) {
                 setTimeout(() => {
@@ -299,10 +300,12 @@ class MyRoom extends colyseus_1.Room {
                 }
             });
             if (player.isTraitor) {
-                currentClient.send("msg", { text: 'You are the treasoning android!' });
+                currentClient.send('msg', { text: 'You are the treasoning android!' });
             }
             else {
-                currentClient.send("msg", { text: 'One of your mates is a treacherous android.' });
+                currentClient.send('msg', {
+                    text: 'One of your mates is a treacherous android.',
+                });
             }
         });
         // maybe I dont need this eiter, listener to active = true
@@ -388,7 +391,7 @@ class MyRoom extends colyseus_1.Room {
         while (!brokeSomething) {
             let randomI = Math.floor(Math.random() * this.state.toFix.length);
             let eqpt;
-            this.state.toFix.forEach(element => {
+            this.state.toFix.forEach((element) => {
                 if (element.id == randomI)
                     eqpt = element;
             });

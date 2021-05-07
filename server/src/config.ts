@@ -17,4 +17,4 @@ export const startBrokenArray = [true, true, true, true, true, true, true, true]
 
 export const PORT = 8081
 
-export const sabotagePenalty = 40
+export const sabotagePenalty = 60

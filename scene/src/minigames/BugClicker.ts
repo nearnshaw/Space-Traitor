@@ -40,7 +40,7 @@ export class BugClicker extends MiniGame {
     this.bugRepositionDelay -= dt
 
     if (this.bugRepositionDelay <= 0) {
-      this.bugRepositionDelay = Scalar.RandomRange(0.4, 0.9)
+      this.bugRepositionDelay = Scalar.RandomRange(0.9, 1.5)
       this.RepositionBug()
     }
   }
