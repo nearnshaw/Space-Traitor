@@ -52,23 +52,28 @@ export function openVotingUI(room: Room) {
         },
         ui.ButtonStyles.SQUARESILVER
       )
-      i++
-    }
 
-    votingUI.addIcon(
-      // 'https://peer.decentraland.org/content/contents/' + player.thumb,
-      player.thumb,
-      -100,
-      offset,
-      64 * 0.7,
-      64 * 0.7,
-      {
-        sourceHeight: 128,
-        sourceWidth: 128,
-      }
-    )
-    // Player icon
-    offset -= 50
+      let portrait = votingUI.addIcon(
+        // 'https://peer.decentraland.org/content/contents/' + player.thumb,
+        player.thumb,
+        -100,
+        offset,
+        64 * 0.7,
+        64 * 0.7,
+        {
+          sourceHeight: 128,
+          sourceWidth: 128,
+        }
+      )
+      portrait.image.onClick = new OnClick(() => {
+        log('Voted for ', PlayerName, i)
+        vote(PlayerName, room)
+      })
+
+      i++
+
+      offset -= 50
+    }
   })
 }
 
@@ -96,7 +101,7 @@ export function updateVotingUI(
 
 export function updateVotingTimer(timeLeft: number) {
   // let seconds = (votingTimeLeft % 60).toString()
-  // let fullSeconds: string 
+  // let fullSeconds: string
   // if (seconds.length < 2) {
   //   fullSeconds = "0" + seconds
   // } else {

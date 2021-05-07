@@ -1,14 +1,28 @@
-# Space Traitor
+# Welcome to Colyseus!
 
-This is a multiplayer game about deceiving and guessing other player's identities.
+This project has been created using [⚔️ `create-colyseus-app`](https://github.com/colyseus/create-colyseus-app/) - an npm init template for kick starting a Colyseus project in TypeScript.
 
-![](./screenshot.jpeg)
+[Documentation](http://docs.colyseus.io/)
 
-At least 3 (or better 4) players must ring the bell of the space station, then the game starts.
+## :crossed_swords: Usage
 
-A traitor is picked randomly, that player will secretly play against the others.
+```
+npm start
+```
 
-## Tech
+## Structure
 
-This project serves as an example on how to deploy a server with secure websocket.
-It opens a websocket server on port 8081 which can then be proxied via nginx to add TLS certificate
+- `index.ts`: main entry point, register an empty room handler and attach [`@colyseus/monitor`](https://github.com/colyseus/colyseus-monitor)
+- `src/rooms/MyRoom.ts`: an empty room handler for you to implement your logic
+- `src/rooms/schema/MyRoomState.ts`: an empty schema used on your room's state.
+- `loadtest/example.ts`: scriptable client for the loadtest tool (see `npm run loadtest`)
+- `package.json`:
+    - `scripts`:
+        - `npm start`: runs `ts-node-dev index.ts`
+        - `npm run loadtest`: runs the [`@colyseus/loadtest`](https://github.com/colyseus/colyseus-loadtest/) tool for testing the connection, using the `loadtest/example.ts` script.
+- `tsconfig.json`: TypeScript configuration file
+
+
+## License
+
+MIT

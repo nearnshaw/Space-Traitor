@@ -6,26 +6,106 @@ At least 3 (or better 4) players must ring the bell of the space station, then t
 
 A traitor is picked randomly, that player will secretly play against the others.
 
+![](https://raw.githubusercontent.com/nearnshaw/Space-Traitor/master/screenshot.jpeg)
+
+This scene is built using Colyseus as an authoritative server, syncing all changes to players via Websockets.
+
 # Instructions
 
 ### Play online
 
 - In decentraland, deployed at:
 
-https://play.decentraland.org/?position=-64,-34
-
-- Deployed to Vercel Now:
-
-https://space-traitor.vercel.app/?position=-64,-34
-
+https://play.decentraland.org/?position=-73,-49
 
 ### Run locally
-- run npm start in server's folder
-- change scene/src/config.ts const local: boolean = false to const local: boolean = true
-- run dcl start in scene folder
+
+- open a console on the `server` folder
+- run `npm run build`, then `npm run start` in server's folder
+- open another console in the `scene` folder
+- run `dcl start`
 - open 3 tabs at "http://127.94.0.1:8000/?SCENE_DEBUG_PANEL&position=-64,-34&realm=localhost-stub", click on the button by the door to register as a player
 - the traitor will be notified
 
 ### Test the scene as 1 player
 
-To be able to test the scene as 1 person you can choose the "F" option twice during the button dialogue
+To be able to test the scene as 1 person you can choose the "F" option twice during the button dialogue.
+
+### Game mechanics
+
+Once at least 3 players have accepted the game, a countdown will start. During this countdown, other players can join, otherwise the game begins.
+
+Once the game begins, one of the players is selected at random to be the traitor, this player is given instructions to act secretively.
+
+A 5 minute countdown starts, non-traitor players hav to fix 8 machines before this countdown ends, otherwise the traitor wins. The machines are fixed by playing a randomly selected UI mini-game. Some equipment might randomly break over time too.
+
+The traitor can also sabotage fuse boxes by cutting cables. By cutting all cables in a fusebox, the time for solving the game gets reduced significantly, favoring the traitor.
+
+At any moment during the game, anyone can hit the vote button on the main hall and start a voting round. All players left alive must vote for someone to be kicked out. If the traitor is kicked out, other players win.
+
+That's why the traitor must act discretely, as cutting wires out in the open will alert them of who he is and vote him out. The game is designed to make everyone doubt each other and suspicions to fly all over the place.
+
+## Using Colyseus SDK with Decentraland
+
+Install `colyseus.js`:
+
+```
+npm install --save colyseus.js
+```
+
+Add `colyseus.js` to your `"bundleDependencies"` in your `package.json`:
+
+```json
+  "bundleDependencies": [
+    "colyseus.js"
+  ]
+```
+
+To avoid TypeScript compilation errors you'll need to edit `tsconfig.json`, and include a few `///<reference` to your source-code, as you can see in the [scene/src/connection.ts](scene/src/connection.ts) file.
+
+```json
+{
+  "compilerOptions": {
+    // ...
+    "noLib": false
+    // ...
+  }
+}
+```
+
+```typescript
+///<reference lib="es2015.symbol" />
+///<reference lib="es2015.symbol.wellknown" />
+///<reference lib="es2015.collection" />
+///<reference lib="es2015.iterable" />
+
+import { Client } from 'colyseus.js'
+```
+
+> The Colyseus SDK requires a few TypeScript libraries that are excluded by default by Decentraland.
+
+---
+
+## Creating a Colyseus server:
+
+```
+npm init colyseus-app ./server
+```
+
+## Deploying to [Colyseus Arena](https://www.colyseus.io/arena)
+
+```
+npm run build
+```
+
+Upload the `lib` folder from the Arena control panel.
+
+## More
+
+Learn more about how to build your own scenes in our [documentation](https://docs.decentraland.org/) site.
+
+If something doesn’t work, please [file an issue](https://github.com/decentraland-scenes/Awesome-Repository/issues/new).
+
+## Copyright info
+
+This scene is protected with a standard Apache 2 licence. See the terms and conditions in the [LICENSE](/LICENSE) file.
